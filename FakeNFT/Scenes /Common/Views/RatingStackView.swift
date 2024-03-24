@@ -27,12 +27,12 @@ final class RatingStackView: UIStackView {
     }
     
     func set(rating: Int) {
-        for i in 0..<rating {
-            arrOfStars[i].tintColor = .yellow
-        }
-        
-        for i in rating..<arrOfStars.count {
-            arrOfStars[i].tintColor = .segmentInactive
+        for i in 0..<arrOfStars.count {
+            if i < rating {
+                arrOfStars[i].tintColor = .yellow
+            } else {
+                arrOfStars[i].tintColor = .segmentInactive
+            }
         }
     }
     
@@ -40,6 +40,7 @@ final class RatingStackView: UIStackView {
         arrOfStars.forEach { addArrangedSubview($0) }
         spacing = 2
         axis = .horizontal
+        distribution = .fillEqually
     }
 }
 

@@ -124,6 +124,9 @@ struct DefaultNetworkClient: NetworkClient {
             urlRequest.httpBody = dtoEncoded
         }
 
+        let token = "6209b976-c7aa-4061-8574-573765a55e71"
+        urlRequest.setValue("\(token)", forHTTPHeaderField: "X-Practicum-Mobile-Token")
+        
         return urlRequest
     }
 

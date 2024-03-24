@@ -4,11 +4,11 @@ final class TabBarController: UITabBarController {
 
     var servicesAssembly: ServicesAssembly!
 
-    private let catalogTabBarItem = UITabBarItem(
-        title: NSLocalizedString("Tab.catalog", comment: ""),
-        image: UIImage(systemName: "square.stack.3d.up.fill"),
-        tag: 0
-    )
+//    private let catalogTabBarItem = UITabBarItem(
+//        title: NSLocalizedString("Tab.catalog", comment: ""),
+//        image: UIImage(systemName: "square.stack.3d.up.fill"),
+//        tag: 0
+//    )
 
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
@@ -22,15 +22,17 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let dataProvider = DataProvider(networkClient: DefaultNetworkClient())
+        let catalogPresenter = CatalogPresenter(dataProvider: dataProvider)
         let catalogController = createNavigation(with: L10n.Tab.catalog,
-                                                 and: UIImage(systemName: "square.stack.3d.up.fill"),
-                                                 vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
+                                                 and: UIImage(systemName: "rectangle.stack.fill"),
+                                                 vc: CatalogViewController(presenter: catalogPresenter))
 
         self.setViewControllers([catalogController], animated: true)
 
         view.backgroundColor = .systemBackground
     }
-
+    
     private func createNavigation(with title: String,
                                   and image: UIImage?,
                                   vc: UIViewController) -> UINavigationController {

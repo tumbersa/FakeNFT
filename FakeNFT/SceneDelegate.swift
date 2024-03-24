@@ -15,6 +15,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowsScene)
 
         let tabBarController = TabBarController(servicesAssembly: servicesAssembly)
+        
 
         window.rootViewController = tabBarController
 

@@ -10,10 +10,6 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum L10n {
-  internal enum Catalog {
-    /// Открыть Nft
-    internal static let openNft = L10n.tr("Localizable", "Catalog.openNft", fallback: "Открыть Nft")
-  }
   internal enum Error {
     /// Произошла ошибка сети
     internal static let network = L10n.tr("Localizable", "Error.network", fallback: "Произошла ошибка сети")
@@ -29,6 +25,8 @@ internal enum L10n {
     internal static let catalog = L10n.tr("Localizable", "Tab.catalog", fallback: "Каталог")
   }
   internal enum Catalog {
+      /// Открыть Nft
+      internal static let openNft = L10n.tr("Localizable", "Catalog.openNft", fallback: "Открыть Nft")
     /// Закрыть
     internal static let close = L10n.tr("Localizable", "catalog.Close", fallback: "Закрыть")
     /// По названию

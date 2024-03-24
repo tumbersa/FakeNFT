@@ -8,11 +8,12 @@
 import Foundation
 
 struct NFTCatalogModel: Codable {
-    let createdAt: Date
-        let name: String
-        let cover: String
-        let nfts: [Int]
-        let description: String
-        let author: Int
-        let id: String
+    let name: String
+    let cover: String
+    let nfts: [String]
+    let id: String
+    var nftCount: Int {
+        nfts.count
+    }
+    
 }

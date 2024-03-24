@@ -30,9 +30,7 @@ final class CatalogViewCell: UITableViewCell {
     }()
     
     static let catalogViewCellReuseIdentifier = "CatalogViewCellReuseIdentifier"
-    
     private let cellImageHeight: CGFloat = 140
-    
     private let cellLabelSpacing: CGFloat = 4
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

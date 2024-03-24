@@ -6,8 +6,13 @@
 //
 
 import UIKit
+import Kingfisher
 
-final class CatalogViewController: UIViewController {
+protocol CatalogViewControllerProtocol: AnyObject {
+    func reloadTableView()
+}
+
+final class CatalogViewController: UIViewController, CatalogViewControllerProtocol {
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -37,27 +42,53 @@ final class CatalogViewController: UIViewController {
         return tableView
     }()
     
+    private var presenter: CatalogPresenterProtocol
+    
     private let tableViewTopSpacing: CGFloat = 20
     private let tableViewSideSpacing: CGFloat = 16
+    
+    init(presenter: CatalogPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        presenter.viewController = self
+        loadNftToCatalog()
+    }
+    
+    func reloadTableView() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
+        }
     }
     
     //MARK: - @objc func
     
     @objc func showSortingMenu() {
         let alertMenu = UIAlertController(title: L10n.Catalog.sorting, message: nil, preferredStyle: .actionSheet)
-        alertMenu.addAction(UIAlertAction(title: L10n.Catalog.sortByName, style: .default, handler: { [weak self] _ in }))
-        alertMenu.addAction(UIAlertAction(title: L10n.Catalog.sortByNFTCount, style: .default, handler: { [weak self] _ in }))
+        alertMenu.addAction(UIAlertAction(title: L10n.Catalog.sortByName, style: .default, handler: { [weak self] _ in
+            self?.presenter.sortNFT(by: .name)
+            self?.reloadTableView()
+        }))
+        alertMenu.addAction(UIAlertAction(title: L10n.Catalog.sortByNFTCount, style: .default, handler: { [weak self] _ in
+            self?.presenter.sortNFT(by: .nftCount)
+            self?.reloadTableView()
+        }))
         alertMenu.addAction(UIAlertAction(title: L10n.Catalog.close, style: .cancel))
         
         present(alertMenu, animated: true)
     }
     
     @objc func loadNftToCatalog() {
-        
+        presenter.fetchCollections()
     }
     
 }
@@ -65,12 +96,16 @@ final class CatalogViewController: UIViewController {
 
 extension CatalogViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        3
+        presenter.dataSource.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogViewCell.catalogViewCellReuseIdentifier,
                                                        for: indexPath) as? CatalogViewCell else { return UITableViewCell() }
+        let nftModel = presenter.dataSource[indexPath.row]
+        let url = URL(string: nftModel.cover.encodeUrl)
+        cell.cellImage.kf.setImage(with: url)
+        cell.cellNameLabel.text = " \(nftModel.name) \(nftModel.nftCount)"
         return cell
     }
     
@@ -102,6 +137,7 @@ private extension CatalogViewController {
     func configUI() {
         view.backgroundColor = Asset.Colors.ypWhite.color
         view.addSubview(tableView)
+        tableView.refreshControl = refreshControl
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: tableViewTopSpacing),

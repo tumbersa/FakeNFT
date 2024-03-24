@@ -9,9 +9,8 @@ import Foundation
 
 struct NFTCollectionsRequest: NetworkRequest {
     var endpoint: URL?
-    
     init() {
-        guard let endpoint = URL(string: "https://64858e8ba795d24810b71189.mockapi.io/api/v1/collections") else { return }
+        guard let endpoint = URL(string: "https://d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net/api/v1/collections") else { return }
         self.endpoint = endpoint
     }
 }

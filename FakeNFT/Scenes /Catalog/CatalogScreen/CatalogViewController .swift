@@ -7,6 +7,7 @@
 
 import UIKit
 import Kingfisher
+import ProgressHUD
 
 protocol CatalogViewControllerProtocol: AnyObject {
     func reloadTableView()
@@ -46,6 +47,7 @@ final class CatalogViewController: UIViewController, CatalogViewControllerProtoc
     
     private let tableViewTopSpacing: CGFloat = 20
     private let tableViewSideSpacing: CGFloat = 16
+    private let tableViewHeight: CGFloat = 187
     
     init(presenter: CatalogPresenterProtocol) {
         self.presenter = presenter
@@ -67,6 +69,7 @@ final class CatalogViewController: UIViewController, CatalogViewControllerProtoc
         DispatchQueue.main.async {
             self.tableView.reloadData()
             self.refreshControl.endRefreshing()
+            ProgressHUD.dismiss()
         }
     }
     
@@ -88,6 +91,7 @@ final class CatalogViewController: UIViewController, CatalogViewControllerProtoc
     }
     
     @objc func loadNftToCatalog() {
+        ProgressHUD.show()
         presenter.fetchCollections()
     }
     
@@ -106,11 +110,12 @@ extension CatalogViewController: UITableViewDataSource {
         let url = URL(string: nftModel.cover.encodeUrl)
         cell.cellImage.kf.setImage(with: url)
         cell.cellNameLabel.text = " \(nftModel.name) (\(nftModel.nftCount))"
+        ProgressHUD.dismiss()
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        180
+        tableViewHeight
     }
 }
 //MARK: - UITableViewDelegate

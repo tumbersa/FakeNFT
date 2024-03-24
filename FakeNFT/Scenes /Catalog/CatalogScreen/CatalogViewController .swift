@@ -105,7 +105,7 @@ extension CatalogViewController: UITableViewDataSource {
         let nftModel = presenter.dataSource[indexPath.row]
         let url = URL(string: nftModel.cover.encodeUrl)
         cell.cellImage.kf.setImage(with: url)
-        cell.cellNameLabel.text = " \(nftModel.name) \(nftModel.nftCount)"
+        cell.cellNameLabel.text = " \(nftModel.name) (\(nftModel.nftCount))"
         return cell
     }
     
@@ -140,7 +140,7 @@ private extension CatalogViewController {
         tableView.refreshControl = refreshControl
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: tableViewTopSpacing),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: tableViewSideSpacing),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -tableViewSideSpacing),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)

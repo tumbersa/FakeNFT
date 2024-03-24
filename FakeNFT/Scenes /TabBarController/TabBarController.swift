@@ -26,7 +26,11 @@ final class TabBarController: UITabBarController {
                                                  and: UIImage(systemName: "square.stack.3d.up.fill"),
                                                  vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
 
-        self.setViewControllers([catalogController], animated: true)
+        let statisticsController = UINavigationController(rootViewController: StatisticsViewController())
+        statisticsController.title = L10n.TabBar.statisticTabBarTitle
+        statisticsController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
+        
+        self.setViewControllers([catalogController, statisticsController], animated: true)
 
         view.backgroundColor = .systemBackground
     }

@@ -13,6 +13,8 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
     
     static let reuseID = "NFTCollectionViewCellThreePerRow"
     
+    private var id: String = ""
+    
     private lazy var nftImageView: UIImageView = {
         let nftImageView = UIImageView()
         nftImageView.layer.cornerRadius = 12
@@ -135,12 +137,29 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
     }
     
     @objc private func likeTapped() {
-        
+        delegate?.likeTapped(id: id)
         print("tap on like")
     }
     
     @objc private func cartTapped() {
+        delegate?.cartTapped(id: id)
         print("tap on cart")
+    }
+    
+    func setLikedStateToLikeButton(isLiked: Bool) {
+        if isLiked {
+            likeButton.tintColor = Asset.Colors.Universal.ypUniRed.color
+        } else {
+            likeButton.tintColor = Asset.Colors.Universal.ypUniWhite.color
+        }
+    }
+    
+    func setAddedStateToCart(isAdded: Bool) {
+        if isAdded {
+            cartButton.setImage(UIImage(resource: .cartDelete).withTintColor(.label), for: .normal)
+        } else {
+            cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
+        }
     }
     
     func set(data: NftStatistics) {
@@ -149,5 +168,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         ratingStackView.set(rating: data.rating)
         let numStr = String(format: "%.2f", data.price)
         priceLabel.text = numStr + " ETH"
+        id = data.id
     }
 }

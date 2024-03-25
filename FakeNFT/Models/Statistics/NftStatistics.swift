@@ -12,4 +12,5 @@ struct NftStatistics {
     let images: [URL]
     let rating: Int
     let price: Double
+    let id: String
 }

@@ -7,8 +7,11 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
+    
+    static let reuseID = "NFTCollectionViewCellThreePerRow"
     
     private lazy var nftImageView: UIImageView = {
         let nftImageView = UIImageView()
@@ -37,6 +40,10 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         nameLabel.font = .bodyBold
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.text = "Archie"
+        #warning("Проверить нужно ли уменьшать текст")
+        nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        nameLabel.numberOfLines = 2
+        nameLabel.adjustsFontSizeToFitWidth = true
         return nameLabel
     }()
     
@@ -68,37 +75,35 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
     private func layoutUI() {
         contentView.addSubview(nftImageView)
         nftImageView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.snp.top)
-            make.leading.equalTo(contentView.snp.leading)
-            make.width.equalTo(108)
-            make.height.equalTo(108)
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.height.equalTo(contentView.snp.width)
         }
         
         nftImageView.addSubview(likeButton)
         likeButton.snp.makeConstraints { make in
             make.height.equalTo(40)
             make.width.equalTo(40)
-            make.trailing.equalTo(nftImageView.snp.trailing)
-            make.top.equalTo(nftImageView.snp.top)
+            make.trailing.equalToSuperview()
+            make.top.equalToSuperview()
         }
         
         ratingStackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(ratingStackView)
         ratingStackView.snp.makeConstraints { make in
             make.top.equalTo(nftImageView.snp.bottom).offset(8)
-            make.leading.equalTo(contentView.snp.leading)
+            make.leading.equalToSuperview()
             make.trailing.equalTo(nftImageView.snp.trailing).offset(-40)
-            make.height.equalTo(12)
-            
         }
         
         bottomContainerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(bottomContainerView)
         bottomContainerView.snp.makeConstraints { make in
-            make.leading.equalTo(contentView.snp.leading)
+            make.leading.equalToSuperview()
             make.top.equalTo(ratingStackView.snp.bottom).offset(5)
-            make.trailing.equalTo(nftImageView.snp.trailing)
-            make.bottom.greaterThanOrEqualTo(contentView.snp.bottom).offset(-21)
+            make.trailing.equalToSuperview()
+            make.bottom.greaterThanOrEqualToSuperview().offset(-21)
         }
         
         bottomContainerView.addSubview(cartImageView)
@@ -106,14 +111,13 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
             make.width.equalTo(40)
-            
         }
         
         bottomContainerView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.top.equalToSuperview()
-            make.trailing.lessThanOrEqualTo(cartImageView.snp.leading)
+            make.trailing.equalTo(cartImageView.snp.leading)
         }
         
         bottomContainerView.addSubview(priceLabel)
@@ -121,9 +125,17 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             make.leading.equalToSuperview()
             make.bottom.equalToSuperview()
             make.top.equalTo(nameLabel.snp.bottom).offset(4)
-            make.trailing.lessThanOrEqualTo(cartImageView.snp.leading)
+            make.trailing.equalTo(cartImageView.snp.leading)
         }
         
+    }
+    
+    func set(data: NftStatistics) {
+        nftImageView.kf.setImage(with: data.images[0])
+        nameLabel.text = data.name
+        ratingStackView.set(rating: data.rating)
+        let numStr = String(format: "%.2f", data.price)
+        priceLabel.text = numStr + " ETH"
     }
 }
 

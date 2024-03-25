@@ -11,7 +11,9 @@ final class RatingStackView: UIStackView {
     
     private lazy var arrOfStars: [UIImageView] = {
         (0...4).map{ _ in
-            UIImageView(image: UIImage(systemName: "star.fill") )
+            let imageView = UIImageView(image: UIImage(systemName: "star.fill") )
+            imageView.contentMode = .scaleAspectFit
+            return imageView
         }
     }()
     
@@ -29,7 +31,7 @@ final class RatingStackView: UIStackView {
     func set(rating: Int) {
         for i in 0..<arrOfStars.count {
             if i < rating {
-                arrOfStars[i].tintColor = .yellow
+                arrOfStars[i].tintColor = Asset.Colors.Universal.ypUniYellow.color
             } else {
                 arrOfStars[i].tintColor = .segmentInactive
             }

@@ -28,6 +28,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             UIImage(systemName: "heart.fill"),
             for: .normal)
         likeButton.tintColor = .white
+        likeButton.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         return likeButton
     }()
@@ -40,7 +41,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         nameLabel.font = .bodyBold
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.text = "Archie"
-        #warning("Проверить нужно ли уменьшать текст")
+        
         nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         nameLabel.numberOfLines = 2
         nameLabel.adjustsFontSizeToFitWidth = true
@@ -55,12 +56,15 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         return priceLabel
     }()
     
-    private lazy var cartImageView: UIImageView = {
-        let cartImageView = UIImageView(image: UIImage(resource: .cartAdd))
-        cartImageView.translatesAutoresizingMaskIntoConstraints = false
-        cartImageView.contentMode = .scaleAspectFit
-        return cartImageView
+    private lazy var cartButton: UIButton = {
+        let cartButton = UIButton()
+        cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
+        cartButton.addTarget(self, action: #selector(cartTapped), for: .touchUpInside)
+        cartButton.translatesAutoresizingMaskIntoConstraints = false
+        return cartButton
     }()
+    
+    weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -81,7 +85,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             make.height.equalTo(contentView.snp.width)
         }
         
-        nftImageView.addSubview(likeButton)
+        contentView.addSubview(likeButton)
         likeButton.snp.makeConstraints { make in
             make.height.equalTo(40)
             make.width.equalTo(40)
@@ -106,8 +110,8 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             make.bottom.greaterThanOrEqualToSuperview().offset(-21)
         }
         
-        bottomContainerView.addSubview(cartImageView)
-        cartImageView.snp.makeConstraints { make in
+        bottomContainerView.addSubview(cartButton)
+        cartButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview()
             make.centerY.equalToSuperview()
             make.width.equalTo(40)
@@ -117,7 +121,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         nameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.top.equalToSuperview()
-            make.trailing.equalTo(cartImageView.snp.leading)
+            make.trailing.equalTo(cartButton.snp.leading)
         }
         
         bottomContainerView.addSubview(priceLabel)
@@ -125,9 +129,18 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
             make.leading.equalToSuperview()
             make.bottom.equalToSuperview()
             make.top.equalTo(nameLabel.snp.bottom).offset(4)
-            make.trailing.equalTo(cartImageView.snp.leading)
+            make.trailing.equalTo(cartButton.snp.leading)
         }
         
+    }
+    
+    @objc private func likeTapped() {
+        
+        print("tap on like")
+    }
+    
+    @objc private func cartTapped() {
+        print("tap on cart")
     }
     
     func set(data: NftStatistics) {
@@ -137,9 +150,4 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
         let numStr = String(format: "%.2f", data.price)
         priceLabel.text = numStr + " ETH"
     }
-}
-
-@available(iOS 17.0, *)
-#Preview {
-    NFTCollectionViewCellThreePerRow(frame: .zero)
 }

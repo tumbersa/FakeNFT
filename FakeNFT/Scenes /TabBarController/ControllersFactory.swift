@@ -7,6 +7,10 @@
 
 import UIKit
 
+enum ControllersType {
+    case catalogViewController
+}
+
 final class ControllersFactory {
     func setupController(of type: ControllersType) -> UINavigationController {
         switch type {

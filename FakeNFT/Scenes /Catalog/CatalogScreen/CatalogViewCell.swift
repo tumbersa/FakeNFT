@@ -41,6 +41,12 @@ final class CatalogViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func makeCell(nftCatalogModel nftModel: NFTCatalogModel, coverURL url: URL?) -> CatalogViewCell {
+        self.cellImage.kf.setImage(with: url)
+        self.cellNameLabel.text = " \(nftModel.name) (\(nftModel.nftCount))"
+        return self
+    }
 }
 
 private extension CatalogViewCell {

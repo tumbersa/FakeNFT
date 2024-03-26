@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Kingfisher
 
-final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
+final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentifying {
     
     static let reuseID = "NFTCollectionViewCellThreePerRow"
     
@@ -138,12 +138,10 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell {
     
     @objc private func likeTapped() {
         delegate?.likeTapped(id: id)
-        print("tap on like")
     }
     
     @objc private func cartTapped() {
         delegate?.cartTapped(id: id)
-        print("tap on cart")
     }
     
     func setLikedStateToLikeButton(isLiked: Bool) {

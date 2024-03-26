@@ -7,10 +7,14 @@
 
 import Foundation
 
-struct NftStatistics {
+struct NftStatistics: Hashable {
     let name: String
     let images: [URL]
     let rating: Int
     let price: Double
     let id: String
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

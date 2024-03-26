@@ -26,6 +26,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     private var flagToFetchNft: Int = 0 {
         didSet {
             if flagToFetchNft == 2 {
+                ProgressHUD.dismiss()
                 for id in ids {
                     loadNft(id: id)
                 }
@@ -57,6 +58,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     }
     
     func viewDidLoad() {
+        ProgressHUD.show()
         loadProfile(httpMethod: .get)
         loadCart(httpMethod: .get)
     }

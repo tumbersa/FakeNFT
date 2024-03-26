@@ -1,8 +1,6 @@
 import UIKit
 
-enum ControllersType {
-    case catalogViewController
-}
+
 
 final class TabBarController: UITabBarController {
 

@@ -3,10 +3,7 @@ import UIKit
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
-    let servicesAssembly = ServicesAssembly(
-        networkClient: DefaultNetworkClient(),
-        nftStorage: NftStorageImpl()
-    )
+    let controllersFactory = ControllersFactory()
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
 
@@ -14,7 +11,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowsScene)
 
-        let tabBarController = TabBarController(servicesAssembly: servicesAssembly)
+        let tabBarController = TabBarController(controllersFactory: controllersFactory)
 
         window.rootViewController = tabBarController
 
@@ -22,7 +19,5 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         window.makeKeyAndVisible()
 
-//        let tabBarController = window?.rootViewController as? TabBarController
-//        tabBarController?.servicesAssembly = servicesAssembly
     }
 }

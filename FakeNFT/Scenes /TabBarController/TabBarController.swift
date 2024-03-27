@@ -4,12 +4,6 @@ final class TabBarController: UITabBarController {
 
     var servicesAssembly: ServicesAssembly!
 
-    private let catalogTabBarItem = UITabBarItem(
-        title: NSLocalizedString("Tab.catalog", comment: ""),
-        image: UIImage(systemName: "square.stack.3d.up.fill"),
-        tag: 0
-    )
-
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
         super.init(nibName: nil, bundle: nil)
@@ -21,24 +15,34 @@ final class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let profileViewController = ProfileViewController(
+            servicesAssembly: servicesAssembly
+        )
 
-        let catalogController = createNavigation(with: L10n.Tab.catalog,
-                                                 and: UIImage(systemName: "square.stack.3d.up.fill"),
-                                                 vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
+        let profileNavigationController = UINavigationController(rootViewController: profileViewController)
 
-        self.setViewControllers([catalogController], animated: true)
+        profileNavigationController.tabBarItem = UITabBarItem(
+            title: L10n.TabBar.profileTabBarTitle,
+            image: UIImage(named: "profile_tab_inactive"),
+            selectedImage: UIImage(named: "profile_tab_active")
+        )
+
+        let profilePresenter = ProfilePresenter()
+        profileViewController.presenter = profilePresenter
+        profilePresenter.view = profileViewController
+
+        self.setViewControllers([profileNavigationController], animated: true)
 
         view.backgroundColor = .systemBackground
+
     }
 
     private func createNavigation(with title: String,
                                   and image: UIImage?,
-                                  vc: UIViewController) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: vc)
-        nav.navigationBar.prefersLargeTitles = true
+                                  viewController: UIViewController) -> UINavigationController {
+        let nav = UINavigationController(rootViewController: viewController)
         nav.tabBarItem.title = title
         nav.tabBarItem.image = image
-        nav.viewControllers.first?.navigationItem.title = title
 
         return nav
     }

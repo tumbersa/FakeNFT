@@ -242,6 +242,12 @@ private extension EditProfileView {
         ].forEach {
             self.addSubview($0)
         }
+
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(handleTapGesture)
+        )
+        self.addGestureRecognizer(tapGesture)
     }
 
     // MARK: - Setup Constraints
@@ -294,6 +300,13 @@ private extension EditProfileView {
 
     @objc func changeImageDidTap() {
         print("Change image did tap")
+    }
+
+    @objc func handleTapGesture() {
+        print("Tap Gesture did tap")
+        nameTextField.resignFirstResponder()
+        descriptionTextView.resignFirstResponder()
+        siteTextField.resignFirstResponder()
     }
 }
 

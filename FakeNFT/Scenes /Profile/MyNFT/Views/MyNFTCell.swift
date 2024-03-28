@@ -10,6 +10,7 @@ import UIKit
 
 // MARK: - MyNFTCell
 final class MyNFTCell: UITableViewCell {
+
     // MARK: - Public properties
     public static let cellID = String(describing: MyNFTCell.self)
 
@@ -86,6 +87,7 @@ final class MyNFTCell: UITableViewCell {
         return stackView
     }()
 
+    // MARK: - Lifecycle
     override init(
         style: UITableViewCell.CellStyle,
         reuseIdentifier: String?
@@ -112,7 +114,9 @@ final class MyNFTCell: UITableViewCell {
     }
  }
 
+// MARK: - Private Extension
 private extension MyNFTCell {
+    // MARK: - Setup Views
     func setupViews() {
         self.backgroundColor = .systemBackground
 
@@ -138,6 +142,7 @@ private extension MyNFTCell {
         }
     }
 
+    // MARK: - Setup Constraints
     func setupConstraints() {
         image.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)

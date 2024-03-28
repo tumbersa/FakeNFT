@@ -23,6 +23,7 @@ final class MyNFTView: UIView {
         )
     ]
 
+    // MARK: - UI
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(
@@ -38,6 +39,7 @@ final class MyNFTView: UIView {
         return tableView
     }()
 
+    // MARK: - Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -49,12 +51,16 @@ final class MyNFTView: UIView {
     }
 }
 
+// MARK: - Private Extension
 private extension MyNFTView {
+
+    // MARK: - Setup Views
     func setupViews() {
         self.backgroundColor = .systemBackground
         self.addSubview(tableView)
     }
 
+    // MARK: - Setup Constraints
     func setupConstraints() {
         tableView.snp.makeConstraints { make in
             make.top.bottom.equalTo(self.safeAreaLayoutGuide)
@@ -63,6 +69,7 @@ private extension MyNFTView {
     }
 }
 
+// MARK: - UITableViewDataSource
 extension MyNFTView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myNFTs.count
@@ -82,6 +89,7 @@ extension MyNFTView: UITableViewDataSource {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension MyNFTView: UITableViewDelegate {
 
 }

@@ -10,6 +10,7 @@ import UIKit
 
 // MARK: - MyNFT ViewController
 final class MyNFTViewController: UIViewController {
+
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
         let button = UIBarButtonItem(
@@ -46,17 +47,22 @@ final class MyNFTViewController: UIViewController {
     }
 }
 
+// MARK: - Private Extension
 private extension MyNFTViewController {
+
+    // MARK: - Setup Navigation
     func setupNavigation() {
         navigationItem.title = L10n.Profile.myNFT
         navigationItem.leftBarButtonItem = navBackButton
         navigationItem.rightBarButtonItem = filterButton
     }
 
+    // MARK: - Setup Views
     func setupViews() {
         view.addSubview(myNFTView)
     }
 
+    // MARK: - Setup Constraints
     func setupConstraints() {
         myNFTView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

@@ -44,6 +44,8 @@ internal enum L10n {
         internal static let loadAvatar = L10n.tr("Localizable", "Profile.loadAvatar", fallback: "Загрузить изображение")
         /// Сменить фото
         internal static let changeImage = L10n.tr("Localizable", "Profile.changeImage", fallback: "Сменить фото")
+        /// Цена
+        internal static let priceText = L10n.tr("Localizable", "Profile.priceText", fallback: "Цена")
     }
 
     internal enum Error {

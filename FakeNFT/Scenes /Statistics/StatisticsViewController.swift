@@ -83,8 +83,6 @@ extension StatisticsViewController: StatisticsView {
         snapshot.appendSections([.main])
         snapshot.appendItems(nfts)
         
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
             
             self.dataSource.apply(snapshot, animatingDifferences: true)
             
@@ -99,6 +97,6 @@ extension StatisticsViewController: StatisticsView {
                     cell.delegate = presenter
                 }
             }
-        }
+        
     }
 }

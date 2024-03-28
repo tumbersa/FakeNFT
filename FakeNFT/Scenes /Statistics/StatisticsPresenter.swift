@@ -11,8 +11,8 @@ import ProgressHUD
 protocol StatisticsPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
     func viewDidLoad()
     var arrOfNFT: [NftStatistics] { get }
-    var idLikes: [String] { get }
-    var idAddedToCart: [String] { get }
+    var idLikes: Set<String> { get }
+    var idAddedToCart: Set<String> { get }
 }
 
 protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
@@ -32,13 +32,14 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                 }
             }
             if flagToFetchNft > 2 {
+                ProgressHUD.dismiss()
                 view?.updateData(on: arrOfNFT)
             }
         }
     }
     
-    private(set) var idLikes: [String] = []
-    private(set) var idAddedToCart: [String] = []
+    private(set) var idLikes: Set<String> = []
+    private(set) var idAddedToCart: Set<String> = []
     private var profile: Profile?
     private var cart: Cart?
     
@@ -47,8 +48,8 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     private let networkClient: NetworkClient
     private lazy var service: NftService = NftServiceImpl(networkClient: networkClient, storage: NftStorageImpl())
     
-    private lazy var profileService: ProfileService = ProfileServiceImpl(networkClient: DefaultNetworkClient())
-    private lazy var cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    private lazy var profileService: ProfileService = ProfileServiceImpl(networkClient: networkClient)
+    private lazy var cartService: CartService = CartServiceImpl(networkClient: networkClient)
     
     weak var view: StatisticsView?
     
@@ -92,26 +93,25 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                 description: profile.description,
                 website: profile.website,
                 nfts: profile.nfts,
-                likes: idLikes,
+                likes: Array(idLikes),
                 id: profile.id
             )
             formData = profileDTO.toFormData()
         }
         
         profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
-            DispatchQueue.main.async { [weak self] in
-                ProgressHUD.dismiss()
                 switch result {
                 case .success(let profile):
                     print(profile)
                     self?.profile = profile
                     self?.flagToFetchNft += 1
-                    self?.idLikes = profile.likes
+                    self?.idLikes = Set(profile.likes)
                 case .failure(let error):
+                    ProgressHUD.dismiss()
                     print(error)
                 }
             }
-        }
+        
     }
     
     private func loadCart(httpMethod: HttpMethod) {
@@ -119,26 +119,24 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
         var formData: String?
         if let cart {
             let cartDTO = Cart(
-                nfts: idAddedToCart,
+                nfts: Array(idAddedToCart),
                 id: cart.id)
             formData = cartDTO.toFormData()
         }
         
         cartService.loadCart(httpMethod: httpMethod, model: formData) {[weak self] result in
-            DispatchQueue.main.async { [weak self] in
-                ProgressHUD.dismiss()
                 switch result {
                 case .success(let cart):
                     print(cart)
                     self?.cart = cart
                     self?.flagToFetchNft += 1
-                    self?.idAddedToCart = cart.nfts
+                    self?.idAddedToCart = Set(cart.nfts)
                 case .failure(let error):
-                    
+                    ProgressHUD.dismiss()
                     print(error)
                 }
             }
-        }
+        
     }
 }
 
@@ -148,9 +146,9 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
         ProgressHUD.show()
         
         if idLikes.contains(id) {
-            idLikes.removeAll(where: { $0 == id })
+            idLikes.remove(id)
         } else {
-            idLikes.append(id)
+            idLikes.insert(id)
         }
         loadProfile(httpMethod: .put)
     }
@@ -158,9 +156,9 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func cartTapped(id: String) {
         ProgressHUD.show()
         if idAddedToCart.contains(id) {
-            idAddedToCart.removeAll(where: { $0 == id })
+            idAddedToCart.remove(id)
         } else {
-            idAddedToCart.append(id)
+            idAddedToCart.insert(id)
         }
         loadCart(httpMethod: .put)
     }

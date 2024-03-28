@@ -85,7 +85,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     
     private func loadProfile(httpMethod: HttpMethod) {
         
-        var formData: String?
+        var formData: String = ""
         if let profile {
             let profileDTO = Profile(
                 name: profile.name,
@@ -99,7 +99,9 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             formData = profileDTO.toFormData()
         }
         
-        profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
+        
+            
+            profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
                 switch result {
                 case .success(let profile):
                     print(profile)
@@ -111,12 +113,12 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                     print(error)
                 }
             }
-        
+       
     }
     
     private func loadCart(httpMethod: HttpMethod) {
         
-        var formData: String?
+        var formData: String = ""
         if let cart {
             let cartDTO = Cart(
                 nfts: Array(idAddedToCart),

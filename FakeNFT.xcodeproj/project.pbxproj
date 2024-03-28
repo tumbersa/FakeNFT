@@ -55,6 +55,11 @@
 		84141B5E2BB091D300134393 /* NetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84141B5D2BB091D300134393 /* NetworkConstants.swift */; };
 		847D30F72BB3208200891408 /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D30F62BB3208200891408 /* AlertModel.swift */; };
 		847D30F92BB3252600891408 /* ControllersFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D30F82BB3252600891408 /* ControllersFactory.swift */; };
+		847D30FB2BB5CD4C00891408 /* NFTCollectionViewCellThreePerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D30FA2BB5CD4C00891408 /* NFTCollectionViewCellThreePerRow.swift */; };
+		847D30FD2BB5CE2F00891408 /* RatingStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D30FC2BB5CE2F00891408 /* RatingStackView.swift */; };
+		847D30FF2BB5D24200891408 /* NftStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D30FE2BB5D24200891408 /* NftStatistics.swift */; };
+		847D31022BB5D2CD00891408 /* NFTCollectionViewCellThreePerRowDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D31012BB5D2CD00891408 /* NFTCollectionViewCellThreePerRowDelegate.swift */; };
+		847D31042BB5D6D000891408 /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847D31032BB5D6D000891408 /* CollectionViewController.swift */; };
 		E19CD5AB2A98B56600CA39A5 /* NftImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E19CD5AA2A98B56600CA39A5 /* NftImageCollectionViewCell.swift */; };
 		E1A1B9DA2AA01CE400C3AFBC /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A1B9D92AA01CE400C3AFBC /* TabBarController.swift */; };
 		E1CD40DC2A96BECC00BE7FE8 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E1CD40DB2A96BECC00BE7FE8 /* Localizable.strings */; };
@@ -127,6 +132,11 @@
 		84141B5D2BB091D300134393 /* NetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConstants.swift; sourceTree = "<group>"; };
 		847D30F62BB3208200891408 /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
 		847D30F82BB3252600891408 /* ControllersFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllersFactory.swift; sourceTree = "<group>"; };
+		847D30FA2BB5CD4C00891408 /* NFTCollectionViewCellThreePerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTCollectionViewCellThreePerRow.swift; sourceTree = "<group>"; };
+		847D30FC2BB5CE2F00891408 /* RatingStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingStackView.swift; sourceTree = "<group>"; };
+		847D30FE2BB5D24200891408 /* NftStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NftStatistics.swift; sourceTree = "<group>"; };
+		847D31012BB5D2CD00891408 /* NFTCollectionViewCellThreePerRowDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTCollectionViewCellThreePerRowDelegate.swift; sourceTree = "<group>"; };
+		847D31032BB5D6D000891408 /* CollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
 		E19CD5AA2A98B56600CA39A5 /* NftImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NftImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		E1A1B9D92AA01CE400C3AFBC /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		E1CD40DB2A96BECC00BE7FE8 /* Localizable.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
@@ -195,6 +205,9 @@
 			isa = PBXGroup;
 			children = (
 				0CF2C2E02A784C7000FDC837 /* LinePageControl.swift */,
+				847D30FA2BB5CD4C00891408 /* NFTCollectionViewCellThreePerRow.swift */,
+				847D30FC2BB5CE2F00891408 /* RatingStackView.swift */,
+				847D31012BB5D2CD00891408 /* NFTCollectionViewCellThreePerRowDelegate.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -206,6 +219,7 @@
 				84141B572BB0462800134393 /* CatalogModels */,
 				84141B502BB0437600134393 /* DataProvider */,
 				84141B492BB025EE00134393 /* CatalogScreen */,
+				847D31002BB5D26500891408 /* CollectionScreen */,
 				0CFCB7482A7808900009A829 /* TestCatalogController.swift */,
 			);
 			path = Catalog;
@@ -347,6 +361,7 @@
 			isa = PBXGroup;
 			children = (
 				0CFCB7412A78013E0009A829 /* Nft.swift */,
+				847D30FE2BB5D24200891408 /* NftStatistics.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -411,6 +426,14 @@
 				847D30F62BB3208200891408 /* AlertModel.swift */,
 			);
 			path = AlertMaker;
+			sourceTree = "<group>";
+		};
+		847D31002BB5D26500891408 /* CollectionScreen */ = {
+			isa = PBXGroup;
+			children = (
+				847D31032BB5D6D000891408 /* CollectionViewController.swift */,
+			);
+			path = CollectionScreen;
 			sourceTree = "<group>";
 		};
 		E19CD5A92A98B55900CA39A5 /* Cell */ = {
@@ -599,7 +622,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Don't run this during index builds\nif [ $ACTION = \"indexbuild\" ]; then exit 0; fi\n\n# Go to the build root and search up the chain to find the Derived Data Path where the source packages are checked out.\nDERIVED_DATA_CANDIDATE=\"${BUILD_ROOT}\"\n\nwhile ! [ -d \"${DERIVED_DATA_CANDIDATE}/SourcePackages\" ]; do\n  if [ \"${DERIVED_DATA_CANDIDATE}\" = / ]; then\n    echo >&2 \"error: Unable to locate SourcePackages directory from BUILD_ROOT: '${BUILD_ROOT}'\"\n    exit 1\n  fi\n\n  DERIVED_DATA_CANDIDATE=\"$(dirname \"${DERIVED_DATA_CANDIDATE}\")\"\ndone\n\n# Grab a reference to the directory where scripts are checked out\nSCRIPT_PATH=\"${DERIVED_DATA_CANDIDATE}/SourcePackages/checkouts/SwiftLint\"\n\nif [ -z \"${SCRIPT_PATH}\" ]; then\n    echo >&2 \"error: Couldn't find the SwiftLint script in your checked out SPM packages; make sure to add the framework to your project.\"\n    exit 1\nfi\n\nCURRENT_DIR=`pwd`\n\ncd \"${SCRIPT_PATH}\"/Source\n\n/usr/bin/xcrun --sdk macosx swift run swiftlint \"${CURRENT_DIR}\"\n";
+			shellScript = "
+";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -616,9 +640,11 @@
 				847D30F72BB3208200891408 /* AlertModel.swift in Sources */,
 				84141B392BACB66200134393 /* XCAssets+Generated.swift in Sources */,
 				3F478ED129DB476500F6D39E /* Fonts.swift in Sources */,
+				847D30FD2BB5CE2F00891408 /* RatingStackView.swift in Sources */,
 				84141B542BB0442F00134393 /* NFTCollectionRequestById.swift in Sources */,
 				84141B5E2BB091D300134393 /* NetworkConstants.swift in Sources */,
 				84141B522BB043AF00134393 /* DataProvider.swift in Sources */,
+				847D31022BB5D2CD00891408 /* NFTCollectionViewCellThreePerRowDelegate.swift in Sources */,
 				84141B5C2BB066D500134393 /* String+Extension.swift in Sources */,
 				84141B4B2BB0261900134393 /* CatalogViewCell.swift in Sources */,
 				0C79EE6A2A76DE1000EE90EA /* NftDetailAssembly.swift in Sources */,
@@ -630,6 +656,7 @@
 				0CFCB7402A78002A0009A829 /* NftService.swift in Sources */,
 				3F6806D529CBBEC700B4F915 /* NetworkTask.swift in Sources */,
 				84141B592BB0465C00134393 /* NFTCatalogModel.swift in Sources */,
+				847D30FF2BB5D24200891408 /* NftStatistics.swift in Sources */,
 				0CF2C2DB2A783C1B00FDC837 /* LoadingView.swift in Sources */,
 				3F68069729CBBAF100B4F915 /* AppDelegate.swift in Sources */,
 				3F68069929CBBAF100B4F915 /* SceneDelegate.swift in Sources */,
@@ -641,8 +668,10 @@
 				0CFCB74B2A780EA80009A829 /* UIView+Constraints.swift in Sources */,
 				84141B3A2BACB66200134393 /* Strings+Generated.swift in Sources */,
 				3F6806D729CBC50A00B4F915 /* CellsReusingUtils.swift in Sources */,
+				847D31042BB5D6D000891408 /* CollectionViewController.swift in Sources */,
 				0C79EE612A76DCD600EE90EA /* NftByIdRequest.swift in Sources */,
 				E19CD5AB2A98B56600CA39A5 /* NftImageCollectionViewCell.swift in Sources */,
+				847D30FB2BB5CD4C00891408 /* NFTCollectionViewCellThreePerRow.swift in Sources */,
 				0CF2C2E12A784C7000FDC837 /* LinePageControl.swift in Sources */,
 				3F6806D329CBBE9600B4F915 /* NetworkRequest.swift in Sources */,
 				0CFCB7492A7808900009A829 /* TestCatalogController.swift in Sources */,

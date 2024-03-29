@@ -46,6 +46,7 @@
 		A43EADB02BB2C0070040337F /* StatisticsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADAF2BB2C0070040337F /* StatisticsPresenter.swift */; };
 		A43EADB22BB2CFB10040337F /* MockDataStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADB12BB2CFB10040337F /* MockDataStatistics.swift */; };
 		A43EADB42BB2D7470040337F /* StatisticsAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADB32BB2D7470040337F /* StatisticsAssembly.swift */; };
+		A44D150A2BB6CA790046938F /* UIBlockingProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44D15092BB6CA790046938F /* UIBlockingProgressHUD.swift */; };
 		A47C96A42BB09B6D00CB5439 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47C96A32BB09B6D00CB5439 /* StatisticsViewController.swift */; };
 		A47C96A62BB09CD100CB5439 /* RatingStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47C96A52BB09CD100CB5439 /* RatingStackView.swift */; };
 		A47C96A82BB0A24500CB5439 /* NFTCollectionViewCellThreePerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47C96A72BB0A24500CB5439 /* NFTCollectionViewCellThreePerRow.swift */; };
@@ -119,6 +120,7 @@
 		A43EADAF2BB2C0070040337F /* StatisticsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsPresenter.swift; sourceTree = "<group>"; };
 		A43EADB12BB2CFB10040337F /* MockDataStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStatistics.swift; sourceTree = "<group>"; };
 		A43EADB32BB2D7470040337F /* StatisticsAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsAssembly.swift; sourceTree = "<group>"; };
+		A44D15092BB6CA790046938F /* UIBlockingProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBlockingProgressHUD.swift; sourceTree = "<group>"; };
 		A47C96A32BB09B6D00CB5439 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		A47C96A52BB09CD100CB5439 /* RatingStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingStackView.swift; sourceTree = "<group>"; };
 		A47C96A72BB0A24500CB5439 /* NFTCollectionViewCellThreePerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTCollectionViewCellThreePerRow.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				3F6806D629CBC50A00B4F915 /* CellsReusingUtils.swift */,
 				3FC8C39229D246BA0081F015 /* DateFormatters+Presets.swift */,
 				0CFCB74A2A780EA80009A829 /* UIView+Constraints.swift */,
+				A44D15092BB6CA790046938F /* UIBlockingProgressHUD.swift */,
 			);
 			path = Foundation;
 			sourceTree = "<group>";
@@ -611,6 +614,7 @@
 				3FC8C39129D2453B0081F015 /* ExampleRequest.swift in Sources */,
 				0CFCB7462A78064B0009A829 /* NftDetailCellModel.swift in Sources */,
 				0CFCB74B2A780EA80009A829 /* UIView+Constraints.swift in Sources */,
+				A44D150A2BB6CA790046938F /* UIBlockingProgressHUD.swift in Sources */,
 				84141B3A2BACB66200134393 /* Strings+Generated.swift in Sources */,
 				3F6806D729CBC50A00B4F915 /* CellsReusingUtils.swift in Sources */,
 				A48F37822BB2142600280CD9 /* CartBuildRequest.swift in Sources */,

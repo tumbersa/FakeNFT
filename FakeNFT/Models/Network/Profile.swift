@@ -9,17 +9,17 @@ import Foundation
 
 struct Profile: Codable {
     let name: String
-    let avatar: URL
+    let avatar: String
     let description: String
-    let website: URL
+    let website: String
     let nfts, likes: [String]
     let id: String
     
     func toFormData() -> String {
         let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedAvatar = avatar.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedAvatar = avatar.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedDescription = description.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedWebsite = website.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedWebsite = website.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let encodedNfts = nfts.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
         let encodedLikes = likes.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
         let encodedId = id.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""

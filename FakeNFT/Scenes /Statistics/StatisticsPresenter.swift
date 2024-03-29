@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ProgressHUD
 
 protocol StatisticsPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
     func viewDidLoad()
@@ -23,20 +22,7 @@ protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
 final class StatisticsPresenterImpl: StatisticsPresenter {
     let ids: [String]
     
-    private var flagToFetchNft: Int = 0 {
-        didSet {
-            if flagToFetchNft == 2 {
-                ProgressHUD.dismiss()
-                for id in ids {
-                    loadNft(id: id)
-                }
-            }
-            if flagToFetchNft > 2 {
-                ProgressHUD.dismiss()
-                view?.updateData(on: arrOfNFT)
-            }
-        }
-    }
+    private let dispatchGroup = DispatchGroup()
     
     private(set) var idLikes: Set<String> = []
     private(set) var idAddedToCart: Set<String> = []
@@ -53,15 +39,41 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     
     weak var view: StatisticsView?
     
+   
+    
     init(input: [String], networlClient: NetworkClient) {
         ids = input
         self.networkClient = networlClient
     }
     
     func viewDidLoad() {
-        ProgressHUD.show()
-        loadProfile(httpMethod: .get)
-        loadCart(httpMethod: .get)
+        UIBlockingProgressHUD.show()
+        
+        
+        dispatchGroup.enter()
+        loadProfile(httpMethod: .get, completion: { [weak self] in
+            guard let self else { return }
+            dispatchGroup.leave()
+        })
+        
+        dispatchGroup.enter()
+        loadCart(httpMethod: .get, completion: { [weak self] in
+            guard let self else { return }
+            dispatchGroup.leave()
+        })
+        
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self else { return }
+            processNFTsLoading()
+            UIBlockingProgressHUD.dismiss()
+        }
+        
+    }
+    
+    private func processNFTsLoading() {
+        for id in ids {
+            loadNft(id: id)
+        }
     }
     
     private func loadNft(id: String) {
@@ -83,7 +95,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
         }
     }
     
-    private func loadProfile(httpMethod: HttpMethod) {
+    private func loadProfile(httpMethod: HttpMethod, completion: @escaping () -> Void) {
         
         var formData: String = ""
         if let profile {
@@ -98,23 +110,23 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             )
             formData = profileDTO.toFormData()
         }
-    
+        
         profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
+            guard let self else { return }            
             switch result {
             case .success(let profile):
-                print(profile)
-                self?.profile = profile
-                self?.flagToFetchNft += 1
-                self?.idLikes = Set(profile.likes)
+                self.profile = profile
+                idLikes = Set(profile.likes)
             case .failure(let error):
-                ProgressHUD.dismiss()
                 print(error)
             }
+            completion()
         }
         
     }
     
-    private func loadCart(httpMethod: HttpMethod) {
+    
+    private func loadCart(httpMethod: HttpMethod, completion: @escaping () -> Void ) {
         
         var formData: String = ""
         if let cart {
@@ -125,16 +137,16 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
         }
         
         cartService.loadCart(httpMethod: httpMethod, model: formData) {[weak self] result in
+            guard let self else { return }
             switch result {
             case .success(let cart):
-                print(cart)
-                self?.cart = cart
-                self?.flagToFetchNft += 1
-                self?.idAddedToCart = Set(cart.nfts)
+                self.cart = cart
+                
+                idAddedToCart = Set(cart.nfts)
             case .failure(let error):
-                ProgressHUD.dismiss()
                 print(error)
             }
+            completion()
         }
         
     }
@@ -143,24 +155,35 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
 
 extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func likeTapped(id: String) {
-        ProgressHUD.show()
+        UIBlockingProgressHUD.show()
         
         if idLikes.contains(id) {
             idLikes.remove(id)
         } else {
             idLikes.insert(id)
         }
-        loadProfile(httpMethod: .put)
+        
+        loadProfile(httpMethod: .put) { [weak self] in
+            guard let self else { return }
+            view?.updateData(on: arrOfNFT)
+            UIBlockingProgressHUD.dismiss()
+        }
     }
     
     func cartTapped(id: String) {
-        ProgressHUD.show()
+        UIBlockingProgressHUD.show()
+        
         if idAddedToCart.contains(id) {
             idAddedToCart.remove(id)
         } else {
             idAddedToCart.insert(id)
         }
-        loadCart(httpMethod: .put)
+        
+        loadCart(httpMethod: .put){ [weak self] in
+            guard let self else { return }
+            view?.updateData(on: arrOfNFT)
+            UIBlockingProgressHUD.dismiss()
+        }
     }
     
 }

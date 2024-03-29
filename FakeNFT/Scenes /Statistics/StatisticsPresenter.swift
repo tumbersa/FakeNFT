@@ -98,22 +98,20 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             )
             formData = profileDTO.toFormData()
         }
-        
-        
-            
-            profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
-                switch result {
-                case .success(let profile):
-                    print(profile)
-                    self?.profile = profile
-                    self?.flagToFetchNft += 1
-                    self?.idLikes = Set(profile.likes)
-                case .failure(let error):
-                    ProgressHUD.dismiss()
-                    print(error)
-                }
+    
+        profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
+            switch result {
+            case .success(let profile):
+                print(profile)
+                self?.profile = profile
+                self?.flagToFetchNft += 1
+                self?.idLikes = Set(profile.likes)
+            case .failure(let error):
+                ProgressHUD.dismiss()
+                print(error)
             }
-       
+        }
+        
     }
     
     private func loadCart(httpMethod: HttpMethod) {
@@ -127,17 +125,17 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
         }
         
         cartService.loadCart(httpMethod: httpMethod, model: formData) {[weak self] result in
-                switch result {
-                case .success(let cart):
-                    print(cart)
-                    self?.cart = cart
-                    self?.flagToFetchNft += 1
-                    self?.idAddedToCart = Set(cart.nfts)
-                case .failure(let error):
-                    ProgressHUD.dismiss()
-                    print(error)
-                }
+            switch result {
+            case .success(let cart):
+                print(cart)
+                self?.cart = cart
+                self?.flagToFetchNft += 1
+                self?.idAddedToCart = Set(cart.nfts)
+            case .failure(let error):
+                ProgressHUD.dismiss()
+                print(error)
             }
+        }
         
     }
 }

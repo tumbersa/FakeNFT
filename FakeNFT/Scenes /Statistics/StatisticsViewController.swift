@@ -72,8 +72,6 @@ final class StatisticsViewController: UIViewController {
         presenter.viewDidLoad()
     }
     
-   
-    
 }
 
 extension StatisticsViewController: StatisticsView {
@@ -83,20 +81,20 @@ extension StatisticsViewController: StatisticsView {
         snapshot.appendSections([.main])
         snapshot.appendItems(nfts)
         
-            
-            self.dataSource.apply(snapshot, animatingDifferences: true)
-            
-            for (index, nft) in nfts.enumerated() {
-                if let cell = self.collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
-                    cell.set(data: nft)
-                    
-                    let idOfCell = nft.id
-                    cell.setLikedStateToLikeButton(isLiked: presenter.idLikes.contains(idOfCell))
-                    cell.setAddedStateToCart(isAdded: presenter.idAddedToCart.contains(idOfCell))
-                    
-                    cell.delegate = presenter
-                }
+        
+        self.dataSource.apply(snapshot, animatingDifferences: true)
+        
+        for (index, nft) in nfts.enumerated() {
+            if let cell = self.collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
+                cell.set(data: nft)
+                
+                let idOfCell = nft.id
+                cell.setLikedStateToLikeButton(isLiked: presenter.idLikes.contains(idOfCell))
+                cell.setAddedStateToCart(isAdded: presenter.idAddedToCart.contains(idOfCell))
+                
+                cell.delegate = presenter
             }
+        }
         
     }
 }

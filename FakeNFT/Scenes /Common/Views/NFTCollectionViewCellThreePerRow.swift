@@ -43,7 +43,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         nameLabel.font = .bodyBold
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.text = "Archie"
-        
         nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         nameLabel.numberOfLines = 2
         nameLabel.adjustsFontSizeToFitWidth = true
@@ -162,6 +161,15 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     
     func set(data: NftStatistics) {
         nftImageView.kf.setImage(with: data.images[0])
+        nameLabel.text = data.name
+        ratingStackView.set(rating: data.rating)
+        let numStr = String(format: "%.2f", data.price)
+        priceLabel.text = numStr + " ETH"
+        id = data.id
+    }
+    
+    func set(mockData data: MockNftStatistics) {
+        nftImageView.image = data.images[0]
         nameLabel.text = data.name
         ratingStackView.set(rating: data.rating)
         let numStr = String(format: "%.2f", data.price)

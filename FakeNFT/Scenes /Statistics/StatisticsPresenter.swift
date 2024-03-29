@@ -20,7 +20,7 @@ protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
 }
 
 final class StatisticsPresenterImpl: StatisticsPresenter {
-    let ids: [String]
+    let inputNftIds: [String]
     
     private let dispatchGroup = DispatchGroup()
     
@@ -35,19 +35,17 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     
     private(set) var arrOfNFT: [NftStatistics] = []
     
-    private let networkClient: NetworkClient
-    private lazy var service: NftService = NftServiceImpl(networkClient: networkClient, storage: NftStorageImpl())
-    
-    private lazy var profileService: ProfileService = ProfileServiceImpl(networkClient: networkClient)
-    private lazy var cartService: CartService = CartServiceImpl(networkClient: networkClient)
+    private let nftService: NftService
+    private let profileService: ProfileService
+    private let cartService: CartService
     
     weak var view: StatisticsView?
     
-    
-    
-    init(input: [String], networlClient: NetworkClient) {
-        ids = input
-        self.networkClient = networlClient
+    init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService) {
+        inputNftIds = input
+        self.nftService = nftService
+        self.profileService = profileService
+        self.cartService = cartService
     }
     
     func viewDidLoad() {
@@ -75,13 +73,13 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     }
     
     private func processNFTsLoading() {
-        for id in ids {
+        for id in inputNftIds {
             loadNft(id: id)
         }
     }
     
     private func loadNft(id: String) {
-        service.loadNft(id: id) { [weak self] result in
+        nftService.loadNft(id: id) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let nft):

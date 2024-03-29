@@ -65,7 +65,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         return cartButton
     }()
     
-    weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
+  //  weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -136,11 +136,11 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     }
     
     @objc private func likeTapped() {
-        delegate?.likeTapped(id: id)
+  //      delegate?.likeTapped(id: id)
     }
     
     @objc private func cartTapped() {
-        delegate?.cartTapped(id: id)
+   //     delegate?.cartTapped(id: id)
     }
     
     func setLikedStateToLikeButton(isLiked: Bool) {

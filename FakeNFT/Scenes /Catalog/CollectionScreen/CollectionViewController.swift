@@ -10,6 +10,7 @@ import UIKit
 final class CollectionViewController: UIViewController {
     
     private let collectionLabelsFont = UIFont.systemFont(ofSize: 13, weight: .regular)
+    private var collectionViewHeightConstraint = NSLayoutConstraint()
     
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -114,15 +115,15 @@ final class CollectionViewController: UIViewController {
     func setMockData() {
         collectionOfMockNft = [
             MockNftStatistics(name: "Archie", images: [Asset.MockImages.Peach.Archie._1.image], rating: 2, price: 1, id: "1"),
-            MockNftStatistics(name: "Art", images: [Asset.MockImages.Peach.Archie._1.image], rating: 3, price: 2, id: "2"),
-            MockNftStatistics(name: "Biscuit", images: [Asset.MockImages.Peach.Archie._1.image], rating: 1, price: 3, id: "3"),
-            MockNftStatistics(name: "Daisy", images: [Asset.MockImages.Peach.Archie._1.image], rating: 4, price: 13, id: "4"),
-            MockNftStatistics(name: "Nacho", images: [Asset.MockImages.Peach.Archie._1.image], rating: 5, price: 4, id: "5"),
-            MockNftStatistics(name: "Oreo", images: [Asset.MockImages.Peach.Archie._1.image], rating: 2, price: 2, id: "6"),
-            MockNftStatistics(name: "Pixi", images: [Asset.MockImages.Peach.Archie._1.image], rating: 1, price: 1, id: "7"),
-            MockNftStatistics(name: "Ruby", images: [Asset.MockImages.Peach.Archie._1.image], rating: 3, price: 3, id: "8"),
-            MockNftStatistics(name: "Susan", images: [Asset.MockImages.Peach.Archie._1.image], rating: 2, price: 41, id: "9"),
-            MockNftStatistics(name: "Tater", images: [Asset.MockImages.Peach.Archie._1.image], rating: 2, price: 2, id: "10")
+            MockNftStatistics(name: "Art", images: [Asset.MockImages.Peach.Art._1.image], rating: 3, price: 2, id: "2"),
+            MockNftStatistics(name: "Biscuit", images: [Asset.MockImages.Peach.Biscuit._1.image], rating: 1, price: 3, id: "3"),
+            MockNftStatistics(name: "Daisy", images: [Asset.MockImages.Peach.Daisy._1.image], rating: 4, price: 13, id: "4"),
+            MockNftStatistics(name: "Nacho", images: [Asset.MockImages.Peach.Nacho._1.image], rating: 5, price: 4, id: "5"),
+            MockNftStatistics(name: "Oreo", images: [Asset.MockImages.Peach.Oreo._1.image], rating: 2, price: 2, id: "6"),
+            MockNftStatistics(name: "Pixi", images: [Asset.MockImages.Peach.Pixi._1.image], rating: 1, price: 1, id: "7"),
+            MockNftStatistics(name: "Ruby", images: [Asset.MockImages.Peach.Ruby._1.image], rating: 3, price: 3, id: "8"),
+            MockNftStatistics(name: "Susan", images: [Asset.MockImages.Peach.Susan._1.image], rating: 2, price: 41, id: "9"),
+            MockNftStatistics(name: "Tater", images: [Asset.MockImages.Peach.Tater._1.image], rating: 2, price: 2, id: "10")
         ]
         
         coverImageView.image = Asset.MockImages.CollectionCovers.beige.image
@@ -145,14 +146,17 @@ final class CollectionViewController: UIViewController {
 
 extension CollectionViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        calculateCollectionHeight(itemCount: collectionOfMockNft.count)
         return collectionOfMockNft.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NFTCollectionViewCellThreePerRow.reuseID,
-                                                       for: indexPath) as? NFTCollectionViewCellThreePerRow else { return UICollectionViewCell() }
+                                                       for: indexPath) as? NFTCollectionViewCellThreePerRow else { 
+            assertionFailure("не удалось получить NFTCollectionViewCellThreePerRow")
+            return UICollectionViewCell() }
         
-        cell.set(mockData: collectionOfMockNft[indexPath.item])
+        cell.set(mockData: collectionOfMockNft[indexPath.row])
         return cell
     }
 }
@@ -170,7 +174,7 @@ extension CollectionViewController: UICollectionViewDelegateFlowLayout {
         CGSize(width: 108, height: 172)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        9
+        20
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         8
@@ -208,6 +212,8 @@ private extension CollectionViewController {
                     (self.navigationController?.navigationBar.frame.height ?? 0.0)
                 }
         
+        collectionViewHeightConstraint = nftCollectionView.heightAnchor.constraint(equalToConstant: 0)
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -topbarHeight),
             scrollView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
@@ -242,8 +248,20 @@ private extension CollectionViewController {
             nftCollectionView.topAnchor.constraint(equalTo: collectionDescriptionLabel.bottomAnchor, constant: descriptionToNftCollectionSpacing),
             nftCollectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: collectionControllerSpacing),
             nftCollectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -collectionControllerSpacing),
-            nftCollectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+            nftCollectionView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            
+            collectionViewHeightConstraint
         ])
+    }
+    
+    private func calculateCollectionHeight(itemCount: Int) {
+        let itemsPerRow = 3
+        let bottomMargin: CGFloat = 55
+        let cellHeight: CGFloat = 172
+        let numRows = (itemCount + itemsPerRow - 1) / itemsPerRow // Вычисляем количество строк
+        
+        // Вычисляем высоту коллекции
+        collectionViewHeightConstraint.constant = CGFloat(numRows) * cellHeight + bottomMargin
     }
     
     func configNavBackButton() {

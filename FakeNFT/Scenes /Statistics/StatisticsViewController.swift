@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol StatisticsView: AnyObject {
+protocol StatisticsView: AnyObject, ErrorView {
     func updateData(on: [NftStatistics])
 }
 
-final class StatisticsViewController: UIViewController {
+final class StatisticsViewController: UIViewController, ErrorView {
     
     private let presenter: StatisticsPresenter
     

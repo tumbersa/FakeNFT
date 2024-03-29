@@ -26,6 +26,10 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     
     private(set) var idLikes: Set<String> = []
     private(set) var idAddedToCart: Set<String> = []
+    
+    private var idLikesForRequests: Set<String> = []
+    private var idAddedToCartForRequests: Set<String> = []
+    
     private var profile: Profile?
     private var cart: Cart?
     
@@ -39,7 +43,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     
     weak var view: StatisticsView?
     
-   
+    
     
     init(input: [String], networlClient: NetworkClient) {
         ids = input
@@ -105,20 +109,20 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                 description: profile.description,
                 website: profile.website,
                 nfts: profile.nfts,
-                likes: Array(idLikes),
+                likes: Array(idLikesForRequests),
                 id: profile.id
             )
             formData = profileDTO.toFormData()
         }
         
         profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
-            guard let self else { return }            
+            guard let self else { return }
             switch result {
             case .success(let profile):
                 self.profile = profile
                 idLikes = Set(profile.likes)
             case .failure(let error):
-                print(error)
+                view?.showError(makeErrorModel(error))
             }
             completion()
         }
@@ -131,7 +135,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
         var formData: String = ""
         if let cart {
             let cartDTO = Cart(
-                nfts: Array(idAddedToCart),
+                nfts: Array(idAddedToCartForRequests),
                 id: cart.id)
             formData = cartDTO.toFormData()
         }
@@ -141,14 +145,28 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             switch result {
             case .success(let cart):
                 self.cart = cart
-                
                 idAddedToCart = Set(cart.nfts)
             case .failure(let error):
-                print(error)
+                view?.showError(makeErrorModel(error))
             }
             completion()
         }
         
+    }
+    
+    private func makeErrorModel(_ error: Error) -> ErrorModel {
+        let message: String
+        switch error {
+        case is NetworkClientError:
+            message = NSLocalizedString("Error.network", comment: "")
+        default:
+            message = NSLocalizedString("Error.unknown", comment: "")
+        }
+
+        let actionText = "Ок"
+        return ErrorModel(message: message, actionText: actionText) {
+            print(error)
+        }
     }
 }
 
@@ -157,10 +175,12 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func likeTapped(id: String) {
         UIBlockingProgressHUD.show()
         
-        if idLikes.contains(id) {
-            idLikes.remove(id)
+        idLikesForRequests = idLikes
+        
+        if idLikesForRequests.contains(id) {
+            idLikesForRequests.remove(id)
         } else {
-            idLikes.insert(id)
+            idLikesForRequests.insert(id)
         }
         
         loadProfile(httpMethod: .put) { [weak self] in
@@ -173,10 +193,12 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func cartTapped(id: String) {
         UIBlockingProgressHUD.show()
         
-        if idAddedToCart.contains(id) {
-            idAddedToCart.remove(id)
+        idAddedToCartForRequests = idAddedToCart
+        
+        if idAddedToCartForRequests.contains(id) {
+            idAddedToCartForRequests.remove(id)
         } else {
-            idAddedToCart.insert(id)
+            idAddedToCartForRequests.insert(id)
         }
         
         loadCart(httpMethod: .put){ [weak self] in

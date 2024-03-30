@@ -24,7 +24,7 @@ final class MyNFTViewController: UIViewController {
     ]
 
     // private var myNFTs = [NFTCellModel]()
-    // для проверки верстки экрана отсутствия Моих NFT
+    // раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
@@ -126,6 +126,8 @@ private extension MyNFTViewController {
         if myNFTs.isEmpty {
             self.emptyLabel.isHidden = false
             tableView.isHidden = true
+            navigationItem.title = ""
+            filterButton.image = nil
         } else {
             emptyLabel.isHidden = true
         }

@@ -7,16 +7,13 @@
 
 import UIKit
 
+// модель для моковых данных
 struct NFTCellModel {
-    let image: UIImage
-    // изменить в будущем на String
     let name: String
-    let rating: UIImage
-    // изменить в будущем на Int
-    let author: String
+    let images: UIImage
+    let rating: Int
     let price: String
-    // изменить в будущем на Double
-//    let isFavorite: UIImageView
-    // изменить на Bool
+    // Float
+    let author: String
     let id: String
 }

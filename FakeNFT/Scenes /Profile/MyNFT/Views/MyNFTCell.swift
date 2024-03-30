@@ -42,9 +42,9 @@ final class MyNFTCell: UITableViewCell {
         return label
     }()
 
-    private lazy var rating: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
+    private lazy var ratingView: RatingView = {
+        let view = RatingView()
+        return view
     }()
 
     private lazy var author: UILabel = {
@@ -106,9 +106,9 @@ final class MyNFTCell: UITableViewCell {
 
     // MARK: - Public Method
     func configureCell(with model: NFTCellModel) {
-        image.image = model.image
+        image.image = model.images
         name.text = model.name
-        rating.image = model.rating
+        ratingView.setRating(model.rating)
         author.text = model.author
         priceValue.text = model.price
     }
@@ -121,7 +121,7 @@ private extension MyNFTCell {
         self.backgroundColor = .systemBackground
 
         [name,
-         rating,
+         ratingView,
          author
         ].forEach {
             stackView.addArrangedSubview($0)
@@ -168,6 +168,11 @@ private extension MyNFTCell {
             make.centerY.equalTo(stackView.snp.centerY)
             make.trailing.equalToSuperview().offset(-39)
             make.bottom.equalTo(stackView.snp.bottom).offset(-10)
+        }
+
+        ratingView.snp.makeConstraints { make in
+            make.width.equalTo(68)
+            make.height.equalTo(12)
         }
     }
 

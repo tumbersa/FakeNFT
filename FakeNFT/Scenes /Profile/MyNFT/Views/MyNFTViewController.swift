@@ -11,6 +11,18 @@ import UIKit
 // MARK: - MyNFT ViewController
 final class MyNFTViewController: UIViewController {
 
+    // MARK: - Private Properties
+    private var myNFTs = [
+        NFTCellModel(
+            name: "Lilo",
+            images: UIImage(named: "nft_icon") ?? UIImage(),
+            rating: 3,
+            price: "1,78 ETH",
+            author: "от John Doe",
+            id: "1"
+        )
+    ]
+
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
         let button = UIBarButtonItem(
@@ -33,9 +45,20 @@ final class MyNFTViewController: UIViewController {
         return button
     }()
 
-    private lazy var myNFTView: MyNFTView = {
-        let view = MyNFTView()
-        return view
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(
+            MyNFTCell.self,
+            forCellReuseIdentifier: MyNFTCell.cellID
+        )
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.backgroundColor = .systemBackground
+        tableView.separatorStyle = .none
+        tableView.allowsMultipleSelection = false
+        tableView.isUserInteractionEnabled = true
+        tableView.backgroundColor = .systemBackground
+        return tableView
     }()
 
     // MARK: - Lifecycle
@@ -59,13 +82,14 @@ private extension MyNFTViewController {
 
     // MARK: - Setup Views
     func setupViews() {
-        view.addSubview(myNFTView)
+        view.addSubview(tableView)
     }
 
     // MARK: - Setup Constraints
     func setupConstraints() {
-        myNFTView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        tableView.snp.makeConstraints { make in
+            make.top.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.equalToSuperview()
         }
     }
 
@@ -77,4 +101,28 @@ private extension MyNFTViewController {
     @objc private func filterButtonDidTap() {
         print("Filter button did tap")
     }
+}
+
+// MARK: - UITableViewDataSource
+extension MyNFTViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return myNFTs.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: MyNFTCell.cellID,
+            for: indexPath
+        ) as? MyNFTCell else {
+            fatalError("Could not cast to MyNFTCell")
+        }
+        let nft = myNFTs[indexPath.row]
+        cell.configureCell(with: nft)
+
+        return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension MyNFTViewController: UITableViewDelegate {
 }

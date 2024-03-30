@@ -248,6 +248,8 @@ extension ProfileViewController: UITableViewDelegate {
             self.navigationController?.pushViewController(viewController, animated: true)
         case 1:
             print("My Favourite NFTs cell did tap")
+            let viewController = FavoriteNFTViewController()
+            self.navigationController?.pushViewController(viewController, animated: true)
         case 2:
             print("About Developer cell did tap")
             let viewController = AboutDeveloperViewController()

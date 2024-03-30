@@ -48,6 +48,10 @@ internal enum L10n {
         internal static let priceText = L10n.tr("Localizable", "Profile.priceText", fallback: "Цена")
         /// У вас ещё нет NFT
         internal static let emptyNFTLabel = L10n.tr("Localizable", "Profile.emptyNFTLabel", fallback: "У вас ещё нет NFT")
+        /// Избранные NFT
+        internal static let NFTFavorites = L10n.tr("Localizable", "Profile.NFTFavorites", fallback: "Избранные NFT")
+        /// У Вас ещё нет избранных NFT
+        internal static let emptyFavouriteNFT = L10n.tr("Localizable", "Profile.emptyFavouriteNFT", fallback: "У Вас ещё нет избранных NFT")
     }
 
     internal enum Error {

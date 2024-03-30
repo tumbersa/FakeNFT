@@ -24,7 +24,7 @@ final class MyNFTViewController: UIViewController {
     ]
 
     // private var myNFTs = [NFTCellModel]()
-    // раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
+    // закомментируйте favoriteNFTS с моковыми данными и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {

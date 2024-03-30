@@ -30,7 +30,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             UIImage(systemName: "heart.fill"),
             for: .normal)
         likeButton.tintColor = .white
-        likeButton.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
+        likeButton.addTarget(self, action: #selector(mockLikeTapped), for: .touchUpInside)
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         return likeButton
     }()
@@ -60,12 +60,15 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     private lazy var cartButton: UIButton = {
         let cartButton = UIButton()
         cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
-        cartButton.addTarget(self, action: #selector(cartTapped), for: .touchUpInside)
+        cartButton.addTarget(self, action: #selector(mockCartTapped), for: .touchUpInside)
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         return cartButton
     }()
     
-  //  weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
+    weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
+    
+    private var isCart: Bool = false
+    private var isLike: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -136,11 +139,11 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     }
     
     @objc private func likeTapped() {
-  //      delegate?.likeTapped(id: id)
+        delegate?.likeTapped(id: id)
     }
     
     @objc private func cartTapped() {
-   //     delegate?.cartTapped(id: id)
+        delegate?.cartTapped(id: id)
     }
     
     func setLikedStateToLikeButton(isLiked: Bool) {
@@ -175,6 +178,16 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         let numStr = String(format: "%.2f", data.price)
         priceLabel.text = numStr + " ETH"
         id = data.id
+    }
+    
+    @objc private func mockLikeTapped() {
+        isLike.toggle()
+        setLikedStateToLikeButton(isLiked: isLike)
+    }
+    
+    @objc private func mockCartTapped() {
+        isCart.toggle()
+        setAddedStateToCart(isAdded: isCart)
     }
 }
 

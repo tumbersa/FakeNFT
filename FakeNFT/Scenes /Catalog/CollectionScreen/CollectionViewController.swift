@@ -104,6 +104,8 @@ final class CollectionViewController: UIViewController {
     
     private let descriptionToNftCollectionSpacing: CGFloat = 24
     
+    private var collectionCellWidth: CGFloat = 0
+    
     private var collectionOfMockNft: [MockNftStatistics] = []
     
     override func viewDidLoad() {
@@ -146,7 +148,8 @@ final class CollectionViewController: UIViewController {
 
 extension CollectionViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        calculateCollectionHeight(itemCount: collectionOfMockNft.count)
+        self.collectionCellWidth = calculateCellWidth(frameWidth: view.frame.width)
+        calculateCollectionHeight(itemCount: collectionOfMockNft.count, cellHeight: self.collectionCellWidth * 1.78)
         return collectionOfMockNft.count
     }
     
@@ -171,13 +174,13 @@ extension CollectionViewController: UICollectionViewDelegate {
 
 extension CollectionViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: 108, height: 172)
+        return CGSize(width: collectionCellWidth, height: collectionCellWidth * 1.6)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        20
+        28
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        8
+        9
     }
 }
 
@@ -254,14 +257,18 @@ private extension CollectionViewController {
         ])
     }
     
-    private func calculateCollectionHeight(itemCount: Int) {
+    private func calculateCollectionHeight(itemCount: Int, cellHeight: CGFloat) {
         let itemsPerRow = 3
-        let bottomMargin: CGFloat = 55
-        let cellHeight: CGFloat = 172
-        let numRows = (itemCount + itemsPerRow - 1) / itemsPerRow // Вычисляем количество строк
-        
+        let bottomMargin: CGFloat = 40
+        let numRows = (itemCount + itemsPerRow) / itemsPerRow // Вычисляем количество строк
         // Вычисляем высоту коллекции
         collectionViewHeightConstraint.constant = CGFloat(numRows) * cellHeight + bottomMargin
+    }
+    
+    private func calculateCellWidth(frameWidth: CGFloat) -> CGFloat {
+        let availableWidth = (frameWidth - (9 * 2 + 16 * 2))
+        let itemWidth = availableWidth / 3
+        return itemWidth
     }
     
     func configNavBackButton() {

@@ -12,8 +12,7 @@ struct NFTCellModel {
     let name: String
     let images: UIImage
     let rating: Int
-    let price: String
-    // Float
+    let price: Float
     let author: String
     let id: String
 }

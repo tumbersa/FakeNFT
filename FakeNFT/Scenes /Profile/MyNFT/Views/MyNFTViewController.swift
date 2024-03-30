@@ -17,8 +17,8 @@ final class MyNFTViewController: UIViewController {
             name: "Lilo",
             images: UIImage(named: "nft_icon") ?? UIImage(),
             rating: 3,
-            price: "1,78 ETH",
-            author: "от John Doe",
+            price: 1.78,
+            author: "John Doe",
             id: "1"
         )
     ]
@@ -118,6 +118,7 @@ extension MyNFTViewController: UITableViewDataSource {
         }
         let nft = myNFTs[indexPath.row]
         cell.configureCell(with: nft)
+        cell.selectionStyle = .none
 
         return cell
     }

@@ -8,11 +8,24 @@
 import SnapKit
 import UIKit
 
+// MARK: - MyNFTCellDelegate Protocol
+protocol MyNFTCellDelegate: AnyObject {
+    func didTapLikeButton(with nftID: String)
+}
+
 // MARK: - MyNFTCell
 final class MyNFTCell: UITableViewCell {
 
     // MARK: - Public properties
     public static let cellID = String(describing: MyNFTCell.self)
+
+    // MARK: - Private Properties
+    private var id: String?
+    // моковое значение лайка
+    private var isLiked: Bool = false
+
+    // MARK: - Delegate
+    weak var delegate: MyNFTCellDelegate?
 
     // MARK: - UI
     private lazy var image: UIImageView = {
@@ -30,7 +43,7 @@ final class MyNFTCell: UITableViewCell {
         )
         button.addTarget(
             self,
-            action: #selector(self.favoriteButtonDidTap),
+            action: #selector(likeButtonDidTap),
             for: .touchUpInside)
         return button
     }()
@@ -109,8 +122,18 @@ final class MyNFTCell: UITableViewCell {
         image.image = model.images
         name.text = model.name
         ratingView.setRating(model.rating)
-        author.text = model.author
-        priceValue.text = model.price
+        author.text = "от \(model.author)"
+        let stringFromNumber = String(format: "%.2f", model.price)
+        priceValue.text = stringFromNumber + " ETH"
+        id = model.id
+    }
+
+    func setIsLiked(_ isLiked: Bool) {
+        if isLiked {
+            favoriteButton.setImage(UIImage(named: "favorite_button_active"), for: .normal)
+        } else {
+            favoriteButton.setImage(UIImage(named: "favorite_button_inactive"), for: .normal)
+        }
     }
  }
 
@@ -177,7 +200,8 @@ private extension MyNFTCell {
     }
 
     // MARK: - Actions
-    @objc func favoriteButtonDidTap() {
+    @objc func likeButtonDidTap() {
         print("Favorite button did tap")
+         setIsLiked(isLiked)
     }
 }

@@ -155,7 +155,7 @@ extension CollectionViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NFTCollectionViewCellThreePerRow.reuseID,
-                                                       for: indexPath) as? NFTCollectionViewCellThreePerRow else { 
+                                                            for: indexPath) as? NFTCollectionViewCellThreePerRow else { 
             assertionFailure("не удалось получить NFTCollectionViewCellThreePerRow")
             return UICollectionViewCell() }
         
@@ -211,9 +211,9 @@ private extension CollectionViewController {
         let safeArea = view.safeAreaLayoutGuide
         
         var topbarHeight: CGFloat {
-                    return (navigationController?.view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
-                    (self.navigationController?.navigationBar.frame.height ?? 0.0)
-                }
+            return (navigationController?.view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
+            (self.navigationController?.navigationBar.frame.height ?? 0.0)
+        }
         
         collectionViewHeightConstraint = nftCollectionView.heightAnchor.constraint(equalToConstant: 0)
         

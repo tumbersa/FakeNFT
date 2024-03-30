@@ -23,6 +23,9 @@ final class MyNFTViewController: UIViewController {
         )
     ]
 
+    // private var myNFTs = [NFTCellModel]()
+    // для проверки верстки экрана отсутствия Моих NFT
+
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
         let button = UIBarButtonItem(
@@ -61,12 +64,21 @@ final class MyNFTViewController: UIViewController {
         return tableView
     }()
 
+    private lazy var emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = L10n.Profile.emptyNFTLabel
+        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.textColor = UIColor(named: "ypBlack")
+        return label
+    }()
+
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
         setupViews()
         setupConstraints()
+        updateEmptyView()
     }
 }
 
@@ -82,7 +94,11 @@ private extension MyNFTViewController {
 
     // MARK: - Setup Views
     func setupViews() {
-        view.addSubview(tableView)
+        [tableView,
+         emptyLabel
+        ].forEach {
+            view.addSubview($0)
+        }
     }
 
     // MARK: - Setup Constraints
@@ -91,15 +107,28 @@ private extension MyNFTViewController {
             make.top.bottom.equalTo(view.safeAreaLayoutGuide)
             make.leading.trailing.equalToSuperview()
         }
+
+        emptyLabel.snp.makeConstraints { make in
+            make.centerX.centerY.equalToSuperview()
+        }
     }
 
     // MARK: - Actions
-    @objc private func navBackButtonDidTap() {
+    @objc func navBackButtonDidTap() {
         self.navigationController?.popViewController(animated: true)
     }
 
-    @objc private func filterButtonDidTap() {
+    @objc func filterButtonDidTap() {
         print("Filter button did tap")
+    }
+
+    func updateEmptyView() {
+        if myNFTs.isEmpty {
+            self.emptyLabel.isHidden = false
+            tableView.isHidden = true
+        } else {
+            emptyLabel.isHidden = true
+        }
     }
 }
 

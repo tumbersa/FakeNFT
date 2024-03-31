@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class UsersCollectionAssembly {
+final class UsersCollectionAssembly {
     
     private let networkClient: NetworkClient
     

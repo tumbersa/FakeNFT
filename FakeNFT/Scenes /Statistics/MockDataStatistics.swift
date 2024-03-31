@@ -18,4 +18,6 @@ enum MockDataStatistics {
      "7773e33c-ec15-4230-a102-92426a3a6d5a",
      "82570704-14ac-4679-9436-050f4a32a8a0"
     ]
+    
+    static let userId = "ab33768d-02ac-4f45-9890-7acf503bde54"
 }

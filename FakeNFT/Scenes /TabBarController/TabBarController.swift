@@ -26,9 +26,7 @@ final class TabBarController: UITabBarController {
                                                  and: UIImage(systemName: "square.stack.3d.up.fill"),
                                                  vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
 
-        let statisticsController = UINavigationController(rootViewController: UserCardViewController())
-        statisticsController.title = L10n.TabBar.statisticTabBarTitle
-        statisticsController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
+        let statisticsController = createStatisticsVC()
         
         self.setViewControllers([catalogController, statisticsController], animated: true)
 
@@ -48,8 +46,8 @@ final class TabBarController: UITabBarController {
     }
     
     private func createStatisticsVC() -> UIViewController {
-        let assembly = UsersCollectionAssembly(networkClient: DefaultNetworkClient())
-        let statisticsInput = MockDataStatistics.ids
+        let assembly = UserCardAssembly(networkClient: DefaultNetworkClient())
+        let statisticsInput = MockDataStatistics.userId
         let statisticsViewController = assembly.build(with: statisticsInput)
         let statisticsController = UINavigationController(rootViewController: statisticsViewController)
         statisticsController.title = L10n.TabBar.statisticTabBarTitle

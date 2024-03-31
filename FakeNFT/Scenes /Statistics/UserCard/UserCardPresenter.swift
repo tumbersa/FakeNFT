@@ -17,16 +17,31 @@ final class UserCardPresenterImpl: UserCardPresenter {
     private let userId: String
     private let userDetailedService: UserDetailedService
     
+    private(set) var userDetailed: UserDetailed?
+    weak var view: UserCardView?
+    
     init(userId: String, userDetailedService: UserDetailedService) {
         self.userId = userId
         self.userDetailedService = userDetailedService
     }
     
     func viewDidLoad() {
-        <#code#>
+        UIBlockingProgressHUD.show()
+        loadUserDetailed()
     }
     
-    var userDetailed: UserDetailed?
-    
+    func loadUserDetailed() {
+        userDetailedService.loadUserDetailed(id: "ab33768d-02ac-4f45-9890-7acf503bde54") { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let userDetailed):
+                self.userDetailed = userDetailed
+                view?.updateData(with: userDetailed)
+                UIBlockingProgressHUD.dismiss()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
 }

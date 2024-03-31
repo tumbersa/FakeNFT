@@ -10,10 +10,13 @@ import SnapKit
 import Kingfisher
 import SafariServices
 
-final class UserCardViewController: UIViewController {
+protocol UserCardView: AnyObject {
+    func updateData(with userDetailed: UserDetailed)
+}
+
+final class UserCardViewController: UIViewController, UserCardView {
     
-    private var userDetailed: UserDetailed?
-    private let userDetailedService = UserDetailedServiceImpl(networkClient: DefaultNetworkClient())
+    private let presenter: UserCardPresenter
     
     private lazy var avatarImageView: UIImageView = {
         let avatarImageView = UIImageView()
@@ -72,36 +75,23 @@ final class UserCardViewController: UIViewController {
         return chevronImageView
     }()
     
+    init(presenter: UserCardPresenter) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        UIBlockingProgressHUD.show()
-        loadUserDetailed()
+        
         layoutUI()
+        presenter.viewDidLoad()
     }
     
-    
-    func loadUserDetailed() {
-        userDetailedService.loadUserDetailed(id: "ab33768d-02ac-4f45-9890-7acf503bde54") { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let userDetailed):
-                self.userDetailed = userDetailed
-                print(userDetailed)
-                guard let avatarUrl = URL(string: userDetailed.avatar) else { return }
-                avatarImageView.kf.setImage(with: avatarUrl)
-                nameLabel.text = userDetailed.name
-                descriptionLabel.text = userDetailed.description
-                collectionNFTLabel.text = "Коллекция NFT (\(userDetailed.nfts.count))"
-                
-                chevronImageView.isHidden = false
-                websiteButton.isHidden = false
-                UIBlockingProgressHUD.dismiss()
-            case .failure(let error):
-                print(error)
-            }
-        }
-    }
     
     func layoutUI() {
         view.addSubview(avatarImageView)
@@ -156,7 +146,7 @@ final class UserCardViewController: UIViewController {
     }
     
     @objc private func colletionNFTControlTapped(){
-        guard let userDetailed else { return }
+        guard let userDetailed = presenter.userDetailed else { return }
         let assembly = UsersCollectionAssembly(networkClient: DefaultNetworkClient())
         let userCollectionInput = userDetailed.nfts
         let userCollectionsViewController = assembly.build(with: userCollectionInput)
@@ -165,9 +155,21 @@ final class UserCardViewController: UIViewController {
     }
     
     @objc private func websiteButtonTapped() {
-        guard let urlStr = userDetailed?.website,
+        guard let urlStr = presenter.userDetailed?.website,
             let url = URL(string: urlStr) else { return }
         let vc = SFSafariViewController(url: url)
         present(vc, animated: true)
+    }
+    
+    func updateData(with userDetailed: UserDetailed) {
+        print(userDetailed)
+        guard let avatarUrl = URL(string: userDetailed.avatar) else { return }
+        avatarImageView.kf.setImage(with: avatarUrl)
+        nameLabel.text = userDetailed.name
+        descriptionLabel.text = userDetailed.description
+        collectionNFTLabel.text = "Коллекция NFT (\(userDetailed.nfts.count))"
+        
+        chevronImageView.isHidden = false
+        websiteButton.isHidden = false
     }
 }

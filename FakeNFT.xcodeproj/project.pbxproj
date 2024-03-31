@@ -46,6 +46,7 @@
 		A43EADB02BB2C0070040337F /* UsersCollectionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADAF2BB2C0070040337F /* UsersCollectionPresenter.swift */; };
 		A43EADB22BB2CFB10040337F /* MockDataStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADB12BB2CFB10040337F /* MockDataStatistics.swift */; };
 		A43EADB42BB2D7470040337F /* UsersCollectionAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADB32BB2D7470040337F /* UsersCollectionAssembly.swift */; };
+		A43EAEB12BB9D7120021DE38 /* UserCardPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EAEB02BB9D7120021DE38 /* UserCardPresenter.swift */; };
 		A44D150A2BB6CA790046938F /* UIBlockingProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A44D15092BB6CA790046938F /* UIBlockingProgressHUD.swift */; };
 		A45BF41F2BB977F200CD8899 /* UserCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45BF41E2BB977F200CD8899 /* UserCardViewController.swift */; };
 		A45BF4212BB9788300CD8899 /* UserDetailedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A45BF4202BB9788300CD8899 /* UserDetailedService.swift */; };
@@ -124,6 +125,7 @@
 		A43EADAF2BB2C0070040337F /* UsersCollectionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCollectionPresenter.swift; sourceTree = "<group>"; };
 		A43EADB12BB2CFB10040337F /* MockDataStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockDataStatistics.swift; sourceTree = "<group>"; };
 		A43EADB32BB2D7470040337F /* UsersCollectionAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCollectionAssembly.swift; sourceTree = "<group>"; };
+		A43EAEB02BB9D7120021DE38 /* UserCardPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCardPresenter.swift; sourceTree = "<group>"; };
 		A44D15092BB6CA790046938F /* UIBlockingProgressHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBlockingProgressHUD.swift; sourceTree = "<group>"; };
 		A45BF41E2BB977F200CD8899 /* UserCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCardViewController.swift; sourceTree = "<group>"; };
 		A45BF4202BB9788300CD8899 /* UserDetailedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDetailedService.swift; sourceTree = "<group>"; };
@@ -402,6 +404,7 @@
 			isa = PBXGroup;
 			children = (
 				A45BF41E2BB977F200CD8899 /* UserCardViewController.swift */,
+				A43EAEB02BB9D7120021DE38 /* UserCardPresenter.swift */,
 			);
 			path = UserCard;
 			sourceTree = "<group>";
@@ -645,6 +648,7 @@
 				0CFCB7462A78064B0009A829 /* NftDetailCellModel.swift in Sources */,
 				A45BF4252BB979AF00CD8899 /* UserDetailed.swift in Sources */,
 				0CFCB74B2A780EA80009A829 /* UIView+Constraints.swift in Sources */,
+				A43EAEB12BB9D7120021DE38 /* UserCardPresenter.swift in Sources */,
 				A44D150A2BB6CA790046938F /* UIBlockingProgressHUD.swift in Sources */,
 				84141B3A2BACB66200134393 /* Strings+Generated.swift in Sources */,
 				3F6806D729CBC50A00B4F915 /* CellsReusingUtils.swift in Sources */,

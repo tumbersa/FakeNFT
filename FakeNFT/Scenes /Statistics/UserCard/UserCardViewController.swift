@@ -6,8 +6,168 @@
 //
 
 import UIKit
+import SnapKit
+import Kingfisher
+import SafariServices
 
 final class UserCardViewController: UIViewController {
     
+    private var userDetailed: UserDetailed?
+    private let userDetailedService = UserDetailedServiceImpl(networkClient: DefaultNetworkClient())
     
+    private lazy var avatarImageView: UIImageView = {
+        let avatarImageView = UIImageView()
+        avatarImageView.layer.cornerRadius = 35
+        avatarImageView.layer.masksToBounds = true
+        return avatarImageView
+    }()
+    
+    private lazy var nameLabel: UILabel = {
+        let nameLabel = UILabel()
+        nameLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        return nameLabel
+    }()
+    
+    private lazy var descriptionLabel: UILabel = {
+        let descriptionLabel = UILabel()
+        descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        descriptionLabel.numberOfLines = 4
+        descriptionLabel.lineBreakMode = .byWordWrapping
+        return descriptionLabel
+    }()
+    
+    private lazy var websiteButton: UIButton = {
+        let websiteButton = UIButton()
+        websiteButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .regular)
+        websiteButton.layer.cornerRadius = 16
+        websiteButton.layer.masksToBounds = true
+        websiteButton.layer.borderWidth = 1
+        websiteButton.setTitleColor(.label, for: .normal)
+        websiteButton.layer.borderColor = UIColor.label.cgColor
+        websiteButton.setTitle("Перейти на сайт пользователя", for: .normal)
+        websiteButton.addTarget(self, action: #selector(websiteButtonTapped), for: .touchUpInside)
+        
+        websiteButton.isHidden = true
+        return websiteButton
+    }()
+    
+    private lazy var colletionNFTControl: UIControl = {
+        let colletionNFTControl = UIControl()
+        colletionNFTControl.addTarget(self, action: #selector(colletionNFTControlTapped), for: UIControl.Event.touchUpInside)
+        return colletionNFTControl
+    }()
+    
+    private lazy var collectionNFTLabel: UILabel = {
+        let collectionNFTLabel = UILabel()
+        collectionNFTLabel.font = .systemFont(ofSize: 17, weight: .bold)
+        return collectionNFTLabel
+    }()
+    
+    private lazy var chevronImageView: UIImageView = {
+        let chevronImageView = UIImageView(image: UIImage(systemName: "chevron.forward"))
+        chevronImageView.contentMode = .scaleAspectFit
+        chevronImageView.tintColor = .label
+        
+        chevronImageView.isHidden = true
+        return chevronImageView
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        UIBlockingProgressHUD.show()
+        loadUserDetailed()
+        layoutUI()
+    }
+    
+    
+    func loadUserDetailed() {
+        userDetailedService.loadUserDetailed(id: "ab33768d-02ac-4f45-9890-7acf503bde54") { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let userDetailed):
+                self.userDetailed = userDetailed
+                print(userDetailed)
+                guard let avatarUrl = URL(string: userDetailed.avatar) else { return }
+                avatarImageView.kf.setImage(with: avatarUrl)
+                nameLabel.text = userDetailed.name
+                descriptionLabel.text = userDetailed.description
+                collectionNFTLabel.text = "Коллекция NFT (\(userDetailed.nfts.count))"
+                
+                chevronImageView.isHidden = false
+                websiteButton.isHidden = false
+                UIBlockingProgressHUD.dismiss()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    func layoutUI() {
+        view.addSubview(avatarImageView)
+        avatarImageView.snp.makeConstraints { make in
+            make.height.equalTo(70)
+            make.width.equalTo(70)
+            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
+        }
+        
+        view.addSubview(nameLabel)
+        nameLabel.snp.makeConstraints { make in
+            make.leading.equalTo(avatarImageView.snp.trailing).offset(16)
+            make.centerY.equalTo(avatarImageView.snp.centerY)
+            make.trailing.equalToSuperview().offset(-16)
+        }
+        
+        view.addSubview(descriptionLabel)
+        descriptionLabel.snp.makeConstraints { make in
+            make.top.equalTo(avatarImageView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-18)
+        }
+        
+        view.addSubview(websiteButton)
+        websiteButton.snp.makeConstraints { make in
+            make.top.equalTo(descriptionLabel.snp.bottom).offset(28)
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+            make.height.equalTo(40)
+        }
+        
+        view.addSubview(colletionNFTControl)
+        colletionNFTControl.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.height.equalTo(54)
+            make.top.equalTo(websiteButton.snp.bottom).offset(40)
+        }
+        
+        colletionNFTControl.addSubview(collectionNFTLabel)
+        collectionNFTLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
+        }
+        
+        colletionNFTControl.addSubview(chevronImageView)
+        chevronImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-20)
+        }
+    }
+    
+    @objc private func colletionNFTControlTapped(){
+        guard let userDetailed else { return }
+        let assembly = UsersCollectionAssembly(networkClient: DefaultNetworkClient())
+        let userCollectionInput = userDetailed.nfts
+        let userCollectionsViewController = assembly.build(with: userCollectionInput)
+        
+        navigationController?.pushViewController(userCollectionsViewController, animated: true)
+    }
+    
+    @objc private func websiteButtonTapped() {
+        guard let urlStr = userDetailed?.website,
+            let url = URL(string: urlStr) else { return }
+        let vc = SFSafariViewController(url: url)
+        present(vc, animated: true)
+    }
 }

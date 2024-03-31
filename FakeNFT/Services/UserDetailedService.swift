@@ -10,7 +10,7 @@ import Foundation
 typealias UserDetailedCompletion = (Result<UserDetailed, Error>) -> Void
 
 protocol UserDetailedService {
-    func loadNft(id: String, completion: @escaping UserDetailedCompletion)
+    func loadUserDetailed(id: String, completion: @escaping UserDetailedCompletion)
 }
 
 final class UserDetailedServiceImpl: UserDetailedService {
@@ -21,7 +21,7 @@ final class UserDetailedServiceImpl: UserDetailedService {
         self.networkClient = networkClient
     }
 
-    func loadNft(id: String, completion: @escaping UserDetailedCompletion) {
+    func loadUserDetailed(id: String, completion: @escaping UserDetailedCompletion) {
 
         let request = UserDetailedBuildRequest(id: id)
         networkClient.send(request: request, type: UserDetailed.self) { result in

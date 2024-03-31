@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol UsersCollectionView: AnyObject, ErrorView {
     func updateData(on: [NftStatistics], id: String?, isCart: Bool?)
@@ -66,10 +67,38 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureVC()
+        configureCollectionView()
+        presenter.viewDidLoad()
+    }
+    
+    private func configureVC(){
+       
+        navigationController?.navigationBar.tintColor = .label
         title = "Коллекция NFT"
         view.backgroundColor = .systemBackground
+        
+        
+        let backButton = UIBarButtonItem(title: "", 
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(backButtonPressed))
+        backButton.image = UIImage(systemName: "chevron.left")
+        navigationItem.leftBarButtonItem = backButton
+    }
+    
+    @objc private func backButtonPressed() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    private func configureCollectionView(){
         view.addSubview(collectionView)
-        presenter.viewDidLoad()
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+        }
     }
     
 }

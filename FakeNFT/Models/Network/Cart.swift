@@ -15,6 +15,6 @@ struct Cart: Codable {
         let encodedNfts = nfts.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
         let encodedId = id.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         
-        return "&nfts=\(encodedNfts)&id=\(encodedId)"
+        return "&nfts=\(encodedNfts),&id=\(encodedId)"
     }
 }

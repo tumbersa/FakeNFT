@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol StatisticsPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
+protocol UsersCollectionPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
     func viewDidLoad()
     var arrOfNFT: [NftStatistics] { get }
     var idLikes: Set<String> { get }
@@ -19,10 +19,11 @@ protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
     func cartTapped(id: String)
 }
 
-final class StatisticsPresenterImpl: StatisticsPresenter {
+final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
     let inputNftIds: [String]
     
     private let dispatchGroup = DispatchGroup()
+    private let utilityQueue = DispatchQueue.global(qos: .utility)
     
     private(set) var idLikes: Set<String> = []
     private(set) var idAddedToCart: Set<String> = []
@@ -39,7 +40,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     private let profileService: ProfileService
     private let cartService: CartService
     
-    weak var view: StatisticsView?
+    weak var view: UsersCollectionView?
     
     init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService) {
         inputNftIds = input
@@ -169,7 +170,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
 }
 
 
-extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
+extension UsersCollectionPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func likeTapped(id: String) {
         
         idLikesForRequests = idLikes
@@ -180,9 +181,11 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
             idLikesForRequests.insert(id)
         }
         
-        loadProfile(httpMethod: .put) { [weak self] in
-            guard let self else { return }
-            view?.updateData(on: arrOfNFT, id: id, isCart: false)
+        utilityQueue.async {[weak self] in
+            self?.loadProfile(httpMethod: .put) { [weak self] in
+                guard let self else { return }
+                view?.updateData(on: arrOfNFT, id: id, isCart: false)
+            }
         }
     }
     
@@ -196,10 +199,14 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
             idAddedToCartForRequests.insert(id)
         }
         
-        loadCart(httpMethod: .put){ [weak self] in
-            guard let self else { return }
-            view?.updateData(on: arrOfNFT, id: id, isCart: true)
+                
+        utilityQueue.async {[weak self] in
+            self?.loadCart(httpMethod: .put){ [weak self] in
+                guard let self else { return }
+                view?.updateData(on: arrOfNFT, id: id, isCart: true)
+            }
         }
+        
     }
     
 }

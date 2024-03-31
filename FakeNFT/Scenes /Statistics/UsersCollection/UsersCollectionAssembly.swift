@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class StatisticsAssembly {
+public final class UsersCollectionAssembly {
     
     private let networkClient: NetworkClient
     
@@ -16,13 +16,13 @@ public final class StatisticsAssembly {
     }
     
     public func build(with input: [String]) -> UIViewController {
-        let presenter = StatisticsPresenterImpl(
+        let presenter = UsersCollectionPresenterImpl(
             input: input,
             nftService: NftServiceImpl(networkClient: networkClient, storage: NftStorageImpl()),
             profileService: ProfileServiceImpl(networkClient: networkClient),
             cartService: CartServiceImpl(networkClient: networkClient)
         )
-        let viewController = StatisticsViewController(presenter: presenter)
+        let viewController = UsersCollectionViewController(presenter: presenter)
         presenter.view = viewController
         return viewController
     }

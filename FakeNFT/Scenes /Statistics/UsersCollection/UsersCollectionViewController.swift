@@ -7,13 +7,13 @@
 
 import UIKit
 
-protocol StatisticsView: AnyObject, ErrorView {
+protocol UsersCollectionView: AnyObject, ErrorView {
     func updateData(on: [NftStatistics], id: String?, isCart: Bool?)
 }
 
-final class StatisticsViewController: UIViewController, ErrorView {
+final class UsersCollectionViewController: UIViewController, ErrorView {
     
-    private let presenter: StatisticsPresenter
+    private let presenter: UsersCollectionPresenter
     
     enum Section {
         case main
@@ -54,7 +54,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
         return collectionView
     }()
     
-    init(presenter: StatisticsPresenter) {
+    init(presenter: UsersCollectionPresenter) {
         self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
@@ -74,7 +74,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
     
 }
 
-extension StatisticsViewController: StatisticsView {
+extension UsersCollectionViewController: UsersCollectionView {
     
     func updateData(on nfts: [NftStatistics], id: String?, isCart: Bool?) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, NftStatistics>()

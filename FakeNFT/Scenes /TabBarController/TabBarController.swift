@@ -46,7 +46,7 @@ final class TabBarController: UITabBarController {
     }
     
     private func createStatisticsVC() -> UIViewController {
-        let assembly = StatisticsAssembly(networkClient: DefaultNetworkClient())
+        let assembly = UsersCollectionAssembly(networkClient: DefaultNetworkClient())
         let statisticsInput = MockDataStatistics.ids
         let statisticsViewController = assembly.build(with: statisticsInput)
         let statisticsController = UINavigationController(rootViewController: statisticsViewController)

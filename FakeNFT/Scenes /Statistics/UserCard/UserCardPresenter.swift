@@ -31,7 +31,7 @@ final class UserCardPresenterImpl: UserCardPresenter {
     }
     
     func loadUserDetailed() {
-        userDetailedService.loadUserDetailed(id: "ab33768d-02ac-4f45-9890-7acf503bde54") { [weak self] result in
+        userDetailedService.loadUserDetailed(id: userId) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let userDetailed):

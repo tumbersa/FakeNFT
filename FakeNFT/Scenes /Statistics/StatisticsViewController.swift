@@ -66,7 +66,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Коллекции NFT"
+        title = "Коллекция NFT"
         view.backgroundColor = .systemBackground
         view.addSubview(collectionView)
         presenter.viewDidLoad()

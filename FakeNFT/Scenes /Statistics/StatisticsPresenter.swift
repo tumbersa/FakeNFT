@@ -171,7 +171,6 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
 
 extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func likeTapped(id: String) {
-        UIBlockingProgressHUD.show()
         
         idLikesForRequests = idLikes
         
@@ -184,12 +183,10 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
         loadProfile(httpMethod: .put) { [weak self] in
             guard let self else { return }
             view?.updateData(on: arrOfNFT)
-            UIBlockingProgressHUD.dismiss()
         }
     }
     
     func cartTapped(id: String) {
-        UIBlockingProgressHUD.show()
         
         idAddedToCartForRequests = idAddedToCart
         
@@ -202,7 +199,6 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
         loadCart(httpMethod: .put){ [weak self] in
             guard let self else { return }
             view?.updateData(on: arrOfNFT)
-            UIBlockingProgressHUD.dismiss()
         }
     }
     

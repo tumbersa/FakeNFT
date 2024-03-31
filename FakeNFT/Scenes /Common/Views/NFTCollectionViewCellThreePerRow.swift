@@ -137,10 +137,12 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     }
     
     @objc private func likeTapped() {
+        likeButton.isUserInteractionEnabled = false
         delegate?.likeTapped(id: id)
     }
     
     @objc private func cartTapped() {
+        cartButton.isUserInteractionEnabled = false
         delegate?.cartTapped(id: id)
     }
     
@@ -167,5 +169,15 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         let numStr = String(format: "%.2f", data.price)
         priceLabel.text = numStr + " ETH"
         id = data.id
+    }
+    
+    func getId() -> String { id }
+    
+    func setIsUserInteractionEnabledToTrue(isCart: Bool) {
+        if isCart { 
+            cartButton.isUserInteractionEnabled = true
+        } else {
+            likeButton.isUserInteractionEnabled = true
+        }
     }
 }

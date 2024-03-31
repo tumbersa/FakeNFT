@@ -90,7 +90,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                     price: nft.price,
                     id: nft.id)
                 arrOfNFT.append(nftStats)
-                view?.updateData(on: arrOfNFT)
+                view?.updateData(on: arrOfNFT, id: nil, isCart: nil)
             case .failure(let error):
                 print(error)
             }
@@ -182,7 +182,7 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
         
         loadProfile(httpMethod: .put) { [weak self] in
             guard let self else { return }
-            view?.updateData(on: arrOfNFT)
+            view?.updateData(on: arrOfNFT, id: id, isCart: false)
         }
     }
     
@@ -198,7 +198,7 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
         
         loadCart(httpMethod: .put){ [weak self] in
             guard let self else { return }
-            view?.updateData(on: arrOfNFT)
+            view?.updateData(on: arrOfNFT, id: id, isCart: true)
         }
     }
     

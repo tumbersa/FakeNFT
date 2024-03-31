@@ -8,7 +8,7 @@
 import UIKit
 
 protocol StatisticsView: AnyObject, ErrorView {
-    func updateData(on: [NftStatistics])
+    func updateData(on: [NftStatistics], id: String?, isCart: Bool?)
 }
 
 final class StatisticsViewController: UIViewController, ErrorView {
@@ -76,7 +76,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
 
 extension StatisticsViewController: StatisticsView {
     
-    func updateData(on nfts: [NftStatistics]) {
+    func updateData(on nfts: [NftStatistics], id: String?, isCart: Bool?) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, NftStatistics>()
         snapshot.appendSections([.main])
         snapshot.appendItems(nfts)
@@ -91,6 +91,12 @@ extension StatisticsViewController: StatisticsView {
                 let idOfCell = nft.id
                 cell.setLikedStateToLikeButton(isLiked: presenter.idLikes.contains(idOfCell))
                 cell.setAddedStateToCart(isAdded: presenter.idAddedToCart.contains(idOfCell))
+                
+                if let id,
+                   let isCart,
+                   cell.getId() == id {
+                    cell.setIsUserInteractionEnabledToTrue(isCart: isCart)
+                }
                 
                 cell.delegate = presenter
             }

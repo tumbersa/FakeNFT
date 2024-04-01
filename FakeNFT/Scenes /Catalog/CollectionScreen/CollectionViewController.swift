@@ -12,6 +12,8 @@ final class CollectionViewController: UIViewController {
     private let collectionLabelsFont = UIFont.systemFont(ofSize: 13, weight: .regular)
     private var collectionViewHeightConstraint = NSLayoutConstraint()
     
+    //MARK: - Views
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
@@ -74,7 +76,12 @@ final class CollectionViewController: UIViewController {
     }()
     
     private lazy var nftCollectionView: UICollectionView = {
-        let nftCollection = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 28
+        layout.minimumInteritemSpacing = 9
+        self.collectionCellWidth = calculateCellWidth(frameWidth: view.frame.width)
+        layout.itemSize = CGSize(width: collectionCellWidth, height: collectionCellWidth * 1.6)
+        let nftCollection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         nftCollection.isScrollEnabled = false
         nftCollection.dataSource = self
         nftCollection.delegate = self
@@ -92,6 +99,8 @@ final class CollectionViewController: UIViewController {
         return button
     }()
     
+    //MARK: - Constants
+    
     private let coverImageHeight: CGFloat = 310
     
     private let collectionControllerSpacing: CGFloat = 16
@@ -108,11 +117,15 @@ final class CollectionViewController: UIViewController {
     
     private var collectionOfMockNft: [MockNftStatistics] = []
     
+    //MARK: - viewDidLoad
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setMockData()
         setupUI()
     }
+    
+    //MARK: - public funcs
     
     func setMockData() {
         collectionOfMockNft = [
@@ -135,6 +148,8 @@ final class CollectionViewController: UIViewController {
         
     }
     
+    //MARK: - private funcs
+    
     @objc private func authorLinkTapped() {
         
     }
@@ -148,16 +163,13 @@ final class CollectionViewController: UIViewController {
 
 extension CollectionViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        self.collectionCellWidth = calculateCellWidth(frameWidth: view.frame.width)
         calculateCollectionHeight(itemCount: collectionOfMockNft.count, cellHeight: self.collectionCellWidth * 1.78)
         return collectionOfMockNft.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NFTCollectionViewCellThreePerRow.reuseID,
-                                                            for: indexPath) as? NFTCollectionViewCellThreePerRow else { 
-            assertionFailure("не удалось получить NFTCollectionViewCellThreePerRow")
-            return UICollectionViewCell() }
+
+        let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
         
         cell.set(mockData: collectionOfMockNft[indexPath.row])
         return cell
@@ -173,15 +185,7 @@ extension CollectionViewController: UICollectionViewDelegate {
 //MARK: - UICollectionViewDelegateFlowLayout
 
 extension CollectionViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionCellWidth, height: collectionCellWidth * 1.6)
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        28
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        9
-    }
+
 }
 
 //MARK: - UI config

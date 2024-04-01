@@ -118,6 +118,13 @@ final class CollectionViewController: UIViewController {
     
     private var collectionOfMockNft: [MockNftStatistics] = []
     
+    private var topBarHeight: CGFloat {
+        let statusBarHeight: CGFloat = 54.0
+        let navBarHeight: CGFloat = 96
+        
+        return statusBarHeight + navBarHeight
+    }
+    
     //MARK: - viewDidLoad
     
     override func viewDidLoad() {
@@ -193,9 +200,10 @@ extension CollectionViewController: UICollectionViewDelegateFlowLayout {
 
 private extension CollectionViewController {
     func setupUI() {
-        configNavBackButton()
+        
         addingViews()
         configConstraints()
+        configNavBackButton()
         view.backgroundColor = Asset.Colors.ypWhite.color
     }
     
@@ -215,15 +223,10 @@ private extension CollectionViewController {
         
         let safeArea = view.safeAreaLayoutGuide
         
-        var topbarHeight: CGFloat {
-            return (navigationController?.view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0.0) +
-            (self.navigationController?.navigationBar.frame.height ?? 0.0)
-        }
-        
         collectionViewHeightConstraint = nftCollectionView.heightAnchor.constraint(equalToConstant: 0)
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -topbarHeight),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -topBarHeight),
             scrollView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),

@@ -65,7 +65,6 @@ final class MyNFTViewController: UIViewController {
         )
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.backgroundColor = .systemBackground
         tableView.separatorStyle = .none
         tableView.allowsMultipleSelection = false
         tableView.isUserInteractionEnabled = true

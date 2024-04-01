@@ -32,6 +32,7 @@ final class CollectionViewController: UIViewController {
         let image = UIImageView()
         image.layer.cornerRadius = 12
         image.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        image.clipsToBounds = true
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
@@ -225,7 +226,7 @@ private extension CollectionViewController {
             scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: -topbarHeight),
             scrollView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
             containerView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             containerView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -270,7 +271,7 @@ private extension CollectionViewController {
     }
     
     private func calculateCellWidth(frameWidth: CGFloat) -> CGFloat {
-        let availableWidth = (frameWidth - (9 * 2 + 16 * 2))
+        let availableWidth = (frameWidth - (10 * 2 + 16 * 2))
         let itemWidth = availableWidth / 3
         return itemWidth
     }

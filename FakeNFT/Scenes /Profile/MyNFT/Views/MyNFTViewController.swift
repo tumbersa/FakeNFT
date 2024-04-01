@@ -20,11 +20,20 @@ final class MyNFTViewController: UIViewController {
             price: 1.78,
             author: "John Doe",
             id: "1"
+        ),
+        NFTCellModel(
+            name: "Stich",
+            images: UIImage(named: "nft_icon") ?? UIImage(),
+            rating: 5,
+            price: 2.55,
+            author: "John Doe",
+            id: "1"
         )
     ]
 
     // private var myNFTs = [NFTCellModel]()
-    // закомментируйте favoriteNFTS с моковыми данными и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
+    // закомментируйте favoriteNFTS с моковыми данными
+    // и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
@@ -80,6 +89,16 @@ final class MyNFTViewController: UIViewController {
         setupConstraints()
         updateEmptyView()
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if let sortType = UserDefaults.standard.data(forKey: "sortType") {
+            let type = try? PropertyListDecoder().decode(Filter.self, from: sortType)
+            self.myNFTs = applySortType(by: type ?? .rating)
+            tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+        }
+    }
 }
 
 // MARK: - Private Extension
@@ -118,8 +137,71 @@ private extension MyNFTViewController {
         self.navigationController?.popViewController(animated: true)
     }
 
+    func saveSortType(type: Filter) {
+        let type = try? PropertyListEncoder().encode(type)
+        UserDefaults.standard.set(type, forKey: "sortType")
+    }
+
+    func applySortType(by type: Filter) -> [NFTCellModel] {
+        let nfts = myNFTs
+
+        switch type {
+        case .name:
+            return nfts.sorted(by: { $0.name < $1.name })
+        case .rating:
+            return nfts.sorted(by: { $0.rating > $1.rating })
+        case .price:
+            return nfts.sorted(by: { $0.price > $1.price })
+        }
+    }
+
     @objc func filterButtonDidTap() {
         print("Filter button did tap")
+
+        let alert = UIAlertController(
+            title: nil,
+            message: L10n.Profile.filter,
+            preferredStyle: .actionSheet
+        )
+
+        let byPriceAction = UIAlertAction(
+            title: L10n.Profile.byPrice,
+            style: .default
+        ) { [weak self] _ in
+            self?.myNFTs = self?.applySortType(by: .price) ?? []
+            self?.saveSortType(type: .price)
+            self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+        }
+
+        let byRatingAction = UIAlertAction(
+            title: L10n.Profile.byRaiting,
+            style: .default
+        ) { [weak self] _ in
+            self?.myNFTs = self?.applySortType(by: .rating) ?? []
+            self?.saveSortType(type: .rating)
+            self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+        }
+
+        let byNameAction = UIAlertAction(
+            title: L10n.Profile.byName,
+            style: .default
+        ) { [weak self] _ in
+            self?.myNFTs = self?.applySortType(by: .name) ?? []
+            self?.saveSortType(type: .name)
+            self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+        }
+
+        let close = UIAlertAction(
+            title: L10n.Profile.close,
+            style: .cancel
+        )
+
+        alert.addAction(byPriceAction)
+        alert.addAction(byRatingAction)
+        alert.addAction(byNameAction)
+        alert.addAction(close)
+
+        present(alert, animated: true)
     }
 
     func updateEmptyView() {

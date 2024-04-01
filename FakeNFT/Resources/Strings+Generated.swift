@@ -52,6 +52,16 @@ internal enum L10n {
         internal static let NFTFavorites = L10n.tr("Localizable", "Profile.NFTFavorites", fallback: "Избранные NFT")
         /// У Вас ещё нет избранных NFT
         internal static let emptyFavouriteNFT = L10n.tr("Localizable", "Profile.emptyFavouriteNFT", fallback: "У Вас ещё нет избранных NFT")
+        /// Сортировка
+        internal static let filter = L10n.tr("Localizable", "Profile.filter", fallback: "Сортировка")
+        /// По цене
+        internal static let byPrice = L10n.tr("Localizable", "Profile.byPrice", fallback: "По цене")
+        /// По названию
+        internal static let byName = L10n.tr("Localizable", "Profile.byName", fallback: "По названию")
+        /// По рейтингу
+        internal static let byRaiting = L10n.tr("Localizable", "Profile.byRaiting", fallback: "По рейтингу")
+        /// Закрыть
+        internal static let close = L10n.tr("Localizable", "Profile.close", fallback: "Закрыть")
     }
 
     internal enum Error {

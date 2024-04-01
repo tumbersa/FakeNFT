@@ -23,6 +23,7 @@
 		0CFCB7492A7808900009A829 /* TestCatalogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFCB7482A7808900009A829 /* TestCatalogController.swift */; };
 		0CFCB74B2A780EA80009A829 /* UIView+Constraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFCB74A2A780EA80009A829 /* UIView+Constraints.swift */; };
 		0CFCB74E2A7817DC0009A829 /* NftStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFCB74D2A7817DC0009A829 /* NftStorage.swift */; };
+		27229CA22BBA8AF700821F4A /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27229CA12BBA8AF700821F4A /* Filter.swift */; };
 		2744E7352BB076B200E21FAD /* AboutDeveloperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744E7342BB076B200E21FAD /* AboutDeveloperViewController.swift */; };
 		275E33032BAF233E00BE3090 /* Decomposition in Resources */ = {isa = PBXBuildFile; fileRef = 275E33022BAF233E00BE3090 /* Decomposition */; };
 		275E33062BAF236500BE3090 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275E33052BAF236500BE3090 /* ProfileViewController.swift */; };
@@ -100,6 +101,7 @@
 		0CFCB7482A7808900009A829 /* TestCatalogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCatalogController.swift; sourceTree = "<group>"; };
 		0CFCB74A2A780EA80009A829 /* UIView+Constraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Constraints.swift"; sourceTree = "<group>"; };
 		0CFCB74D2A7817DC0009A829 /* NftStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NftStorage.swift; sourceTree = "<group>"; };
+		27229CA12BBA8AF700821F4A /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		2744E7342BB076B200E21FAD /* AboutDeveloperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutDeveloperViewController.swift; sourceTree = "<group>"; };
 		275E33022BAF233E00BE3090 /* Decomposition */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Decomposition; sourceTree = "<group>"; };
 		275E33052BAF236500BE3090 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 			children = (
 				2771E3392BB4A46C004E490C /* NFT.swift */,
 				276F8B2E2BB57F18009A260D /* NFTCellModel.swift */,
+				27229CA12BBA8AF700821F4A /* Filter.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -673,6 +676,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				276925EC2BB08120001A3E70 /* EditProfileView.swift in Sources */,
+				27229CA22BBA8AF700821F4A /* Filter.swift in Sources */,
 				276F8B2F2BB57F18009A260D /* NFTCellModel.swift in Sources */,
 				3FC8C38B29D242E90081F015 /* ProductDetailsTableViewCell.swift in Sources */,
 				3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */,

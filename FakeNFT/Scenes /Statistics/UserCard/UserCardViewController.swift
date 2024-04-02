@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 import Kingfisher
-import SafariServices
 
 protocol UserCardView: AnyObject,ErrorView {
     func updateData(with userDetailed: UserDetailed)
@@ -149,10 +148,7 @@ final class UserCardViewController: UIViewController, ErrorView {
     }
     
     @objc private func websiteButtonTapped() {
-        guard let urlStr = presenter.userDetailed?.website,
-              let url = URL(string: urlStr) else { return }
-        let vc = SFSafariViewController(url: url)
-        present(vc, animated: true)
+        presenter.websiteButtonTapped()
     }
 }
     

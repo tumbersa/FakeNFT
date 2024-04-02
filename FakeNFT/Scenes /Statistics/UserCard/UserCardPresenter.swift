@@ -9,6 +9,7 @@ import Foundation
 
 protocol UserCardPresenter {
     func colletionNFTControlTapped()
+    func websiteButtonTapped()
     func viewDidLoad()
     var userDetailed: UserDetailed? { get }
 }
@@ -37,6 +38,11 @@ final class UserCardPresenterImpl: UserCardPresenter {
         guard let userDetailed else { return }
         let userCollectionInput = StatisticsInput.nftIds(userDetailed.nfts)
         router.push(with: userCollectionInput)
+    }
+    
+    func websiteButtonTapped() {
+        guard let urlStr = userDetailed?.website else { return }
+        router.presentSFViewController(urlStr: urlStr)
     }
     
     private func loadUserDetailed() {

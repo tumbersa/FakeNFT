@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import SafariServices
 
 protocol StatisticsRouter {
     func push(with input: StatisticsInput)
     func pop()
+    func presentSFViewController(urlStr: String)
 }
 
 final class StatisticsRouterImpl: StatisticsRouter {
@@ -35,6 +37,13 @@ final class StatisticsRouterImpl: StatisticsRouter {
     
     func pop() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    func presentSFViewController(urlStr: String) {
+        if let url = URL(string: urlStr) {
+            let vc = SFSafariViewController(url: url)
+            navigationController?.present(vc, animated: true)
+        }
     }
 }
 

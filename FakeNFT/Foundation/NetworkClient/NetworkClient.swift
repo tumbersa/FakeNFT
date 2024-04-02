@@ -110,22 +110,26 @@ struct DefaultNetworkClient: NetworkClient {
     // MARK: - Private
 
     private func create(request: NetworkRequest) -> URLRequest? {
-        guard let endpoint = request.endpoint else {
-            assertionFailure("Empty endpoint")
-            return nil
-        }
+           guard let endpoint = request.endpoint else {
+               assertionFailure("Empty endpoint")
+               return nil
+           }
 
-        var urlRequest = URLRequest(url: endpoint)
-        urlRequest.httpMethod = request.httpMethod.rawValue
+           var urlRequest = URLRequest(url: endpoint)
+           urlRequest.httpMethod = request.httpMethod.rawValue
 
-        if let dto = request.dto,
-           let dtoEncoded = try? encoder.encode(dto) {
-            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            urlRequest.httpBody = dtoEncoded
-        }
-
-        return urlRequest
-    }
+           if let dto = request.dto,
+              let dtoEncoded = try? encoder.encode(dto) {
+               urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+               urlRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+               urlRequest.httpBody = dtoEncoded
+           }
+           
+           let token = "6209b976-c7aa-4061-8574-573765a55e71"
+           urlRequest.setValue("\(token)", forHTTPHeaderField: "X-Practicum-Mobile-Token")
+           
+           return urlRequest
+       }
 
     private func parse<T: Decodable>(data: Data, type _: T.Type, onResponse: @escaping (Result<T, Error>) -> Void) {
         do {

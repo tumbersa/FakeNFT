@@ -21,7 +21,7 @@ class DeleteViewController: UIViewController {
         return imageView
     }()
     
-    private let textLabel: UILabel = {
+    private lazy var textLabel: UILabel = {
        let label = UILabel()
         label.text = "Вы уверены, что хотите удалить объект из корзины?"
         label.textAlignment = .center
@@ -32,7 +32,7 @@ class DeleteViewController: UIViewController {
         return label
     }()
     
-    private let removeNftButton: UIButton = {
+    private lazy var removeNftButton: UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
@@ -47,7 +47,7 @@ class DeleteViewController: UIViewController {
         return button
     }()
     
-    private let backNftButton: UIButton = {
+    private lazy var backNftButton: UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16

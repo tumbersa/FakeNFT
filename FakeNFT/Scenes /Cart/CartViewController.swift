@@ -11,6 +11,11 @@ class CartViewController: UIViewController {
     
     var mockData: [String] = ["NFT1", "NFT2", "NFT3", "NFT4", "NFT5", "NFT6"]
     
+    private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
+    private var idAddedToCart: Set<String> = []
+    private var arrOfNFT: [Nft] = []
+    
     private let emptyCart: UILabel = {
        let label = UILabel()
         label.text = "Корзина пуста"
@@ -59,7 +64,7 @@ class CartViewController: UIViewController {
         return label
     }()
     
-    private let buttonPay: UIButton = {
+    private lazy var buttonPay: UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
@@ -73,8 +78,52 @@ class CartViewController: UIViewController {
         return button
     }()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        configureVC()
+        loadCart(httpMethod: .get) {[weak self] error in
+            self?.processNFTsLoading()
+        }
+    }
+    
+    private func processNFTsLoading() {
+        for id in idAddedToCart {
+            loadNft(id: id)
+        }
+    }
+        
+    private func loadNft(id: String) {
+        nftService.loadNft(id: id) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let nft):
+                print(nft)
+                arrOfNFT.append(nft)
+                tableView.reloadData()
+            case .failure(let error):
+               print(error)
+            }
+        }
+    }
+    
+    private func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
+           cartService.loadCart(httpMethod: httpMethod, model: nil) {[weak self] result in
+               guard let self else { return }
+               switch result {
+               case .success(let cart):
+                   print(cart)
+                   idAddedToCart = Set(cart.nfts)
+                   completion(nil)
+               case .failure(let error):
+                   print(error)
+                   completion(error)
+               }
+           }
+       }
+    
+    func configureVC() {
         let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, style: .plain, target: self, action: #selector(addButtonTapped))
         addButton.tintColor = .black
         navigationItem.rightBarButtonItem = addButton
@@ -189,14 +238,14 @@ extension CartViewController: UITableViewDelegate {
 
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        mockData.count
+        arrOfNFT.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as! CartCustomCell
         cell.delegate = self
-        cell.indexPath = indexPath
-        cell.nftName.text = mockData[indexPath.row]
+        cell.nftName.text = arrOfNFT[indexPath.row].name
+        
         return cell
     }
 }

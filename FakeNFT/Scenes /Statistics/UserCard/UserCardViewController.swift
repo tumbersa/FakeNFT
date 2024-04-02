@@ -145,12 +145,7 @@ final class UserCardViewController: UIViewController, ErrorView {
     }
     
     @objc private func colletionNFTControlTapped(){
-        guard let userDetailed = presenter.userDetailed else { return }
-        let assembly = UsersCollectionAssembly(networkClient: DefaultNetworkClient())
-        let userCollectionInput = userDetailed.nfts
-        let userCollectionsViewController = assembly.build(with: userCollectionInput)
-        
-        navigationController?.pushViewController(userCollectionsViewController, animated: true)
+        presenter.colletionNFTControlTapped()
     }
     
     @objc private func websiteButtonTapped() {

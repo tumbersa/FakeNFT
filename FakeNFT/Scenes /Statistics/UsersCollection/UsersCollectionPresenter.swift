@@ -9,6 +9,7 @@ import Foundation
 
 protocol UsersCollectionPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
     func viewDidLoad()
+    func backButtonPressed()
     var arrOfNFT: [NftStatistics] { get }
     var idLikes: Set<String> { get }
     var idAddedToCart: Set<String> { get }
@@ -20,7 +21,7 @@ protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
 }
 
 final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
-    let inputNftIds: [String]
+    private let inputNftIds: [String]
     
     private let dispatchGroup = DispatchGroup()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
@@ -39,14 +40,16 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
     private let nftService: NftService
     private let profileService: ProfileService
     private let cartService: CartService
+    private let router: StatisticsRouter
     
     weak var view: UsersCollectionView?
     
-    init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService) {
+    init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService, router: StatisticsRouter) {
         inputNftIds = input
         self.nftService = nftService
         self.profileService = profileService
         self.cartService = cartService
+        self.router = router
     }
     
     func viewDidLoad() {
@@ -74,6 +77,10 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
         
     }
     
+    func backButtonPressed() {
+        router.pop()
+    }
+    
     private func processNFTsLoading() {
         for id in inputNftIds {
             loadNft(id: id)
@@ -99,7 +106,7 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
         }
     }
     
-    private func loadProfile(httpMethod: HttpMethod, completion: @escaping (Error?) -> Void) {
+    private func loadProfile(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void) {
         
         var formData: String = ""
         if let profile {
@@ -124,9 +131,9 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
                 completion(nil)
             case .failure(let error):
                 print(error)
-                view?.showError(ErrorModel() {[weak self] in
+                view?.showError(ErrorModel {[weak self] in
                     guard let self else { return }
-                    if let id = idLikes.symmetricDifference(idLikesForRequests).first {
+                    if let id {
                         likeTapped(id: id)
                     } else {
                         viewDidLoad()
@@ -139,7 +146,7 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
     }
     
     
-    private func loadCart(httpMethod: HttpMethod, completion: @escaping (Error?) -> Void ) {
+    private func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
         
         var formData: String = ""
         if let cart {
@@ -158,9 +165,9 @@ final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
                 completion(nil)
             case .failure(let error):
                 print(error)
-                view?.showError(ErrorModel() {[weak self] in
+                view?.showError(ErrorModel {[weak self] in
                     guard let self else { return }
-                    if let id = idAddedToCart.symmetricDifference(idAddedToCartForRequests).first {
+                    if let id {
                         cartTapped(id: id)
                     } else {
                         viewDidLoad()
@@ -186,8 +193,7 @@ extension UsersCollectionPresenterImpl: NFTCollectionViewCellThreePerRowDelegate
         }
         
         utilityQueue.async {[weak self] in
-            self?.loadProfile(httpMethod: .put) { [weak self] error in
-                if let error { return }
+            self?.loadProfile(httpMethod: .put, id: id) { [weak self] _ in
                 guard let self else { return }
                 view?.updateData(on: arrOfNFT, id: id, isCart: false)
             }
@@ -206,8 +212,7 @@ extension UsersCollectionPresenterImpl: NFTCollectionViewCellThreePerRowDelegate
         
                 
         utilityQueue.async {[weak self] in
-            self?.loadCart(httpMethod: .put){ [weak self] error in
-                if let error { return }
+            self?.loadCart(httpMethod: .put, id: id){ [weak self] _ in
                 guard let self else { return }
                 view?.updateData(on: arrOfNFT, id: id, isCart: true)
             }

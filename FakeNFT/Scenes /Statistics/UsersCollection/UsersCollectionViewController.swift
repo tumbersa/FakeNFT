@@ -88,7 +88,7 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
     }
     
     @objc private func backButtonPressed() {
-        navigationController?.popViewController(animated: true)
+        presenter.backButtonPressed()
     }
     
     private func configureCollectionView(){

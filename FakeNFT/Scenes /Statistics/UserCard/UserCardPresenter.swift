@@ -8,6 +8,7 @@
 import Foundation
 
 protocol UserCardPresenter {
+    func colletionNFTControlTapped()
     func viewDidLoad()
     var userDetailed: UserDetailed? { get }
 }
@@ -16,13 +17,15 @@ final class UserCardPresenterImpl: UserCardPresenter {
     
     private let userId: String
     private let userDetailedService: UserDetailedService
+    private let router: StatisticsRouter
     
     private(set) var userDetailed: UserDetailed?
     weak var view: UserCardView?
     
-    init(userId: String, userDetailedService: UserDetailedService) {
+    init(userId: String, userDetailedService: UserDetailedService, router: StatisticsRouter) {
         self.userId = userId
         self.userDetailedService = userDetailedService
+        self.router = router
     }
     
     func viewDidLoad() {
@@ -30,7 +33,13 @@ final class UserCardPresenterImpl: UserCardPresenter {
         loadUserDetailed()
     }
     
-    func loadUserDetailed() {
+    func colletionNFTControlTapped() {
+        guard let userDetailed else { return }
+        let userCollectionInput = StatisticsInput.nftIds(userDetailed.nfts)
+        router.push(with: userCollectionInput)
+    }
+    
+    private func loadUserDetailed() {
         userDetailedService.loadUserDetailed(id: userId) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             guard let self else { return }

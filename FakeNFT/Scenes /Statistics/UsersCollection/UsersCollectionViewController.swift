@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 protocol UsersCollectionView: AnyObject, ErrorView {
-    func updateData(on: [NftStatistics], id: String?, isCart: Bool?)
+    func updateData(with: [NftStatistics], id: String?, isCart: Bool?)
 }
 
 final class UsersCollectionViewController: UIViewController, ErrorView {
@@ -27,28 +27,40 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
                 
                 guard let self else { return UICollectionViewCell()}
                 let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
-                let nftItem = presenter.arrOfNFT[indexPath.item]
+                let nftItem = presenter.getNftItem(indexPath.item)
                 cell.set(data: nftItem)
                 
                 let idOfCell = nftItem.id
-                cell.setLikedStateToLikeButton(isLiked: presenter.idLikes.contains(idOfCell))
-                cell.setAddedStateToCart(isAdded: presenter.idAddedToCart.contains(idOfCell))
+                
+                cell.setLikedStateToLikeButton(isLiked: presenter.isLiked(idOfCell))
+                cell.setAddedStateToCart(isAdded: presenter.isAddedToCart(idOfCell))
                 cell.delegate = presenter
                 
                 return cell
             })
     }()
     
-    private lazy var collectionView: UICollectionView! = {
+    private lazy var layout: UICollectionViewFlowLayout = {
+        let countOfCellsInRow: CGFloat = 3
+        let minimumInteritemSpacing: CGFloat = 9
+        let sidePadding: CGFloat = 16
+        let aspectRatio: CGFloat = 1.78
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 8
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        layout.minimumInteritemSpacing = 9
-        let availableWidth = (view.frame.width - (10 * 2 + 16 * 2))
-        let itemWidth = availableWidth / 3
-        layout.itemSize = CGSize(width: itemWidth, height: itemWidth * 1.78)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: sidePadding, bottom: 0, right: sidePadding)
+        layout.minimumInteritemSpacing = minimumInteritemSpacing
         
+        let totalPaddingWidth = (minimumInteritemSpacing+1) * (countOfCellsInRow-1) + sidePadding * (countOfCellsInRow-1)
+        let availableWidth = view.frame.width - totalPaddingWidth
+        let itemWidth = availableWidth / countOfCellsInRow
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth * aspectRatio)
+        
+        return layout
+    }()
+    
+    private lazy var collectionView: UICollectionView! = {
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
         collectionView.register(NFTCollectionViewCellThreePerRow.self)
         
@@ -73,11 +85,9 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
     }
     
     private func configureVC(){
-       
         navigationController?.navigationBar.tintColor = .label
         title = "Коллекция NFT"
         view.backgroundColor = .systemBackground
-        
         
         let backButton = UIBarButtonItem(title: "", 
                                          style: .plain,
@@ -105,21 +115,19 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
 
 extension UsersCollectionViewController: UsersCollectionView {
     
-    func updateData(on nfts: [NftStatistics], id: String?, isCart: Bool?) {
+    func updateData(with nfts: [NftStatistics], id: String?, isCart: Bool?) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, NftStatistics>()
         snapshot.appendSections([.main])
         snapshot.appendItems(nfts)
-        
-        
-        self.dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: true)
         
         for (index, nft) in nfts.enumerated() {
-            if let cell = self.collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
+            if let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
                 cell.set(data: nft)
                 
                 let idOfCell = nft.id
-                cell.setLikedStateToLikeButton(isLiked: presenter.idLikes.contains(idOfCell))
-                cell.setAddedStateToCart(isAdded: presenter.idAddedToCart.contains(idOfCell))
+                cell.setLikedStateToLikeButton(isLiked: presenter.isLiked(idOfCell))
+                cell.setAddedStateToCart(isAdded: presenter.isAddedToCart(idOfCell))
                 
                 if let id,
                    let isCart,
@@ -130,6 +138,5 @@ extension UsersCollectionViewController: UsersCollectionView {
                 cell.delegate = presenter
             }
         }
-        
     }
 }

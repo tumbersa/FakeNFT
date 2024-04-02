@@ -11,7 +11,6 @@ protocol UserCardPresenter {
     func colletionNFTControlTapped()
     func websiteButtonTapped()
     func viewDidLoad()
-    var userDetailed: UserDetailed? { get }
 }
 
 final class UserCardPresenterImpl: UserCardPresenter {
@@ -54,8 +53,7 @@ final class UserCardPresenterImpl: UserCardPresenter {
             case .success(let userDetailed):
                 self.userDetailed = userDetailed
                 view?.updateData(with: userDetailed)
-            case .failure(let error):
-                print(error)
+            case .failure(_):
                 view?.showError(ErrorModel() {[weak self] in
                     guard let self else { return }
                     viewDidLoad()

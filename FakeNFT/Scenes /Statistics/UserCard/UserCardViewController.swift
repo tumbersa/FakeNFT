@@ -162,10 +162,9 @@ extension  UserCardViewController: UserCardView {
             switch result {
             case .success(_):
                 break
-            case .failure(let error):
+            case .failure(_):
                 let errorImage = UIImage(systemName: "person.circle.fill")?.withTintColor(.label, renderingMode: .alwaysOriginal)
                 avatarImageView.image = errorImage
-                print(error)
             }
         }
         

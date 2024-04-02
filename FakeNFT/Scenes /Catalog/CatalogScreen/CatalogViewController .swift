@@ -107,6 +107,7 @@ extension CatalogViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogViewCell.catalogViewCellReuseIdentifier,
                                                        for: indexPath) as? CatalogViewCell else { return UITableViewCell() }
+        cell.selectionStyle = .none
         let nftModel = presenter.dataSource[indexPath.row]
         let url = URL(string: nftModel.cover.encodeUrl)
         return cell.makeCell(nftCatalogModel: nftModel, coverURL: url)
@@ -119,7 +120,11 @@ extension CatalogViewController: UITableViewDataSource {
 //MARK: - UITableViewDelegate
 
 extension CatalogViewController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let viewController = CollectionViewController()
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(viewController, animated: true)
+    }
 }
 
 //MARK: - ConfigUI

@@ -32,14 +32,19 @@ final class UserCardPresenterImpl: UserCardPresenter {
     
     func loadUserDetailed() {
         userDetailedService.loadUserDetailed(id: userId) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
             guard let self else { return }
+            
             switch result {
             case .success(let userDetailed):
                 self.userDetailed = userDetailed
                 view?.updateData(with: userDetailed)
-                UIBlockingProgressHUD.dismiss()
             case .failure(let error):
                 print(error)
+                view?.showError(ErrorModel() {[weak self] in
+                    guard let self else { return }
+                    viewDidLoad()
+                })
             }
         }
     }

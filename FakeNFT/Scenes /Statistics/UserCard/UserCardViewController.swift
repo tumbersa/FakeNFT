@@ -10,11 +10,11 @@ import SnapKit
 import Kingfisher
 import SafariServices
 
-protocol UserCardView: AnyObject {
+protocol UserCardView: AnyObject,ErrorView {
     func updateData(with userDetailed: UserDetailed)
 }
 
-final class UserCardViewController: UIViewController, UserCardView {
+final class UserCardViewController: UIViewController, ErrorView {
     
     private let presenter: UserCardPresenter
     
@@ -87,7 +87,6 @@ final class UserCardViewController: UIViewController, UserCardView {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         layoutUI()
         presenter.viewDidLoad()
     }
@@ -156,15 +155,29 @@ final class UserCardViewController: UIViewController, UserCardView {
     
     @objc private func websiteButtonTapped() {
         guard let urlStr = presenter.userDetailed?.website,
-            let url = URL(string: urlStr) else { return }
+              let url = URL(string: urlStr) else { return }
         let vc = SFSafariViewController(url: url)
         present(vc, animated: true)
     }
+}
     
+extension  UserCardViewController: UserCardView {
     func updateData(with userDetailed: UserDetailed) {
-        print(userDetailed)
         guard let avatarUrl = URL(string: userDetailed.avatar) else { return }
-        avatarImageView.kf.setImage(with: avatarUrl)
+        
+        avatarImageView.kf.setImage(with: avatarUrl) {[weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(_):
+                break
+            case .failure(let error):
+                let errorImage = UIImage(systemName: "person.circle.fill")?.withTintColor(.label, renderingMode: .alwaysOriginal)
+                avatarImageView.image = errorImage
+                print(error)
+            }
+        }
+        
         nameLabel.text = userDetailed.name
         descriptionLabel.text = userDetailed.description
         collectionNFTLabel.text = "Коллекция NFT (\(userDetailed.nfts.count))"

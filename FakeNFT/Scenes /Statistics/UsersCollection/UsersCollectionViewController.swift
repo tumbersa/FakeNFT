@@ -45,7 +45,7 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
         layout.minimumLineSpacing = 8
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         layout.minimumInteritemSpacing = 9
-        let availableWidth = (view.frame.width - (9 * 2 + 16 * 2))
+        let availableWidth = (view.frame.width - (10 * 2 + 16 * 2))
         let itemWidth = availableWidth / 3
         layout.itemSize = CGSize(width: itemWidth, height: itemWidth * 1.78)
         

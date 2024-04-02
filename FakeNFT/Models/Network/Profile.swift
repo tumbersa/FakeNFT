@@ -21,9 +21,12 @@ struct Profile: Codable {
         let encodedDescription = description
         let encodedWebsite = website.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? ""
         let encodedNfts = nfts.map { String($0) }.joined(separator: ",")
-        let encodedLikes = likes.map { String($0) }.joined(separator: ",")
+        var encodedLikes = likes.map { String($0) }.joined(separator: ",")
+        if encodedLikes.isEmpty {
+            encodedLikes = "null"
+        }
         let encodedId = id
         
-        return "&name=\(encodedName)&avatar=\(encodedAvatar)&description=\(encodedDescription)&website=\(encodedWebsite)&nfts=\(encodedNfts),&likes=\(encodedLikes),&id=\(encodedId)"
+        return "&name=\(encodedName)&avatar=\(encodedAvatar)&description=\(encodedDescription)&website=\(encodedWebsite)&nfts=\(encodedNfts),&likes=\(encodedLikes)&id=\(encodedId)"
     }
 }

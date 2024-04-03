@@ -21,6 +21,8 @@ class CryptoWalletCell: UICollectionViewCell {
         let image = UIImage(named: "Bitcoin (BTC)")
         // Создаем UIImageView с этим изображением
         let imageView = UIImageView(image: image)
+        imageView.heightAnchor.constraint(equalToConstant: 36).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 36).isActive = true
         imageView.contentMode = .scaleAspectFit // Настраиваем режим отображения
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView

@@ -1,17 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "ApeCoin (APE).png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "ApeCoin (APE)@1x.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

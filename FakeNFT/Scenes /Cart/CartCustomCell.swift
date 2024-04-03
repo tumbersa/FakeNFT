@@ -99,7 +99,7 @@ class CartCustomCell: UITableViewCell {
     
     private lazy var deleteNftButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "Delete"), for: .normal)
+        button.setImage(UIImage(named: "Group 7"), for: .normal)
         button.addTarget(self, action: #selector(deleteNFT), for: .touchUpInside)
         button.heightAnchor.constraint(equalToConstant: 40).isActive = true
         button.widthAnchor.constraint(equalToConstant: 40).isActive = true

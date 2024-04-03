@@ -59,7 +59,7 @@ class CartViewController: UIViewController {
         return label
     }()
     
-    private let buttonPay: UIButton = {
+    private lazy var buttonPay: UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
@@ -193,7 +193,9 @@ extension CartViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as! CartCustomCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CartCustomCell else {
+            return UITableViewCell()
+        }
         cell.delegate = self
         cell.indexPath = indexPath
         cell.nftName.text = mockData[indexPath.row]

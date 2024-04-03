@@ -245,10 +245,12 @@ extension ProfileViewController: UITableViewDelegate {
         case 0:
             print("My NFTs cell did tap")
             let viewController = MyNFTViewController()
+            viewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController, animated: true)
         case 1:
             print("My Favourite NFTs cell did tap")
             let viewController = FavoriteNFTViewController()
+            viewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController, animated: true)
         case 2:
             print("About Developer cell did tap")

@@ -9,6 +9,12 @@ final class TabBarController: UITabBarController {
         image: UIImage(systemName: "square.stack.3d.up.fill"),
         tag: 0
     )
+    
+    private let cartTabBarItem = UITabBarItem(
+        title: "Корзина",
+        image: UIImage(named: "Cart"),
+        tag: 1
+    )
 
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
@@ -22,11 +28,17 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let catalogController = createNavigation(with: L10n.Tab.catalog,
-                                                 and: UIImage(systemName: "square.stack.3d.up.fill"),
-                                                 vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
+        let catalogController = TestCatalogViewController(
+            servicesAssembly: servicesAssembly
+        )
+        let cartViewController = UINavigationController( rootViewController: CartViewController())
+        
+        catalogController.tabBarItem = catalogTabBarItem
+        cartViewController.tabBarItem = cartTabBarItem
 
-        self.setViewControllers([catalogController], animated: true)
+        viewControllers = [catalogController, cartViewController]
+
+        self.setViewControllers([catalogController, cartViewController], animated: true)
 
         view.backgroundColor = .systemBackground
     }

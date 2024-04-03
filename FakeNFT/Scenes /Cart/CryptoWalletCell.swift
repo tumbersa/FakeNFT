@@ -9,14 +9,14 @@ import UIKit
 
 class CryptoWalletCell: UICollectionViewCell {
     
-    let cryptoBacground: UIView = {
+    private let cryptoBacground: UIView = {
        let view = UIView()
         view.backgroundColor = UIColor(named: "ypLightGray")
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    lazy var cryptoImage: UIImageView = {
+    private lazy var cryptoImage: UIImageView = {
         // Загружаем изображение по имени
         let image = UIImage(named: "Bitcoin (BTC)")
         // Создаем UIImageView с этим изображением
@@ -28,7 +28,7 @@ class CryptoWalletCell: UICollectionViewCell {
         return imageView
     }()
     
-    lazy var fullNameCrypto: UILabel = {
+    private lazy var fullNameCrypto: UILabel = {
        let label = UILabel()
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.text = "Bitcoin"
@@ -38,7 +38,7 @@ class CryptoWalletCell: UICollectionViewCell {
         return label
     }()
     
-    lazy var shortNameCrypto: UILabel = {
+    private lazy var shortNameCrypto: UILabel = {
        let label = UILabel()
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.text = "BTC"

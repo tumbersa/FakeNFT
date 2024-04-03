@@ -12,9 +12,9 @@ struct Cart: Codable {
     let id: String
     
     func toFormData() -> String {
-        let encodedNfts = nfts.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
-        let encodedId = id.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedNfts = nfts.map { String($0) }.joined(separator: ",")
+        let encodedId = id
         
-        return "&nfts=\(encodedNfts)&id=\(encodedId)"
+        return "&nfts=\(encodedNfts),&id=\(encodedId)"
     }
 }

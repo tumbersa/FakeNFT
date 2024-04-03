@@ -16,14 +16,17 @@ struct Profile: Codable {
     let id: String
     
     func toFormData() -> String {
-        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedAvatar = avatar.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedDescription = description.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedWebsite = website.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let encodedNfts = nfts.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
-        let encodedLikes = likes.map { $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "" }.joined(separator: ",")
-        let encodedId = id.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedName = name
+        let encodedAvatar = avatar.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? ""
+        let encodedDescription = description
+        let encodedWebsite = website.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? ""
+        let encodedNfts = nfts.map { String($0) }.joined(separator: ",")
+        var encodedLikes = likes.map { String($0) }.joined(separator: ",")
+        if encodedLikes.isEmpty {
+            encodedLikes = "null"
+        }
+        let encodedId = id
         
-        return "&name=\(encodedName)&avatar=\(encodedAvatar)&description=\(encodedDescription)&website=\(encodedWebsite)&nfts=\(encodedNfts)&likes=\(encodedLikes)&id=\(encodedId)"
+        return "&name=\(encodedName)&avatar=\(encodedAvatar)&description=\(encodedDescription)&website=\(encodedWebsite)&nfts=\(encodedNfts),&likes=\(encodedLikes)&id=\(encodedId)"
     }
 }

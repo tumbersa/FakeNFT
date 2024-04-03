@@ -7,11 +7,12 @@
 
 import Foundation
 
-protocol StatisticsPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
+protocol UsersCollectionPresenter: AnyObject, NFTCollectionViewCellThreePerRowDelegate {
     func viewDidLoad()
-    var arrOfNFT: [NftStatistics] { get }
-    var idLikes: Set<String> { get }
-    var idAddedToCart: Set<String> { get }
+    func backButtonPressed()
+    func getNftItem(_ index: Int) -> NftStatistics
+    func isLiked(_ idOfCell: String) -> Bool
+    func isAddedToCart(_ idOfCell: String) -> Bool
 }
 
 protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
@@ -19,13 +20,14 @@ protocol NFTCollectionViewCellThreePerRowDelegate: AnyObject {
     func cartTapped(id: String)
 }
 
-final class StatisticsPresenterImpl: StatisticsPresenter {
-    let inputNftIds: [String]
+final class UsersCollectionPresenterImpl: UsersCollectionPresenter {
+    private let inputNftIds: [String]
     
     private let dispatchGroup = DispatchGroup()
+    private let utilityQueue = DispatchQueue.global(qos: .utility)
     
-    private(set) var idLikes: Set<String> = []
-    private(set) var idAddedToCart: Set<String> = []
+    private var idLikes: Set<String> = []
+    private var idAddedToCart: Set<String> = []
     
     private var idLikesForRequests: Set<String> = []
     private var idAddedToCartForRequests: Set<String> = []
@@ -33,35 +35,38 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     private var profile: Profile?
     private var cart: Cart?
     
-    private(set) var arrOfNFT: [NftStatistics] = []
+    private var arrOfNFT: [NftStatistics] = []
     
     private let nftService: NftService
     private let profileService: ProfileService
     private let cartService: CartService
+    private let router: StatisticsRouter
     
-    weak var view: StatisticsView?
+    weak var view: UsersCollectionView?
     
-    init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService) {
+    init(input: [String], nftService: NftService, profileService: ProfileService, cartService: CartService, router: StatisticsRouter) {
         inputNftIds = input
         self.nftService = nftService
         self.profileService = profileService
         self.cartService = cartService
+        self.router = router
     }
     
     func viewDidLoad() {
         UIBlockingProgressHUD.show()
         
-        
         dispatchGroup.enter()
-        loadProfile(httpMethod: .get, completion: { [weak self] in
+        loadProfile(httpMethod: .get, completion: { [weak self] error in
             guard let self else { return }
             dispatchGroup.leave()
+            if error != nil { return }
         })
         
         dispatchGroup.enter()
-        loadCart(httpMethod: .get, completion: { [weak self] in
+        loadCart(httpMethod: .get, completion: { [weak self] error in
             guard let self else { return }
             dispatchGroup.leave()
+            if error != nil { return }
         })
         
         dispatchGroup.notify(queue: .main) { [weak self] in
@@ -70,6 +75,22 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             UIBlockingProgressHUD.dismiss()
         }
         
+    }
+    
+    func getNftItem(_ index: Int) -> NftStatistics {
+        arrOfNFT[index]
+    }
+    
+    func isLiked(_ idOfCell: String) -> Bool {
+        idLikes.contains(idOfCell)
+    }
+    
+    func isAddedToCart(_ idOfCell: String) -> Bool {
+        idAddedToCart.contains(idOfCell)
+    }
+    
+    func backButtonPressed() {
+        router.pop()
     }
     
     private func processNFTsLoading() {
@@ -90,14 +111,17 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                     price: nft.price,
                     id: nft.id)
                 arrOfNFT.append(nftStats)
-                view?.updateData(on: arrOfNFT)
-            case .failure(let error):
-                print(error)
+                view?.updateData(with: arrOfNFT, id: nil, isCart: nil)
+            case .failure(_):
+                view?.showError(ErrorModel {[weak self] in
+                    guard let self else { return }
+                    loadNft(id: id)
+                })
             }
         }
     }
     
-    private func loadProfile(httpMethod: HttpMethod, completion: @escaping () -> Void) {
+    private func loadProfile(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void) {
         
         var formData: String = ""
         if let profile {
@@ -119,16 +143,24 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             case .success(let profile):
                 self.profile = profile
                 idLikes = Set(profile.likes)
+                completion(nil)
             case .failure(let error):
-                view?.showError(makeErrorModel(error))
+                view?.showError(ErrorModel {[weak self] in
+                    guard let self else { return }
+                    if let id {
+                        likeTapped(id: id)
+                    } else {
+                        viewDidLoad()
+                    }
+                })
+                completion(error)
             }
-            completion()
         }
         
     }
     
     
-    private func loadCart(httpMethod: HttpMethod, completion: @escaping () -> Void ) {
+    private func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
         
         var formData: String = ""
         if let cart {
@@ -144,32 +176,24 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             case .success(let cart):
                 self.cart = cart
                 idAddedToCart = Set(cart.nfts)
+                completion(nil)
             case .failure(let error):
-                view?.showError(makeErrorModel(error))
+                view?.showError(ErrorModel {[weak self] in
+                    guard let self else { return }
+                    if let id {
+                        cartTapped(id: id)
+                    } else {
+                        viewDidLoad()
+                    }
+                })
+                completion(error)
             }
-            completion()
-        }
-        
-    }
-    
-    private func makeErrorModel(_ error: Error) -> ErrorModel {
-        let message: String
-        switch error {
-        case is NetworkClientError:
-            message = NSLocalizedString("Error.network", comment: "")
-        default:
-            message = NSLocalizedString("Error.unknown", comment: "")
-        }
-
-        let actionText = "Ок"
-        return ErrorModel(message: message, actionText: actionText) {
-            print(error)
         }
     }
 }
 
 
-extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
+extension UsersCollectionPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
     func likeTapped(id: String) {
         
         idLikesForRequests = idLikes
@@ -180,9 +204,11 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
             idLikesForRequests.insert(id)
         }
         
-        loadProfile(httpMethod: .put) { [weak self] in
-            guard let self else { return }
-            view?.updateData(on: arrOfNFT)
+        utilityQueue.async {[weak self] in
+            self?.loadProfile(httpMethod: .put, id: id) { [weak self] _ in
+                guard let self else { return }
+                view?.updateData(with: arrOfNFT, id: id, isCart: false)
+            }
         }
     }
     
@@ -196,10 +222,12 @@ extension StatisticsPresenterImpl: NFTCollectionViewCellThreePerRowDelegate {
             idAddedToCartForRequests.insert(id)
         }
         
-        loadCart(httpMethod: .put){ [weak self] in
-            guard let self else { return }
-            view?.updateData(on: arrOfNFT)
+                
+        utilityQueue.async {[weak self] in
+            self?.loadCart(httpMethod: .put, id: id){ [weak self] _ in
+                guard let self else { return }
+                view?.updateData(with: arrOfNFT, id: id, isCart: true)
+            }
         }
     }
-    
 }

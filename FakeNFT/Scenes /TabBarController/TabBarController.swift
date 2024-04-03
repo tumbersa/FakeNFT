@@ -46,13 +46,14 @@ final class TabBarController: UITabBarController {
     }
     
     private func createStatisticsVC() -> UIViewController {
-        let assembly = StatisticsAssembly(networkClient: DefaultNetworkClient())
-        let statisticsInput = MockDataStatistics.ids
-        let statisticsViewController = assembly.build(with: statisticsInput)
-        let statisticsController = UINavigationController(rootViewController: statisticsViewController)
-        statisticsController.title = L10n.TabBar.statisticTabBarTitle
-        statisticsController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
+        let navController = UINavigationController()
+        let assemblyBuilder = StatisticsAssemblyBuilderImpl(networkClient: DefaultNetworkClient())
+        let statisticsInput = StatisticsInput.userId(MockDataStatistics.userId)
+        let router = StatisticsRouterImpl(navigationController: navController, assemblyBuilder: assemblyBuilder)
+        router.initialViewController(input: statisticsInput)
         
-        return statisticsController
+        navController.title = L10n.TabBar.statisticTabBarTitle
+        navController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
+        return navController
     }
 }

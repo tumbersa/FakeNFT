@@ -51,7 +51,7 @@ class CartCustomCell: UITableViewCell {
         return imageView
     }()
     
-    lazy var starsStack: UIStackView = {
+    private lazy var starsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center

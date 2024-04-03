@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CartViewController: UIViewController {
+final class CartViewController: UIViewController {
     
     var mockData: [String] = ["NFT1", "NFT2", "NFT3", "NFT4", "NFT5", "NFT6"]
     

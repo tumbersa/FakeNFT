@@ -108,6 +108,6 @@ class DeleteViewController: UIViewController {
             
             buttonStackView.topAnchor.constraint(equalTo: textLabel.bottomAnchor, constant: 20),
             buttonStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            ])
+        ])
     }
 }

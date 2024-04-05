@@ -13,7 +13,7 @@ protocol UserCardView: AnyObject,ErrorView {
     func updateData(with userDetailed: UserDetailed)
 }
 
-final class UserCardViewController: UIViewController, ErrorView {
+final class UserCardViewController: UIViewController {
     
     private let presenter: UserCardPresenter
     

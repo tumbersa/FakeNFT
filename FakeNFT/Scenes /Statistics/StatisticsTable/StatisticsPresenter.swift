@@ -55,10 +55,10 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
             case .success(let users):
                 self.users = users.sorted(by: { $0.rating < $1.rating })
                 view?.updateData(with: self.users)
-                
-            case .failure(let error):
-                //TODO: - доделать обработку ошибок
-                print(error)
+            case .failure(_):
+                view?.showError(ErrorModel {[weak self] in
+                    self?.viewDidLoad()
+                })
             }
         }
     }

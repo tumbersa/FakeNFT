@@ -8,11 +8,11 @@
 import UIKit
 import SnapKit
 
-protocol StatisticsView: AnyObject {
+protocol StatisticsView: AnyObject, ErrorView {
     func updateData(with: [UserDetailed])
 }
 
-final class StatisticsViewController: UIViewController, StatisticsView {
+final class StatisticsViewController: UIViewController, ErrorView {
     
     private let presenter: StatisticsPresenter
     
@@ -106,13 +106,6 @@ final class StatisticsViewController: UIViewController, StatisticsView {
         alert.addAction(cancelAlertAction)
         present(alert, animated: true)
     }
-    
-    func updateData(with users: [UserDetailed]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, UserDetailed>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(users)
-        dataSource.apply(snapshot, animatingDifferences: true)
-    }
 }
 
 extension StatisticsViewController: UITableViewDelegate {
@@ -122,3 +115,13 @@ extension StatisticsViewController: UITableViewDelegate {
         presenter.tableSelected(atRow: indexPath.row)
     }
 }
+
+extension StatisticsViewController: StatisticsView {
+    func updateData(with users: [UserDetailed]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, UserDetailed>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(users)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+}
+

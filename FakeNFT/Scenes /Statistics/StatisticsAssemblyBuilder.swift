@@ -8,7 +8,7 @@
 import UIKit
 
 protocol StatisticsAssemblyBuilder {
-    func build(with input: StatisticsInput, router: StatisticsRouter) -> UIViewController
+    func build(with input: StatisticsInput?, router: StatisticsRouter) -> UIViewController
 }
 
 final class StatisticsAssemblyBuilderImpl: StatisticsAssemblyBuilder {
@@ -19,18 +19,22 @@ final class StatisticsAssemblyBuilderImpl: StatisticsAssemblyBuilder {
         self.networkClient = networkClient
     }
     
-    func build(with input: StatisticsInput, router: StatisticsRouter) -> UIViewController {
+    func build(with input: StatisticsInput?, router: StatisticsRouter) -> UIViewController {
         var vc: UIViewController
+        guard let input else {
+            vc = buildStatisticsPresenterImpl(router: router)
+            return vc
+        }
         switch input {
         case .userDetailed(let userDetailed):
-            vc = buildUserDetailedServiceImpl(with: userDetailed, router: router)
+            vc = buildUserCardPresenterImpl(with: userDetailed, router: router)
         case .nftIds(let nftIds):
             vc = buildUsersCollectionPresenterImpl(with: nftIds, router: router)
         }
         return vc
     }
     
-    private func buildUserDetailedServiceImpl(with input: UserDetailed, router: StatisticsRouter) -> UIViewController {
+    private func buildUserCardPresenterImpl(with input: UserDetailed, router: StatisticsRouter) -> UIViewController {
         let presenter = UserCardPresenterImpl(
             userDetailed: input,
             router: router)
@@ -48,6 +52,16 @@ final class StatisticsAssemblyBuilderImpl: StatisticsAssemblyBuilder {
             router: router
         )
         let viewController = UsersCollectionViewController(presenter: presenter)
+        presenter.view = viewController
+        return viewController
+    }
+    
+    private func buildStatisticsPresenterImpl(router: StatisticsRouter) -> UIViewController {
+        let presenter = StatisticsPresenterImpl(
+            usersService: UserDetailedServiceImpl(networkClient: networkClient),
+            router: router
+        )
+        let viewController = StatisticsViewController(presenter: presenter)
         presenter.view = viewController
         return viewController
     }

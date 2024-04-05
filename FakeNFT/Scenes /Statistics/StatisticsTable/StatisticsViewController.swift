@@ -8,7 +8,13 @@
 import UIKit
 import SnapKit
 
-final class StatisticsViewController: UIViewController {
+protocol StatisticsView: AnyObject {
+    func updateData(with: [UserDetailed])
+}
+
+final class StatisticsViewController: UIViewController, StatisticsView {
+    
+    private let presenter: StatisticsPresenter
     
     enum Section {
         case main
@@ -36,44 +42,44 @@ final class StatisticsViewController: UIViewController {
         return tableView
     }()
     
-    private let usersService = UserDetailedServiceImpl(networkClient: DefaultNetworkClient())
-    private var users: [UserDetailed] = []
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        configureVC()
-    }
-    
-    private func configureVC() {
-        navigationController?.navigationBar.tintColor = .label
+    private lazy var sortButton: UIBarButtonItem = {
         let sortButton = UIBarButtonItem(title: "",
                                          style: .plain,
                                          target: self,
                                          action: #selector(sortButtonPressed))
         sortButton.image = UIImage(resource: .sort)
-        navigationItem.rightBarButtonItem = sortButton
+        return sortButton
+    }()
+    
+    init(presenter: StatisticsPresenter) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
+        configureNavBar()
+        layoutUI()
+        presenter.viewDidLoad()
+    }
+    
+    private func configureNavBar() {
+        navigationController?.navigationBar.tintColor = .label
+        navigationItem.rightBarButtonItem = sortButton
+    }
+    
+    private func layoutUI() {
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalToSuperview().offset(-16)
             make.bottom.equalToSuperview()
-        }
-        
-        usersService.loadUsers {[weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let users):
-                self.users = users.sorted(by: { $0.rating < $1.rating })
-                updateData(with: self.users)
-                
-            case .failure(let error):
-                //TODO: - доделать обработку ошибок
-                print(error)
-            }
         }
     }
     
@@ -85,15 +91,13 @@ final class StatisticsViewController: UIViewController {
         
         let nameSortAction = UIAlertAction(title: "По имени", style: .default) { [weak self] _ in
             guard let self else { return }
-            users = users.sorted(by: { $0.name < $1.name })
-            updateData(with: users)
+            presenter.nameSortActionTapped()
         }
         
         let ratingSortAction = UIAlertAction(title: "По рейтингу", style: .default){ [weak self] _ in
-        guard let self else { return }
-        users = users.sorted(by: { $0.rating < $1.rating })
-        updateData(with: users)
-    }
+            guard let self else { return }
+            presenter.ratingSortActionTapped()
+        }
         
         let cancelAlertAction = UIAlertAction(title: "Закрыть", style: .cancel)
         
@@ -115,9 +119,6 @@ extension StatisticsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let assemblyBuilder = StatisticsAssemblyBuilderImpl(networkClient: DefaultNetworkClient())
-        let statisticsInput = StatisticsInput.userDetailed(users[indexPath.row])
-        let router = StatisticsRouterImpl(navigationController: self.navigationController, assemblyBuilder: assemblyBuilder)
-        router.push(with: statisticsInput)
+        presenter.tableSelected(atRow: indexPath.row)
     }
 }

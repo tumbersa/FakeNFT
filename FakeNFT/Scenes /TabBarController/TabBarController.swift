@@ -26,10 +26,7 @@ final class TabBarController: UITabBarController {
                                                  and: UIImage(systemName: "square.stack.3d.up.fill"),
                                                  vc: TestCatalogViewController(servicesAssembly: servicesAssembly))
 
-        let statisticsController = UINavigationController(rootViewController: StatisticsViewController())
-        statisticsController.title = L10n.TabBar.statisticTabBarTitle
-        statisticsController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
-        //createStatisticsVC()
+        let statisticsController = createStatisticsVC()
         
         self.setViewControllers([catalogController, statisticsController], animated: true)
 
@@ -48,15 +45,14 @@ final class TabBarController: UITabBarController {
         return nav
     }
     
-//    private func createStatisticsVC() -> UIViewController {
-//        let navController = UINavigationController()
-//        let assemblyBuilder = StatisticsAssemblyBuilderImpl(networkClient: DefaultNetworkClient())
-//        let statisticsInput = StatisticsInput.us
-//        let router = StatisticsRouterImpl(navigationController: navController, assemblyBuilder: assemblyBuilder)
-//        router.initialViewController(input: statisticsInput)
-//        
-//        navController.title = L10n.TabBar.statisticTabBarTitle
-//        navController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
-//        return navController
-//    }
+    private func createStatisticsVC() -> UIViewController {
+        let navController = UINavigationController()
+        let assemblyBuilder = StatisticsAssemblyBuilderImpl(networkClient: DefaultNetworkClient())
+        let router = StatisticsRouterImpl(navigationController: navController, assemblyBuilder: assemblyBuilder)
+        router.initialViewController()
+        
+        navController.title = L10n.TabBar.statisticTabBarTitle
+        navController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")
+        return navController
+    }
 }

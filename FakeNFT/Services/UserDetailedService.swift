@@ -12,6 +12,7 @@ typealias UsersCompletion = (Result<[UserDetailed], Error>) -> Void
 
 protocol UserDetailedService {
     func loadUserDetailed(id: String, completion: @escaping UserDetailedCompletion)
+    func loadUsers(completion: @escaping UsersCompletion)
 }
 
 final class UserDetailedServiceImpl: UserDetailedService {

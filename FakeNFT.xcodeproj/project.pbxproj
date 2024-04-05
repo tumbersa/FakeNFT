@@ -46,6 +46,7 @@
 		A40F9FF32BBFC3B500BD1388 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40F9FF22BBFC3B500BD1388 /* StatisticsViewController.swift */; };
 		A40F9FF52BBFC43500BD1388 /* StatisticsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40F9FF42BBFC43500BD1388 /* StatisticsTableViewCell.swift */; };
 		A40F9FF92BBFD5E500BD1388 /* UsersBuildRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40F9FF82BBFD5E500BD1388 /* UsersBuildRequest.swift */; };
+		A40F9FFB2BC003D400BD1388 /* StatisticsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40F9FFA2BC003D400BD1388 /* StatisticsPresenter.swift */; };
 		A4368D082BBBF2E10067033C /* StatisticsRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4368D072BBBF2E10067033C /* StatisticsRouter.swift */; };
 		A4368D0A2BBBF5450067033C /* StatisticsInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4368D092BBBF5450067033C /* StatisticsInput.swift */; };
 		A43EADB02BB2C0070040337F /* UsersCollectionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EADAF2BB2C0070040337F /* UsersCollectionPresenter.swift */; };
@@ -130,6 +131,7 @@
 		A40F9FF22BBFC3B500BD1388 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		A40F9FF42BBFC43500BD1388 /* StatisticsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsTableViewCell.swift; sourceTree = "<group>"; };
 		A40F9FF82BBFD5E500BD1388 /* UsersBuildRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersBuildRequest.swift; sourceTree = "<group>"; };
+		A40F9FFA2BC003D400BD1388 /* StatisticsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsPresenter.swift; sourceTree = "<group>"; };
 		A4368D072BBBF2E10067033C /* StatisticsRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsRouter.swift; sourceTree = "<group>"; };
 		A4368D092BBBF5450067033C /* StatisticsInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsInput.swift; sourceTree = "<group>"; };
 		A43EADAF2BB2C0070040337F /* UsersCollectionPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersCollectionPresenter.swift; sourceTree = "<group>"; };
@@ -406,6 +408,7 @@
 			children = (
 				A40F9FF22BBFC3B500BD1388 /* StatisticsViewController.swift */,
 				A40F9FF42BBFC43500BD1388 /* StatisticsTableViewCell.swift */,
+				A40F9FFA2BC003D400BD1388 /* StatisticsPresenter.swift */,
 			);
 			path = StatisticsTable;
 			sourceTree = "<group>";
@@ -694,6 +697,7 @@
 				A4368D0A2BBBF5450067033C /* StatisticsInput.swift in Sources */,
 				A45BF4212BB9788300CD8899 /* UserDetailedService.swift in Sources */,
 				A48F377A2BB2032900280CD9 /* Profile.swift in Sources */,
+				A40F9FFB2BC003D400BD1388 /* StatisticsPresenter.swift in Sources */,
 				A40F9FF92BBFD5E500BD1388 /* UsersBuildRequest.swift in Sources */,
 				0CFCB7442A7802440009A829 /* NftDetailInput.swift in Sources */,
 				0C79EE632A76DD1900EE90EA /* RequestConstants.swift in Sources */,

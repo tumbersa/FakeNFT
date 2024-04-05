@@ -22,18 +22,17 @@ final class StatisticsAssemblyBuilderImpl: StatisticsAssemblyBuilder {
     func build(with input: StatisticsInput, router: StatisticsRouter) -> UIViewController {
         var vc: UIViewController
         switch input {
-        case .userId(let userId):
-            vc = buildUserDetailedServiceImpl(with: userId, router: router)
+        case .userDetailed(let userDetailed):
+            vc = buildUserDetailedServiceImpl(with: userDetailed, router: router)
         case .nftIds(let nftIds):
             vc = buildUsersCollectionPresenterImpl(with: nftIds, router: router)
         }
         return vc
     }
     
-    private func buildUserDetailedServiceImpl(with input: String, router: StatisticsRouter) -> UIViewController {
+    private func buildUserDetailedServiceImpl(with input: UserDetailed, router: StatisticsRouter) -> UIViewController {
         let presenter = UserCardPresenterImpl(
-            userId: input,
-            userDetailedService: UserDetailedServiceImpl(networkClient: networkClient), 
+            userDetailed: input,
             router: router)
         let viewController = UserCardViewController(presenter: presenter)
         presenter.view = viewController

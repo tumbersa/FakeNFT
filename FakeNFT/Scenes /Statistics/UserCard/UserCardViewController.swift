@@ -88,10 +88,22 @@ final class UserCardViewController: UIViewController, ErrorView {
         
         layoutUI()
         presenter.viewDidLoad()
+        let backButton = UIBarButtonItem(title: "",
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(backButtonPressed))
+        backButton.image = UIImage(systemName: "chevron.left")
+        navigationItem.leftBarButtonItem = backButton
+    }
+    
+    @objc private func backButtonPressed() {
+        presenter.backButtonPressed()
     }
     
     
     func layoutUI() {
+        view.backgroundColor = .systemBackground
+        
         view.addSubview(avatarImageView)
         avatarImageView.snp.makeConstraints { make in
             make.height.equalTo(70)
@@ -163,7 +175,7 @@ extension  UserCardViewController: UserCardView {
             case .success(_):
                 break
             case .failure(_):
-                let errorImage = UIImage(systemName: "person.circle.fill")?.withTintColor(.label, renderingMode: .alwaysOriginal)
+                let errorImage = UIImage(systemName: "person.crop.circle.fill")?.withTintColor(Asset.Colors.Universal.ypUniGray.color, renderingMode: .alwaysOriginal)
                 avatarImageView.image = errorImage
             }
         }

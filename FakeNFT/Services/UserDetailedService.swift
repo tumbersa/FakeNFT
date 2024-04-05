@@ -8,6 +8,7 @@
 import Foundation
 
 typealias UserDetailedCompletion = (Result<UserDetailed, Error>) -> Void
+typealias UsersCompletion = (Result<[UserDetailed], Error>) -> Void
 
 protocol UserDetailedService {
     func loadUserDetailed(id: String, completion: @escaping UserDetailedCompletion)
@@ -28,6 +29,18 @@ final class UserDetailedServiceImpl: UserDetailedService {
             switch result {
             case .success(let userDetailed):
                 completion(.success(userDetailed))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func loadUsers(completion: @escaping UsersCompletion) {
+        let request = UsersBuildRequest()
+        networkClient.send(request: request, type: [UserDetailed].self) { result in
+            switch result {
+            case .success(let users):
+                completion(.success(users))
             case .failure(let error):
                 completion(.failure(error))
             }

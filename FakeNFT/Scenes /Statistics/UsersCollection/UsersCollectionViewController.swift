@@ -27,13 +27,7 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
                 
                 guard let self else { return UICollectionViewCell()}
                 let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
-                let nftItem = presenter.getNftItem(indexPath.item)
-                cell.set(data: nftItem)
-                
-                let idOfCell = nftItem.id
-                
-                cell.setLikedStateToLikeButton(isLiked: presenter.isLiked(idOfCell))
-                cell.setAddedStateToCart(isAdded: presenter.isAddedToCart(idOfCell))
+
                 cell.delegate = presenter
                 
                 return cell
@@ -63,7 +57,7 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
     private lazy var collectionView: UICollectionView! = {
         let collectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
         collectionView.register(NFTCollectionViewCellThreePerRow.self)
-        
+        collectionView.showsVerticalScrollIndicator = false
         return collectionView
     }()
     

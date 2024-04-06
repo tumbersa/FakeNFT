@@ -74,7 +74,7 @@ private extension ProfileNFTService {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
-        urlComponents.path = "/api/v1/nft\(id)"
+        urlComponents.path = "/api/v1/nft/\(id)"
 
         guard let url = urlComponents.url else {
             fatalError("Failed to create URL")

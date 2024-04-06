@@ -11,7 +11,7 @@ struct NFTCollectionRequestById: NetworkRequest {
     var endpoint: URL?
     
     init(id: Int) {
-        guard let endpoint = URL(string: "https://d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net/api/v1/collections\(id)") else { return }
+        guard let endpoint = URL(string: "\(NetworkConstants.baseURL)/api/v1/collections\(id)") else { return }
         self.endpoint = endpoint
     }
 }

@@ -15,7 +15,7 @@ final class ControllersFactory {
     func setupController(of type: ControllersType) -> UINavigationController {
         switch type {
         case .catalogViewController:
-            let dataProvider = DataProvider(networkClient: DefaultNetworkClient())
+            let dataProvider = CatalogDataProvider(networkClient: DefaultNetworkClient())
             let catalogPresenter = CatalogPresenter(dataProvider: dataProvider)
             let catalogController = CatalogViewController(presenter: catalogPresenter)
             catalogPresenter.viewController = catalogController

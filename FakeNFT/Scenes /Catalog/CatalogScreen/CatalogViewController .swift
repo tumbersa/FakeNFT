@@ -33,7 +33,7 @@ final class CatalogViewController: UIViewController, CatalogViewControllerProtoc
     
     private lazy var tableView: UITableView = {
         var tableView = UITableView()
-        tableView.register(CatalogViewCell.self, forCellReuseIdentifier: CatalogViewCell.catalogViewCellReuseIdentifier)
+        tableView.register(CatalogViewCell.self)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.backgroundColor = Asset.Colors.ypWhite.color
         tableView.showsVerticalScrollIndicator = false
@@ -105,8 +105,7 @@ extension CatalogViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CatalogViewCell.catalogViewCellReuseIdentifier,
-                                                       for: indexPath) as? CatalogViewCell else { return UITableViewCell() }
+        let cell: CatalogViewCell = tableView.dequeueReusableCell()
         cell.selectionStyle = .none
         let nftModel = presenter.dataSource[indexPath.row]
         let url = URL(string: nftModel.cover.encodeUrl)

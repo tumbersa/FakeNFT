@@ -7,8 +7,8 @@
 
 import Foundation
 
-protocol DataProviderProtocol: AnyObject {
-    func fetchNFTCollection(completion: @escaping CollectionCompletion)
+protocol CatalogDataProviderProtocol: AnyObject {
+    func fetchNFTCollection(completion: @escaping CatalogCompletion)
     func sortNFTCollections(by parameter: NFTCatalogSortingParameters)
     var NFTCollections: [NFTCatalogModel] { get }
 }
@@ -18,9 +18,9 @@ enum NFTCatalogSortingParameters: String {
     case nftCount
 }
 
-typealias CollectionCompletion = (Result<[NFTCatalogModel], Error>) -> Void
+typealias CatalogCompletion = (Result<[NFTCatalogModel], Error>) -> Void
 
-final class DataProvider: DataProviderProtocol {
+final class CatalogDataProvider: CatalogDataProviderProtocol {
     
     var NFTCollections: [NFTCatalogModel] = []
     let networkClient: DefaultNetworkClient
@@ -29,7 +29,7 @@ final class DataProvider: DataProviderProtocol {
         self.networkClient = networkClient
     }
     
-    func fetchNFTCollection(completion: @escaping CollectionCompletion) {
+    func fetchNFTCollection(completion: @escaping CatalogCompletion) {
         networkClient.send(request: NFTCollectionsRequest(), type: [NFTCatalogModel].self) { [weak self] result in
             guard let self = self else { return }
             switch result {

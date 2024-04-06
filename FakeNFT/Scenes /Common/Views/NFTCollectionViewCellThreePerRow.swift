@@ -30,7 +30,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             UIImage(systemName: "heart.fill"),
             for: .normal)
         likeButton.tintColor = .white
-        likeButton.addTarget(self, action: #selector(mockLikeTapped), for: .touchUpInside)
+        likeButton.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
         likeButton.translatesAutoresizingMaskIntoConstraints = false
         return likeButton
     }()
@@ -60,7 +60,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     private lazy var cartButton: UIButton = {
         let cartButton = UIButton()
         cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
-        cartButton.addTarget(self, action: #selector(mockCartTapped), for: .touchUpInside)
+        cartButton.addTarget(self, action: #selector(cartTapped), for: .touchUpInside)
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         return cartButton
     }()
@@ -139,10 +139,12 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     }
     
     @objc private func likeTapped() {
+        likeButton.isUserInteractionEnabled = false
         delegate?.likeTapped(id: id)
     }
     
     @objc private func cartTapped() {
+        likeButton.isUserInteractionEnabled = false
         delegate?.cartTapped(id: id)
     }
     
@@ -156,9 +158,9 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     
     func setAddedStateToCart(isAdded: Bool) {
         if isAdded {
-            cartButton.setImage(UIImage(resource: .cartDelete).withTintColor(.label), for: .normal)
+            cartButton.setImage(Asset.StatisticsImages.cartDelete.image.withTintColor(.label), for: .normal)
         } else {
-            cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
+            cartButton.setImage(Asset.StatisticsImages.cartAdd.image.withTintColor(.label), for: .normal)
         }
     }
     
@@ -171,23 +173,33 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         id = data.id
     }
     
-    func set(mockData data: MockNftStatistics) {
-        nftImageView.image = data.images[0]
-        nameLabel.text = data.name
-        ratingStackView.set(rating: data.rating)
-        let numStr = String(format: "%.2f", data.price)
-        priceLabel.text = numStr + " ETH"
-        id = data.id
+    func getID() -> String { id }
+    
+    func setIsUserInteractionEnabledToTrue(isCart: Bool) {
+        if isCart {
+            cartButton.isUserInteractionEnabled = true
+        } else {
+            likeButton.isUserInteractionEnabled = true
+        }
     }
     
-    @objc private func mockLikeTapped() {
-        isLike.toggle()
-        setLikedStateToLikeButton(isLiked: isLike)
-    }
-    
-    @objc private func mockCartTapped() {
-        isCart.toggle()
-        setAddedStateToCart(isAdded: isCart)
-    }
+//    func set(mockData data: MockNftStatistics) {
+//        nftImageView.image = data.images[0]
+//        nameLabel.text = data.name
+//        ratingStackView.set(rating: data.rating)
+//        let numStr = String(format: "%.2f", data.price)
+//        priceLabel.text = numStr + " ETH"
+//        id = data.id
+//    }
+//    
+//    @objc private func mockLikeTapped() {
+//        isLike.toggle()
+//        setLikedStateToLikeButton(isLiked: isLike)
+//    }
+//    
+//    @objc private func mockCartTapped() {
+//        isCart.toggle()
+//        setAddedStateToCart(isAdded: isCart)
+//    }
 }
 

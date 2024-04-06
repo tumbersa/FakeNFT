@@ -8,32 +8,29 @@
 import SnapKit
 import UIKit
 
+protocol MyNFTViewControllerProtocol: AnyObject {
+    var presenter: MyNFTPresenterProtocol? { get set }
+    func updateMyNFTs(_ nfts: [NFT]?)
+}
+
 // MARK: - MyNFT ViewController
 final class MyNFTViewController: UIViewController {
 
     // MARK: - Private Properties
-    private var myNFTs = [
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        ),
-        NFTCellModel(
-            name: "Stich",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 5,
-            price: 2.55,
-            author: "John Doe",
-            id: "1"
-        )
-    ]
+    var presenter: MyNFTPresenterProtocol?
+    private var myNFTs: [NFT] = []
+    private var nftID: [String]
+    private var likedNFT: [String]
 
-    // private var myNFTs = [NFTCellModel]()
-    // закомментируйте favoriteNFTS с моковыми данными
-    // и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
+    init(nftID: [String], likedID: [String]) {
+        self.nftID = nftID
+        self.likedNFT = likedID
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
@@ -87,6 +84,7 @@ final class MyNFTViewController: UIViewController {
         setupViews()
         setupConstraints()
         updateEmptyView()
+        setupPresenter()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -131,6 +129,12 @@ private extension MyNFTViewController {
         }
     }
 
+    func setupPresenter() {
+        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
+        presenter?.view = self
+        presenter?.viewDidLoad()
+    }
+
     // MARK: - Actions
     @objc func navBackButtonDidTap() {
         self.navigationController?.popViewController(animated: true)
@@ -141,7 +145,7 @@ private extension MyNFTViewController {
         UserDefaults.standard.set(type, forKey: "sortType")
     }
 
-    func applySortType(by type: Filter) -> [NFTCellModel] {
+    func applySortType(by type: Filter) -> [NFT] {
         let nfts = myNFTs
 
         switch type {
@@ -218,7 +222,11 @@ private extension MyNFTViewController {
 // MARK: - UITableViewDataSource
 extension MyNFTViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return myNFTs.count
+        guard let presenter = presenter as? MyNFTPresenter else {
+            return 0
+        }
+
+        return presenter.nfts.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -238,4 +246,12 @@ extension MyNFTViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension MyNFTViewController: UITableViewDelegate {
+}
+
+extension MyNFTViewController: MyNFTViewControllerProtocol {
+    func updateMyNFTs(_ nfts: [NFT]?) {
+        guard let nfts = nfts else { return }
+        myNFTs.append(contentsOf: nfts)
+        tableView.reloadData()
+    }
 }

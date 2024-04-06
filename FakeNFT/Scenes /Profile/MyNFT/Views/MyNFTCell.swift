@@ -118,8 +118,8 @@ final class MyNFTCell: UITableViewCell {
     }
 
     // MARK: - Public Method
-    func configureCell(with model: NFTCellModel) {
-        image.image = model.images
+    func configureCell(with model: NFT) {
+//        image.image = model.images
         name.text = model.name
         ratingView.setRating(model.rating)
         author.text = "от \(model.author)"

@@ -9,9 +9,14 @@ import Kingfisher
 import SnapKit
 import UIKit
 
+// MARK: - ProfileViewControllerDelegate
+protocol ProfileViewControllerDelegate: AnyObject {
+    func didTapMyNFT()
+}
+
 // MARK: - ProfileViewControllerProtocol
-public protocol ProfileViewControllerProtocol: AnyObject {
-    var presenter: ProfilePresenterProtocol? { get set }
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenter? { get set }
     func updateProfileDetails(_ profile: Profile?)
     func updateAvatar(url: URL)
 }
@@ -21,7 +26,8 @@ final class ProfileViewController: UIViewController {
 
     // MARK: - Public Properties
     let servicesAssembly: ServicesAssembly
-    var presenter: ProfilePresenterProtocol?
+    var presenter: ProfilePresenter?
+    weak var delegate: ProfilePresenterDelegate?
 
     // MARK: - Private Properties
     private var profile: Profile?
@@ -126,6 +132,8 @@ final class ProfileViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
+        delegate = self
+        presenter?.delegate = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -244,9 +252,7 @@ extension ProfileViewController: UITableViewDelegate {
         switch indexPath.row {
         case 0:
             print("My NFTs cell did tap")
-            let viewController = MyNFTViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(viewController, animated: true)
+            presenter?.didTapMyNFT()
         case 1:
             print("My Favourite NFTs cell did tap")
             let viewController = FavoriteNFTViewController()
@@ -289,5 +295,16 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 
     func updateAvatar(url: URL) {
         avatarImageView.kf.setImage(with: url)
+    }
+}
+
+extension ProfileViewController: ProfilePresenterDelegate {
+    func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String]) {
+        let myNFTViewController = MyNFTViewController(nftID: nftID, likedID: likedNFT)
+        myNFTViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(
+            myNFTViewController,
+            animated: true
+        )
     }
 }

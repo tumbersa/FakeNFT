@@ -28,7 +28,6 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     }
     
     func viewDidLoad() {
-        UIBlockingProgressHUD.show()
         loadUsers()
     }
     
@@ -48,6 +47,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
     }
     
     private func loadUsers() {
+        UIBlockingProgressHUD.show()
         usersService.loadUsers {[weak self] result in
             UIBlockingProgressHUD.dismiss()
             guard let self else { return }
@@ -57,7 +57,7 @@ final class StatisticsPresenterImpl: StatisticsPresenter {
                 view?.updateData(with: self.users)
             case .failure(_):
                 view?.showError(ErrorModel {[weak self] in
-                    self?.viewDidLoad()
+                    self?.loadUsers()
                 })
             }
         }

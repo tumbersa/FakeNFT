@@ -96,6 +96,12 @@ final class UserCardViewController: UIViewController {
         navigationItem.leftBarButtonItem = backButton
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        tabBarController?.tabBar.isHidden = true
+    }
+    
     @objc private func backButtonPressed() {
         presenter.backButtonPressed()
     }

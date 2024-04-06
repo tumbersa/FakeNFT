@@ -68,6 +68,12 @@ final class StatisticsViewController: UIViewController, ErrorView {
         presenter.viewDidLoad()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        tabBarController?.tabBar.isHidden = false
+    }
+    
     private func configureNavBar() {
         navigationController?.navigationBar.tintColor = .label
         navigationItem.rightBarButtonItem = sortButton
@@ -84,26 +90,14 @@ final class StatisticsViewController: UIViewController, ErrorView {
     }
     
     @objc private func sortButtonPressed() {
-        let alert = UIAlertController(
-            title: nil,
-            message: "Сортировка",
-            preferredStyle: .actionSheet)
-        
-        let nameSortAction = UIAlertAction(title: "По имени", style: .default) { [weak self] _ in
+        let alert = SortAlertController { [weak self] in
             guard let self else { return }
             presenter.nameSortActionTapped()
-        }
-        
-        let ratingSortAction = UIAlertAction(title: "По рейтингу", style: .default){ [weak self] _ in
+        } ratingSortHandler: { [weak self]  in
             guard let self else { return }
             presenter.ratingSortActionTapped()
         }
         
-        let cancelAlertAction = UIAlertAction(title: "Закрыть", style: .cancel)
-        
-        alert.addAction(nameSortAction)
-        alert.addAction(ratingSortAction)
-        alert.addAction(cancelAlertAction)
         present(alert, animated: true)
     }
 }

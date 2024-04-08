@@ -172,7 +172,6 @@ final class CartViewController: UIViewController {
             loadNft(id: id)
         }
         self.hideLoader()
-        
     }
     
     private func loadNft(id: String) {

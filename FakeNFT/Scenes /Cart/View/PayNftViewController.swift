@@ -172,7 +172,9 @@ extension PayNftViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CryptoCell", for: indexPath) as! CryptoWalletCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CryptoCell", for: indexPath) as? CryptoWalletCell else {
+            return UICollectionViewCell()
+        }
         
         let imageName = cryptoImage[indexPath.row]
         let image = UIImage(named: imageName)

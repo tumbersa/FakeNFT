@@ -35,9 +35,10 @@ private extension MyNFTPresenter {
     func fetchNFTs() {
         for id in nftID {
             profileNFTService.fetchNFTs(id) { [weak self] result in
+                print("Ошибка: \(result)")
                 switch result {
                 case .success(let nfts):
-                    self?.nfts.append(contentsOf: nfts)
+                    self?.nfts.append(nfts)
                     self?.view?.updateMyNFTs(nfts)
                 case .failure(let error):
                     print("Failed to fetch NFTs: \(error)")

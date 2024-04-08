@@ -68,7 +68,7 @@ private extension ProfileService {
     func makeFetchProfileRequest(token: String) -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
+        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
         urlComponents.path = "/api/v1/profile/1"
 
         guard let url = urlComponents.url else {
@@ -79,8 +79,8 @@ private extension ProfileService {
 
         request.httpMethod = "GET"
 
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
         return request
     }
 }

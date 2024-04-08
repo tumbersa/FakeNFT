@@ -25,43 +25,20 @@ final class ProfileNFTService {
         self.urlSessionTask = urlSessionTask
     }
 
-    func fetchNFT(_ id: String) {
-        self.fetchNFTs(id) { result in
-            switch result {
-            case .success(let myNFTs):
-                self.NFTs = myNFTs
-            case .failure(let error):
-                fatalError("Error: \(error)")
-            }
-        }
-    }
-
-    func fetchNFTs(_ id: String, completion: @escaping (Result<[NFT], Error>) -> Void) {
+    func fetchNFTs(_ id: String, completion: @escaping (Result<NFT, Error>) -> Void) {
         guard let request = makeFetchNFTRequest(id: id) else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
 
-        urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<[NFT], Error>) in
+        urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<NFT, Error>) in
+            print("Ответ: \(response)")
             switch response {
+
             case .success(let NFTs):
-                var myNFTs: [NFT] = []
-                for nft in NFTs {
-                    let newNFT = NFT(
-                        createdAt: nft.createdAt,
-                        name: nft.name,
-                        images: nft.images,
-                        rating: nft.rating,
-                        description: nft.description,
-                        price: nft.price,
-                        author: nft.author,
-                        id: nft.id
-                    )
-                    myNFTs.append(newNFT)
-                }
-                self?.NFTs = myNFTs
-                completion(.success(myNFTs))
+                self?.NFTs?.append(NFTs)
+                completion(.success(NFTs))
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -73,7 +50,7 @@ private extension ProfileNFTService {
     func makeFetchNFTRequest(id: String) -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
+        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
         urlComponents.path = "/api/v1/nft/\(id)"
 
         guard let url = urlComponents.url else {
@@ -81,10 +58,11 @@ private extension ProfileNFTService {
         }
 
         var request = URLRequest(url: url)
-
+        print("Запрос: \(request)")
         request.httpMethod = "GET"
 
-        request.setValue("Accept: application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
         return request
     }

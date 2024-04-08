@@ -10,7 +10,7 @@ import UIKit
 
 protocol MyNFTViewControllerProtocol: AnyObject {
     var presenter: MyNFTPresenterProtocol? { get set }
-    func updateMyNFTs(_ nfts: [NFT]?)
+    func updateMyNFTs(_ nfts: NFT?)
 }
 
 // MARK: - MyNFT ViewController
@@ -249,9 +249,9 @@ extension MyNFTViewController: UITableViewDelegate {
 }
 
 extension MyNFTViewController: MyNFTViewControllerProtocol {
-    func updateMyNFTs(_ nfts: [NFT]?) {
+    func updateMyNFTs(_ nfts: NFT?) {
         guard let nfts = nfts else { return }
-        myNFTs.append(contentsOf: nfts)
+        myNFTs.append(nfts)
         tableView.reloadData()
     }
 }

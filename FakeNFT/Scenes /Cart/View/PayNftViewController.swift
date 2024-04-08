@@ -56,9 +56,9 @@ class PayNftViewController: UIViewController {
        let button = UIButton()
         button.setTitle("Пользовательского соглашения", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .regular)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(UIColor(named: "ypUniBlue"), for: .normal)
         button.contentHorizontalAlignment = .left
-        button.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 26).isActive = true
         button.widthAnchor.constraint(equalToConstant: 202).isActive = true
         button.addTarget(self, action: #selector(showUserInfo), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -128,7 +128,7 @@ class PayNftViewController: UIViewController {
         }
         
         NSLayoutConstraint.activate([
-            selectedCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            selectedCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             selectedCollection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             selectedCollection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             selectedCollection.bottomAnchor.constraint(equalTo: bottomView.topAnchor),

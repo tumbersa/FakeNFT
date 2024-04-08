@@ -13,7 +13,7 @@ protocol CartCellDelegate: AnyObject {
 
 final class CartCustomCell: UITableViewCell {
     
-    var starsCount: Int? {
+    private var starsCount: Int? {
         didSet {
             setupStarsView()
         }
@@ -21,7 +21,7 @@ final class CartCustomCell: UITableViewCell {
     
     weak var delegate: CartCellDelegate?
     
-    var indexPath: IndexPath?
+    private var indexPath: IndexPath?
     
     private lazy var nftView: UIView = {
         let view = UIView()
@@ -39,7 +39,7 @@ final class CartCustomCell: UITableViewCell {
         return imageView
     }()
     
-    lazy var nftName: UILabel = {
+    private lazy var nftName: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .bold)
         label.text = "April"
@@ -47,7 +47,7 @@ final class CartCustomCell: UITableViewCell {
         return label
     }()
     
-    lazy var stars: UIImageView = {
+    private lazy var stars: UIImageView = {
         let imageView = UIImageView()
         let image = UIImage(systemName: "star.fill")?.withRenderingMode(.alwaysTemplate)
         imageView.image = image
@@ -57,11 +57,11 @@ final class CartCustomCell: UITableViewCell {
         return imageView
     }()
     
-    lazy var starsStack: UIStackView = {
+    private lazy var starsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 2 // Расстояние между звездами
+        stack.spacing = 2
         // Создаем пять звезд
         for i in 1...5 {
             let fullStar = "star"
@@ -104,7 +104,7 @@ final class CartCustomCell: UITableViewCell {
         return label
     }()
     
-    lazy var nftPrice: UILabel = {
+    private lazy var nftPrice: UILabel = {
        let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .bold)
         label.text = "1,78 ETH"
@@ -124,7 +124,8 @@ final class CartCustomCell: UITableViewCell {
     
     @objc func deleteNFT() {
         guard let indexPath = indexPath else { return }
-        delegate?.deleteButtonTapped(at: indexPath, image: nftImage.image!)
+        guard let image = nftImage.image else { return }
+        delegate?.deleteButtonTapped(at: indexPath, image: image)
         print("DELETE")
     }
     
@@ -136,6 +137,13 @@ final class CartCustomCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setupAllViews()
+    }
+    
+    func update(name: String, price: String, starsCount: Int, indexPath: IndexPath) {
+        nftName.text = name
+        nftPrice.text = price
+        self.starsCount = starsCount
+        self.indexPath = indexPath
     }
     
     private func setupAllViews() {

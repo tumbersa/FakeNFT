@@ -25,6 +25,7 @@ final class CartViewController: UIViewController {
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     private var idAddedToCart: Set<String> = []
     private var arrOfNFT: [Nft] = []
+    private var sortArrOfNFT: [Nft] = []
     
     private lazy var loaderIndicator: UIImageView = {
        let image = UIImage(named: "Loader")
@@ -38,6 +39,7 @@ final class CartViewController: UIViewController {
     
     private lazy var emptyCart: UILabel = {
        let label = UILabel()
+        label.isHidden = false
         label.text = "Корзина пуста"
         label.font = .systemFont(ofSize: 17, weight: .bold)
         label.textAlignment = .center
@@ -118,7 +120,6 @@ final class CartViewController: UIViewController {
             cartService: cartService,
             nftService: nftService)
         presenter.viewDidLoad()
-        setupEmptyOrNftViews()
         setupTableView()
         setupIndicator()
     }
@@ -176,15 +177,18 @@ final class CartViewController: UIViewController {
     
     private func loadNft(id: String) {
         nftService.loadNft(id: id) { [weak self] result in
-            guard let self else { return }
+            guard let self = self else { return }
             switch result {
             case .success(let nft):
-                arrOfNFT.append(nft)
-                tableView.reloadData()
+                presenter.cacheImages(for: [nft]) { cachedImages in
+                    //тут изображения в кэше
+                }
+                self.arrOfNFT.append(nft)
+                self.setupEmptyOrNftViews()
+                self.tableView.reloadData()
             case .failure(let error):
-               print(error)
+                print(error)
             }
-            self.setupEmptyOrNftViews()
         }
     }
     
@@ -194,6 +198,7 @@ final class CartViewController: UIViewController {
         
         // Добавляем действия для каждой опции сортировки
         alertController.addAction(UIAlertAction(title: "По цене", style: .default) { _ in
+            self.sortArrOfNFT = self.arrOfNFT
             self.arrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.price < nftItem2.price
             }
@@ -318,11 +323,16 @@ extension CartViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         cell.delegate = self
-        cell.nftName.text = arrOfNFT[indexPath.row].name
-        cell.nftPrice.text = String(arrOfNFT[indexPath.row].price)
+        cell.update(
+            name: arrOfNFT[indexPath.row].name,
+            price: "\(arrOfNFT[indexPath.row].price) ETH",
+            starsCount: arrOfNFT[indexPath.row].rating,
+            indexPath: indexPath
+        )
         //Цена всех NFT
         var cellCount = 0.0
-        for count in self.arrOfNFT {
+        cell.selectionStyle = .none
+        for count in arrOfNFT {
             cellCount += count.price
         }
         let formatter = NumberFormatter()
@@ -330,41 +340,34 @@ extension CartViewController: UITableViewDataSource {
         formatter.maximumFractionDigits = 2
         formatter.numberStyle = .decimal
         if let formattedString = formatter.string(from: NSNumber(value: cellCount)) {
-            nftPrice.text = String(formattedString)
+            nftPrice.text = "\(String(formattedString)) ETH"
         }
         nftCount.text = "\(arrOfNFT.count) NFT"
-        cell.starsCount = arrOfNFT[indexPath.row].rating
         
         //Картинка
         let imagesURL = arrOfNFT[indexPath.row].images[0]
-        loadImage(imageUrl: imagesURL, indexPath: indexPath)
-        cell.indexPath = indexPath
+        // Используем кэш для установки изображения
+        if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
+            cell.nftImage.image = cachedImage
+        } else {
+            // Если изображение не найдено в кэше, устанавливаем пустую картинку и начинаем загрузку
+            cell.nftImage.image = UIImage(named: "placeholder")
+            loadImage(imageUrl: imagesURL, indexPath: indexPath)
+        }
         return cell
     }
-}
-
-extension CartViewController {
-    func loadImage(imageUrl: URL, indexPath: IndexPath) {
-        // Загрузка данных изображения асинхронно
-        URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-            // Проверка наличия ошибок
-            guard let imageData = data, error == nil else {
-                print("Ошибка при загрузке изображения: \(error?.localizedDescription ?? "Unknown error")")
-                return
-            }
-            // Инициализация UIImage с использованием данных изображения
-            if let image = UIImage(data: imageData) {
-                // Обновление UI в основном потоке
-                DispatchQueue.main.async {
-                    if let updatedCell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell {
-                        updatedCell.nftImage.image = image
-                    }
+    
+    private func loadImage(imageUrl: URL, indexPath: IndexPath) {
+        presenter.loadImage(from: imageUrl) { [weak self] image in
+            DispatchQueue.main.async {
+                guard let self = self, let image = image, let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
+                    return
                 }
-            } else {
-                print("Не удалось создать изображение из загруженных данных")
+                cell.nftImage.image = image
+                // Сохраняем загруженное изображение в кэше
+                self.presenter.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
             }
         }
-        .resume()
     }
 }
 
@@ -387,7 +390,7 @@ extension CartViewController: CartView {
     func showLoader() {
         loaderIndicator.isHidden = false
         UIView.animate(withDuration: 1, delay: 0, options: [.repeat, .curveLinear], animations: {
-            self.loaderIndicator.transform = self.loaderIndicator.transform.rotated(by: .pi)
+            self.loaderIndicator.transform = CGAffineTransform(rotationAngle: .pi)
         }, completion: nil)
     }
     

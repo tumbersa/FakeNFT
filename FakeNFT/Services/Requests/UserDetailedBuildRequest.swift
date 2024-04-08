@@ -12,7 +12,7 @@ struct UserDetailedBuildRequest: NetworkRequest {
     let id: String
 
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/users/\(id)")
+        URL(string: "\(NetworkConstants.baseURL)/api/v1/users/\(id)")
     }
 }
 

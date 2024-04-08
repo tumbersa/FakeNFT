@@ -12,13 +12,13 @@ import ProgressHUD
 final class CollectionViewControllerPresenter {
     
     weak var viewController: CollectionViewController?
-    private var dataProvider: CollectionDataProviderProtocol
     private let dispatchGroup = DispatchGroup()
     private let utilityQueue = DispatchQueue.global(qos: .utility)
     
     let nftModel: NFTCatalogModel
     var authorURL: String = ""
     var nftArray: [Nft] = []
+    
     private var profile: Profile?
     private var cart: Cart?
     
@@ -33,16 +33,16 @@ final class CollectionViewControllerPresenter {
     private let cartService: CartService
     
     init(nftCatalogModel nftModel: NFTCatalogModel,
-         dataProvider: CollectionDataProvider,
          nftService: NftService,
          profileService: ProfileService, 
          cartService: CartService) {
         self.nftModel = nftModel
-        self.dataProvider = dataProvider
         self.nftService = nftService
         self.profileService = profileService
         self.cartService = cartService
     }
+    
+    //MARK: - Public funcs
     
     func getLikesCartAndNft() {
         ProgressHUD.show()
@@ -77,6 +77,33 @@ final class CollectionViewControllerPresenter {
     func isAddedToCart(_ idOfCell: String) -> Bool {
         idAddedToCart.contains(idOfCell)
     }
+    
+    func prepareFullDataForShow() {
+        let viewData = CollectionViewModel(coverImageURL: nftModel.cover,
+                                           title: nftModel.name,
+                                           description: nftModel.description,
+                                           authorName: nftModel.author)
+        viewController?.show(viewCollectionViewModel: viewData)
+    }
+    
+    #warning("Сообщение для ревьюера: Наставник сказал написать это уведомление для Вас, так как в ответе от сервера отсутствует ссылка на сайт автора коллекции и это недоработка сервера как он сказал, так что наставник разрешил брать сайт автора первой nft в коллекции (к сожалению сайты которые даны в nft не рабочие но переход осуществляется по правильной ссылке)")
+    func loadAuthorWebsite() {
+        authorURL = nftArray[0].author
+    }
+    
+    func presentSFVC() {
+        if let url = URL(string: authorURL) {
+            let safaryVC = SFSafariViewController(url: url)
+            viewController?.configNavBackButton()
+            viewController?.navigationController?.present(safaryVC, animated: true)
+        }
+    }
+    
+    func backButtonTapped() {
+        viewController?.navigationController?.popViewController(animated: true)
+    }
+    
+    //MARK: - Private funcs
     
     private func loadProfile(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void) {
 
@@ -151,40 +178,6 @@ final class CollectionViewControllerPresenter {
         }
     }
     
-    func prepareDataForShow(authorName: String) {
-        let viewData = CollectionViewModel(coverImageURL: nftModel.cover,
-                                           title: nftModel.name,
-                                           description: nftModel.description,
-                                           authorName: nftModel.author)
-        viewController?.show(viewCollectionViewModel: viewData)
-    }
-    
-    func prepareFullDataForShow() {
-        let viewData = CollectionViewModel(coverImageURL: nftModel.cover,
-                                           title: nftModel.name,
-                                           description: nftModel.description,
-                                           authorName: nftModel.author)
-        viewController?.show(viewCollectionViewModel: viewData)
-    }
-    
-    func loadAuthorWebsite() {
-        authorURL = nftArray[0].author
-    }
-    
-    func presentSFVC() {
-        print(nftArray[0].author)
-        if let url = URL(string: authorURL) {
-            let safaryVC = SFSafariViewController(url: url)
-            viewController?.configNavBackButton()
-            viewController?.navigationController?.present(safaryVC, animated: true)
-            viewController?.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        }
-    }
-    
-    func backButtonTapped() {
-        viewController?.navigationController?.popViewController(animated: true)
-    }
-    
     private func processNFTsLoading() {
         for id in nftModel.nfts {
             loadNftById(id: id)
@@ -223,14 +216,12 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
         utilityQueue.async {[weak self] in
             self?.loadProfile(httpMethod: .put, id: id) { [weak self] _ in
                 guard let self else { return }
-                viewController?.reloadCollectionView()
-              //  viewController?.updateData(with: nftArray, id: id, isCart: false)
+                viewController?.reloadCollectionForLikesAndCard(with: nftArray, id: id, isCart: false)
             }
         }
     }
     
     func cartTapped(id: String) {
-        
         idAddedToCartForRequests = idAddedToCart
         
         if idAddedToCartForRequests.contains(id) {
@@ -243,8 +234,7 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
         utilityQueue.async {[weak self] in
             self?.loadCart(httpMethod: .put, id: id){ [weak self] _ in
                 guard let self else { return }
-                viewController?.reloadCollectionView()
-              //  viewController?.updateData(with: nftArray, id: id, isCart: true)
+                viewController?.reloadCollectionForLikesAndCard(with: nftArray, id: id, isCart: true)
             }
         }
     }

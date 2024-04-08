@@ -10,7 +10,7 @@ import Foundation
 struct UsersBuildRequest: NetworkRequest {
 
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/users")
+        URL(string: "\(NetworkConstants.baseURL)/api/v1/users")
     }
 }
 

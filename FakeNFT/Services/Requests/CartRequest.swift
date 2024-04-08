@@ -21,7 +21,7 @@ struct CartRequest: NetworkRequest {
     }
     
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1")
+        URL(string: "\(NetworkConstants.baseURL)/api/v1/orders/1")
     }
 }
 

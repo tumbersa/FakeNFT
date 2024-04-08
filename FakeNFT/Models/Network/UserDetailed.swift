@@ -16,10 +16,6 @@ struct UserDetailed: Codable, Hashable {
     let nfts: [String]
     let rating, id: String
     
-    init(from decoder: any Decoder) throws {
-        <#code#>
-    }
-    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

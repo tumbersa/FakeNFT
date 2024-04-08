@@ -18,7 +18,7 @@ protocol CollectionDataProviderProtocol: AnyObject {
 
 typealias CollectionCompletion = (Result<UserDetailed, Error>) -> Void
 
-typealias ProfileCompletion = (Result<Profile, Error>) -> Void
+//typealias ProfileCompletion = (Result<Profile, Error>) -> Void
 
 final class CollectionDataProvider: CollectionDataProviderProtocol {
     
@@ -37,6 +37,7 @@ final class CollectionDataProvider: CollectionDataProviderProtocol {
             case .success(let data):
                 completion(.success(data))
             case .failure(let error):
+                print(error.localizedDescription)
                 completion(.failure(error))
             }
             ProgressHUD.dismiss()
@@ -79,7 +80,5 @@ final class CollectionDataProvider: CollectionDataProviderProtocol {
             ProgressHUD.dismiss()
         }
     }
-    
-    
-    
 }
+

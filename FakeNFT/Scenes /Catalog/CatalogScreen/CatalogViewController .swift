@@ -120,7 +120,21 @@ extension CatalogViewController: UITableViewDataSource {
 
 extension CatalogViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let viewController = CollectionViewController()
+#warning ("передать сразу имя автора, обложку, описание, название коллекции, и набор нфт из набора нфт взять первый нфт и из него достать ссылку на автора")
+        let networkClient = DefaultNetworkClient()
+        let nftStorage = NftStorageImpl()
+        let nftService = NftServiceImpl(networkClient: networkClient, storage: nftStorage)
+        let profileService = ProfileServiceImpl(networkClient: networkClient)
+        let cartService = CartServiceImpl(networkClient: networkClient)
+        let collectionDataProvider = CollectionDataProvider(networkClient: networkClient)
+        let collectionPresenter = CollectionViewControllerPresenter(nftCatalogModel: presenter.dataSource[indexPath.row],
+                                                                    dataProvider: collectionDataProvider,
+                                                                    nftService: nftService,
+                                                                    profileService: profileService,
+                                                                    cartService: cartService
+        )
+        let viewController = CollectionViewController(presenter: collectionPresenter)
+        collectionPresenter.viewController = viewController
         viewController.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(viewController, animated: true)
     }

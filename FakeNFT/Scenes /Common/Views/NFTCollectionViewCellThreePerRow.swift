@@ -173,7 +173,16 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         id = data.id
     }
     
-    func getID() -> String { id }
+    func set(data: Nft) {
+        nftImageView.kf.setImage(with: data.images[0])
+        nameLabel.text = data.name
+        ratingStackView.set(rating: data.rating)
+        let numStr = String(format: "%.2f", data.price)
+        priceLabel.text = numStr + " ETH"
+        id = data.id
+    }
+    
+    func getId() -> String { id }
     
     func setIsUserInteractionEnabledToTrue(isCart: Bool) {
         if isCart {

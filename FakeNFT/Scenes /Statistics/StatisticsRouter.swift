@@ -23,7 +23,7 @@ final class StatisticsRouterImpl: StatisticsRouter {
         self.assemblyBuilder = assemblyBuilder
     }
     
-    func initialViewController(input: StatisticsInput) {
+    func initialViewController(input: StatisticsInput? = nil) {
         guard let assemblyBuilder else { return }
         let vc = assemblyBuilder.build(with: input, router: self)
         navigationController?.viewControllers = [vc]

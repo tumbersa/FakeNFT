@@ -8,11 +8,15 @@
 import Foundation
 
 // MARK: - UserDetailed
-struct UserDetailed: Codable {
+struct UserDetailed: Codable, Hashable {
     let name: String
     let avatar: String
     let description: String
     let website: String
     let nfts: [String]
     let rating, id: String
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

@@ -48,9 +48,8 @@ final class TabBarController: UITabBarController {
     private func createStatisticsVC() -> UIViewController {
         let navController = UINavigationController()
         let assemblyBuilder = StatisticsAssemblyBuilderImpl(networkClient: DefaultNetworkClient())
-        let statisticsInput = StatisticsInput.userId(MockDataStatistics.userId)
         let router = StatisticsRouterImpl(navigationController: navController, assemblyBuilder: assemblyBuilder)
-        router.initialViewController(input: statisticsInput)
+        router.initialViewController()
         
         navController.title = L10n.TabBar.statisticTabBarTitle
         navController.tabBarItem.image = UIImage(systemName: "flag.2.crossed.fill")

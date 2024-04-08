@@ -8,6 +8,6 @@
 import Foundation
 
 enum StatisticsInput {
-    case userId(String)
+    case userDetailed(UserDetailed)
     case nftIds([String])
 }

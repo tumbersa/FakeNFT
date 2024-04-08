@@ -11,55 +11,35 @@ protocol UserCardPresenter {
     func colletionNFTControlTapped()
     func websiteButtonTapped()
     func viewDidLoad()
+    func backButtonPressed()
 }
 
 final class UserCardPresenterImpl: UserCardPresenter {
-    
-    private let userId: String
-    private let userDetailedService: UserDetailedService
+
     private let router: StatisticsRouter
+    private let userDetailed: UserDetailed
     
-    private(set) var userDetailed: UserDetailed?
     weak var view: UserCardView?
     
-    init(userId: String, userDetailedService: UserDetailedService, router: StatisticsRouter) {
-        self.userId = userId
-        self.userDetailedService = userDetailedService
+    init(userDetailed: UserDetailed, router: StatisticsRouter) {
+        self.userDetailed = userDetailed
         self.router = router
     }
     
     func viewDidLoad() {
-        UIBlockingProgressHUD.show()
-        loadUserDetailed()
+        view?.updateData(with: userDetailed)
     }
     
     func colletionNFTControlTapped() {
-        guard let userDetailed else { return }
         let userCollectionInput = StatisticsInput.nftIds(userDetailed.nfts)
         router.push(with: userCollectionInput)
     }
     
     func websiteButtonTapped() {
-        guard let urlStr = userDetailed?.website else { return }
-        router.presentSFViewController(urlStr: urlStr)
+        router.presentSFViewController(urlStr: userDetailed.website)
     }
     
-    private func loadUserDetailed() {
-        userDetailedService.loadUserDetailed(id: userId) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-            guard let self else { return }
-            
-            switch result {
-            case .success(let userDetailed):
-                self.userDetailed = userDetailed
-                view?.updateData(with: userDetailed)
-            case .failure(_):
-                view?.showError(ErrorModel() {[weak self] in
-                    guard let self else { return }
-                    viewDidLoad()
-                })
-            }
-        }
+    func backButtonPressed() {
+        router.pop()
     }
-    
 }

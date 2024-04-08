@@ -123,9 +123,9 @@ class PayNftViewController: UIViewController {
     private func setupViews() {
         view.addSubview(bottomView)
         view.addSubview(selectedCollection)
-        bottomView.addSubview(infoLabel)
-        bottomView.addSubview(infoWebButton)
-        bottomView.addSubview(payButton)
+        [infoLabel, infoWebButton, payButton].forEach {
+            bottomView.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             selectedCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),

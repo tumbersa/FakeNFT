@@ -17,13 +17,9 @@ protocol CartView: AnyObject {
 
 final class CartViewController: UIViewController {
     
-    var presenter: CartPresenter!
-        
-    private var cartId: String = ""
+    private var presenter: CartPresenter!
     
-    private var cellCount: Double = 0
-    private var mockID: [String] = []
-    private var loadImages = LoadNftImages()
+    private var cartId: String = ""
     
     private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
@@ -113,24 +109,31 @@ final class CartViewController: UIViewController {
         loadCart(httpMethod: .get) {[weak self] error in
             self?.showLoader()
             self?.processNFTsLoading()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                self?.hideLoader()
-            }
         }
     }
     
     private func configureVC() {
-        presenter = CartPresenter(view: self, cartService: CartServiceImpl(networkClient: DefaultNetworkClient()), nftService: NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl()))
+        presenter = CartPresenter(
+            view: self,
+            cartService: cartService,
+            nftService: nftService)
         presenter.viewDidLoad()
-        tableView.delegate = self
-        tableView.dataSource = self
-        setupAllViews()
+        setupEmptyOrNftViews()
+        setupTableView()
+        setupIndicator()
+    }
+    
+    private func setupTableView() {
+            tableView.delegate = self
+            tableView.dataSource = self
+    }
+    
+    private func setupIndicator() {
         view.addSubview(loaderIndicator)
         NSLayoutConstraint.activate([
             loaderIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loaderIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-        setupEmptyOrNftViews()
     }
     
     private func setupEmptyOrNftViews() {
@@ -168,6 +171,8 @@ final class CartViewController: UIViewController {
         for id in idAddedToCart {
             loadNft(id: id)
         }
+        self.hideLoader()
+        
     }
     
     private func loadNft(id: String) {
@@ -267,9 +272,9 @@ final class CartViewController: UIViewController {
         navigationItem.rightBarButtonItem = addButton
         view.addSubview(tableView)
         view.addSubview(bottomView)
-        bottomView.addSubview(nftCount)
-        bottomView.addSubview(nftPrice)
-        bottomView.addSubview(buttonPay)
+        [nftCount, nftPrice, buttonPay].forEach {
+            bottomView.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             

@@ -50,22 +50,3 @@ final class CartServiceImpl: CartService {
     }
 }
 
-//private func deleteFromCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
-//        cartService.deleteFromCart(nftId: id ?? "") { result in
-//            switch result {
-//            case .success:
-//                // Если удаление прошло успешно
-//                completion(nil)
-//            case .failure(let error):
-//                completion(error)
-//            }
-//        }
-//    }
-//
-//    deleteFromCart(httpMethod: .delete, id: cartId) { error in
-//        if let error = error {
-//            print("Произошла ошибка при удалении из корзины: \(error)")
-//        } else {
-//            print("Объект успешно удален из корзины")
-//        }
-//    }

@@ -57,9 +57,9 @@ class CongratulationViewController: UIViewController {
     }
 
     private func setupAllViews() {
-        view.addSubview(pictureImage)
-        view.addSubview(congratulationLabel)
-        view.addSubview(backCatalogButton)
+        [pictureImage, congratulationLabel, backCatalogButton].forEach {
+            view.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             pictureImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 196),

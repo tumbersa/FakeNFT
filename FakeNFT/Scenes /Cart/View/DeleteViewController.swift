@@ -110,9 +110,9 @@ class DeleteViewController: UIViewController {
     }
     
     private func setupViews() {
-        view.addSubview(textLabel)
-        view.addSubview(buttonStackView)
-        view.addSubview(nftImage)
+        [textLabel, buttonStackView, nftImage].forEach {
+            view.addSubview($0)
+        }
         buttonStackView.addArrangedSubview(removeNftButton)
         buttonStackView.addArrangedSubview(backNftButton)
         

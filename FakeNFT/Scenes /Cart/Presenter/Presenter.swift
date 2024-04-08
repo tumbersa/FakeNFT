@@ -8,7 +8,7 @@
 import Foundation
 
 
-class CartPresenter {
+final class CartPresenter {
     private weak var view: CartView?
     private let cartService: CartService
     private let nftService: NftService

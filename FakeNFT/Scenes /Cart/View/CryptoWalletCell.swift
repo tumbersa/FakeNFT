@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CryptoWalletCell: UICollectionViewCell {
+final class CryptoWalletCell: UICollectionViewCell {
     
     let cryptoBacground: UIView = {
        let view = UIView()
@@ -53,9 +53,9 @@ class CryptoWalletCell: UICollectionViewCell {
         super.init(frame: frame)
         
         contentView.addSubview(cryptoBacground)
-        cryptoBacground.addSubview(cryptoImage)
-        cryptoBacground.addSubview(fullNameCrypto)
-        cryptoBacground.addSubview(shortNameCrypto)
+        [cryptoImage, fullNameCrypto, shortNameCrypto].forEach {
+            cryptoBacground.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             cryptoBacground.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),

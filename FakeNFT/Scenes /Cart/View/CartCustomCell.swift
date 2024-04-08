@@ -11,7 +11,7 @@ protocol CartCellDelegate: AnyObject {
     func deleteButtonTapped(at indexPath: IndexPath, image: UIImage)
 }
 
-class CartCustomCell: UITableViewCell {
+final class CartCustomCell: UITableViewCell {
     
     var starsCount: Int? {
         didSet {
@@ -140,12 +140,9 @@ class CartCustomCell: UITableViewCell {
     
     private func setupAllViews() {
         contentView.addSubview(nftView)
-        nftView.addSubview(nftImage)
-        nftView.addSubview(nftName)
-        nftView.addSubview(starsStack)
-        nftView.addSubview(nftPriceLabel)
-        nftView.addSubview(nftPrice)
-        nftView.addSubview(deleteNftButton)
+        [nftImage, nftName, starsStack, nftPriceLabel, nftPrice, deleteNftButton].forEach {
+            nftView.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             nftView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),

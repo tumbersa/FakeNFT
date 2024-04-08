@@ -15,7 +15,7 @@ protocol CartView: AnyObject {
     func displayError(_ message: String)
 }
 
-final class CartViewController: UIViewController, CartView {
+final class CartViewController: UIViewController {
     
     private var presenter: CartPresenter!
     

@@ -7,7 +7,6 @@
 
 import UIKit
 
-
 final class CartPresenter {
     private weak var view: CartView?
     var imageCache = NSCache<NSString, UIImage>()

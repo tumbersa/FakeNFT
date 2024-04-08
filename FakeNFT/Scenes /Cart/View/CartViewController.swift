@@ -15,7 +15,7 @@ protocol CartView: AnyObject {
     func displayError(_ message: String)
 }
 
-final class CartViewController: UIViewController {
+final class CartViewController: UIViewController, CartView {
     
     private var presenter: CartPresenter!
     
@@ -125,8 +125,8 @@ final class CartViewController: UIViewController {
     }
     
     private func setupTableView() {
-            tableView.delegate = self
-            tableView.dataSource = self
+        tableView.delegate = self
+        tableView.dataSource = self
     }
     
     private func setupIndicator() {

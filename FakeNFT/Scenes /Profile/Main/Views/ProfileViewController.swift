@@ -301,6 +301,11 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 extension ProfileViewController: ProfilePresenterDelegate {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String]) {
         let myNFTViewController = MyNFTViewController(nftID: nftID, likedID: likedNFT)
+        print("MyNFTViewController создан")
+
+        print("Переданный nftID: \(nftID)")
+        print("Переданный likedID: \(likedNFT)")
+
         myNFTViewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(
             myNFTViewController,

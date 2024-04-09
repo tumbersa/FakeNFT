@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 protocol MyNFTViewControllerProtocol: AnyObject {
-    var presenter: MyNFTPresenterProtocol? { get set }
+    var presenter: MyNFTPresenter? { get set }
     func updateMyNFTs(_ nfts: NFT?)
 }
 
@@ -17,7 +17,7 @@ protocol MyNFTViewControllerProtocol: AnyObject {
 final class MyNFTViewController: UIViewController {
 
     // MARK: - Private Properties
-    var presenter: MyNFTPresenterProtocol?
+    var presenter: MyNFTPresenter?
     private var myNFTs: [NFT] = []
     private var nftID: [String]
     private var likedNFT: [String]
@@ -26,10 +26,15 @@ final class MyNFTViewController: UIViewController {
         self.nftID = nftID
         self.likedNFT = likedID
         super.init(nibName: nil, bundle: nil)
+        print("Инициализация MyNFTViewController с nftID: \(nftID), likedID: \(likedID)")
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        print("Деинициализация MyNFTViewController")
     }
 
     // MARK: - UI
@@ -80,21 +85,33 @@ final class MyNFTViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("viewDidLoad вызван")
+
         setupNavigation()
         setupViews()
         setupConstraints()
-        updateEmptyView()
-        setupPresenter()
+
+        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
+        print("MyNFTPresenter создан")
+        presenter?.view = self
+        print("Привязка presenter к MyNFTViewController")
+        presenter?.viewDidLoad()
+
+        print("viewDidLoad завершен")
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         if let sortType = UserDefaults.standard.data(forKey: "sortType") {
             let type = try? PropertyListDecoder().decode(Filter.self, from: sortType)
             self.myNFTs = applySortType(by: type ?? .rating)
             tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        print("TableView frame: \(tableView.frame)")
     }
 }
 
@@ -127,12 +144,6 @@ private extension MyNFTViewController {
         emptyLabel.snp.makeConstraints { make in
             make.centerX.centerY.equalToSuperview()
         }
-    }
-
-    func setupPresenter() {
-        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
-        presenter?.view = self
-        presenter?.viewDidLoad()
     }
 
     // MARK: - Actions
@@ -206,27 +217,14 @@ private extension MyNFTViewController {
 
         present(alert, animated: true)
     }
-
-    func updateEmptyView() {
-        if myNFTs.isEmpty {
-            self.emptyLabel.isHidden = false
-            tableView.isHidden = true
-            navigationItem.title = ""
-            filterButton.image = nil
-        } else {
-            emptyLabel.isHidden = true
-        }
-    }
 }
 
 // MARK: - UITableViewDataSource
 extension MyNFTViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let presenter = presenter as? MyNFTPresenter else {
-            return 0
-        }
+        print("Count of nfts in presenter: \(presenter?.nfts.count ?? 0)")
+        return presenter?.nfts.count ?? 0
 
-        return presenter.nfts.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -236,7 +234,12 @@ extension MyNFTViewController: UITableViewDataSource {
         ) as? MyNFTCell else {
             fatalError("Could not cast to MyNFTCell")
         }
-        let nft = myNFTs[indexPath.row]
+
+        guard let nft = presenter?.nfts[indexPath.row] else {
+            return UITableViewCell()
+        }
+        print("Count of nfts in presenter: \(presenter?.nfts.count ?? 0)")
+
         cell.configureCell(with: nft)
         cell.selectionStyle = .none
 
@@ -246,12 +249,37 @@ extension MyNFTViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension MyNFTViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 140
+    }
 }
 
 extension MyNFTViewController: MyNFTViewControllerProtocol {
     func updateMyNFTs(_ nfts: NFT?) {
+        guard let presenter = presenter else {
+            print("Presenter is nil")
+            return
+        }
+
         guard let nfts = nfts else { return }
-        myNFTs.append(nfts)
-        tableView.reloadData()
+        print("NFT получены: \(nfts)")
+
+        print("Перед добавлением NFT: \(myNFTs.count)")
+
+        self.myNFTs.append(nfts)
+
+        print("NFT добавлены в presenter.nfts: \(nfts)")
+        DispatchQueue.main.async {
+            if  self.myNFTs.isEmpty {
+                self.emptyLabel.isHidden = false
+                self.tableView.isHidden = true
+                self.navigationItem.title = ""
+                self.filterButton.image = nil
+            } else {
+                self.emptyLabel.isHidden = true
+                self.tableView.isHidden = false
+            }
+            self.tableView.reloadData()
+        }
     }
 }

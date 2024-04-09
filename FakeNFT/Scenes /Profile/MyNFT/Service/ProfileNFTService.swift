@@ -26,6 +26,7 @@ final class ProfileNFTService {
     }
 
     func fetchNFTs(_ id: String, completion: @escaping (Result<NFT, Error>) -> Void) {
+        print("Fetching NFTs for ID: \(id)")
         guard let request = makeFetchNFTRequest(id: id) else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
@@ -37,6 +38,7 @@ final class ProfileNFTService {
             switch response {
 
             case .success(let NFTs):
+                print("Successfully fetched NFTs: \(NFTs)")
                 self?.NFTs?.append(NFTs)
                 completion(.success(NFTs))
             case .failure(let error):

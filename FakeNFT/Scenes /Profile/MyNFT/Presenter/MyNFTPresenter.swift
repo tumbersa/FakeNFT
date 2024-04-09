@@ -22,6 +22,11 @@ final class MyNFTPresenter {
     init(nftID: [String], likedNFT: [String]) {
         self.nftID = nftID
         self.likedNFT = likedNFT
+        print("Инициализация MyNFTPresenter с nftID: \(nftID), likedNFT: \(likedNFT)")
+    }
+
+    deinit {
+        print("Деинициализация MyNFTPresenter")
     }
 }
 
@@ -33,12 +38,12 @@ extension MyNFTPresenter: MyNFTPresenterProtocol {
 
 private extension MyNFTPresenter {
     func fetchNFTs() {
+
         for id in nftID {
             profileNFTService.fetchNFTs(id) { [weak self] result in
-                print("Ошибка: \(result)")
+                print("Результат: \(result)")
                 switch result {
                 case .success(let nfts):
-                    self?.nfts.append(nfts)
                     self?.view?.updateMyNFTs(nfts)
                 case .failure(let error):
                     print("Failed to fetch NFTs: \(error)")

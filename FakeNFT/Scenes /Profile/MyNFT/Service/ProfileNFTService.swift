@@ -26,7 +26,6 @@ final class ProfileNFTService {
     }
 
     func fetchNFTs(_ id: String, completion: @escaping (Result<NFT, Error>) -> Void) {
-        print("Fetching NFTs for ID: \(id)")
         guard let request = makeFetchNFTRequest(id: id) else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
@@ -34,11 +33,9 @@ final class ProfileNFTService {
         }
 
         urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<NFT, Error>) in
-            print("Ответ: \(response)")
             switch response {
 
             case .success(let NFTs):
-                print("Successfully fetched NFTs: \(NFTs)")
                 self?.NFTs?.append(NFTs)
                 completion(.success(NFTs))
             case .failure(let error):
@@ -60,7 +57,6 @@ private extension ProfileNFTService {
         }
 
         var request = URLRequest(url: url)
-        print("Запрос: \(request)")
         request.httpMethod = "GET"
 
         request.setValue("application/json", forHTTPHeaderField: "Accept")

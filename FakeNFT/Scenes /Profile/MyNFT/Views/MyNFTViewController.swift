@@ -26,15 +26,10 @@ final class MyNFTViewController: UIViewController {
         self.nftID = nftID
         self.likedNFT = likedID
         super.init(nibName: nil, bundle: nil)
-        print("Инициализация MyNFTViewController с nftID: \(nftID), likedID: \(likedID)")
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    deinit {
-        print("Деинициализация MyNFTViewController")
     }
 
     // MARK: - UI
@@ -85,19 +80,13 @@ final class MyNFTViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("viewDidLoad вызван")
-
         setupNavigation()
         setupViews()
         setupConstraints()
 
         presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
-        print("MyNFTPresenter создан")
         presenter?.view = self
-        print("Привязка presenter к MyNFTViewController")
         presenter?.viewDidLoad()
-
-        print("viewDidLoad завершен")
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -111,7 +100,6 @@ final class MyNFTViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        print("TableView frame: \(tableView.frame)")
     }
 }
 
@@ -222,9 +210,7 @@ private extension MyNFTViewController {
 // MARK: - UITableViewDataSource
 extension MyNFTViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("Count of nfts in presenter: \(presenter?.nfts.count ?? 0)")
         return presenter?.nfts.count ?? 0
-
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -238,7 +224,6 @@ extension MyNFTViewController: UITableViewDataSource {
         guard let nft = presenter?.nfts[indexPath.row] else {
             return UITableViewCell()
         }
-        print("Count of nfts in presenter: \(presenter?.nfts.count ?? 0)")
 
         cell.configureCell(with: nft)
         cell.selectionStyle = .none
@@ -262,15 +247,11 @@ extension MyNFTViewController: MyNFTViewControllerProtocol {
         }
 
         guard let nfts = nfts else { return }
-        print("NFT получены: \(nfts)")
 
-        print("Перед добавлением NFT: \(myNFTs.count)")
+        presenter.nfts.append(nfts)
 
-        self.myNFTs.append(nfts)
-
-        print("NFT добавлены в presenter.nfts: \(nfts)")
         DispatchQueue.main.async {
-            if  self.myNFTs.isEmpty {
+            if  presenter.nfts.isEmpty {
                 self.emptyLabel.isHidden = false
                 self.tableView.isHidden = true
                 self.navigationItem.title = ""

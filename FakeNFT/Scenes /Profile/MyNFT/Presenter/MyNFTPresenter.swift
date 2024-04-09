@@ -22,11 +22,6 @@ final class MyNFTPresenter {
     init(nftID: [String], likedNFT: [String]) {
         self.nftID = nftID
         self.likedNFT = likedNFT
-        print("Инициализация MyNFTPresenter с nftID: \(nftID), likedNFT: \(likedNFT)")
-    }
-
-    deinit {
-        print("Деинициализация MyNFTPresenter")
     }
 }
 
@@ -41,7 +36,6 @@ private extension MyNFTPresenter {
 
         for id in nftID {
             profileNFTService.fetchNFTs(id) { [weak self] result in
-                print("Результат: \(result)")
                 switch result {
                 case .success(let nfts):
                     self?.view?.updateMyNFTs(nfts)

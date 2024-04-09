@@ -5,6 +5,7 @@
 //  Created by Dinara on 30.03.2024.
 //
 
+import Kingfisher
 import SnapKit
 import UIKit
 
@@ -79,8 +80,14 @@ final class FavoriteNFTCell: UICollectionViewCell {
     }
 
     // MARK: - Public Method
-    func configureCell(with model: NFTCellModel) {
-        image.image = model.images
+    func configureCell(with model: NFT) {
+        if let imageURLString = model.images.first,
+           let imageURL = URL(string: imageURLString) {
+            image.kf.setImage(with: imageURL)
+        } else {
+            image.image = UIImage(named: "avatar_icon")
+        }
+
         name.text = model.name
         ratingView.setRating(model.rating)
         let stringFromNumber = String(format: "%.2f", model.price)

@@ -255,9 +255,7 @@ extension ProfileViewController: UITableViewDelegate {
             presenter?.didTapMyNFT()
         case 1:
             print("My Favourite NFTs cell did tap")
-            let viewController = FavoriteNFTViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(viewController, animated: true)
+            presenter?.didTapFavoriteNFT()
         case 2:
             print("About Developer cell did tap")
             let viewController = AboutDeveloperViewController()
@@ -299,6 +297,15 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 }
 
 extension ProfileViewController: ProfilePresenterDelegate {
+    func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String]) {
+        let favoriteNFTViewController = FavoriteNFTViewController(nftID: nftID, likedID: likedNFT)
+        favoriteNFTViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(
+            favoriteNFTViewController,
+            animated: true
+        )
+    }
+
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String]) {
         let myNFTViewController = MyNFTViewController(nftID: nftID, likedID: likedNFT)
         myNFTViewController.hidesBottomBarWhenPushed = true

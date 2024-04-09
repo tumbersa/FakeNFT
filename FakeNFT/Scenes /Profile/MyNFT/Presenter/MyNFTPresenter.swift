@@ -33,7 +33,6 @@ extension MyNFTPresenter: MyNFTPresenterProtocol {
 
 private extension MyNFTPresenter {
     func fetchNFTs() {
-
         for id in nftID {
             profileNFTService.fetchNFTs(id) { [weak self] result in
                 switch result {

@@ -96,10 +96,6 @@ final class MyNFTViewController: UIViewController {
             tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
     }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
 }
 
 // MARK: - Private Extension
@@ -144,7 +140,7 @@ private extension MyNFTViewController {
     }
 
     func applySortType(by type: Filter) -> [NFT] {
-        guard let nfts = presenter?.nfts else  {
+        guard let nfts = presenter?.nfts else {
             return []
         }
 

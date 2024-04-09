@@ -8,47 +8,29 @@
 import SnapKit
 import UIKit
 
+protocol FavoriteNFTViewControllerProtocol: AnyObject {
+    var presenter: FavoriteNFTPresenter? { get set }
+    func updateFavoriteNFTs(_ likes: NFT?)
+}
+
 // MARK: - FavoriteNFTViewController
 final class FavoriteNFTViewController: UIViewController {
 
     // MARK: - Private Properties
-    private var favoriteNFTS = [
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        ),
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        ),
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        ),
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        )
-    ]
+    private var favoriteNFTS: [NFT] = []
+    var presenter: FavoriteNFTPresenter?
+    private var nftID: [String]
+    private var likedNFT: [String]
 
-    // private var favoriteNFTS = [NFTCellModel]()
-    // закомментируйте favoriteNFTS с моковыми данными и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
+    init(nftID: [String], likedID: [String]) {
+        self.nftID = nftID
+        self.likedNFT = likedID
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
@@ -107,7 +89,9 @@ final class FavoriteNFTViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
-        updateEmptyView()
+        presenter = FavoriteNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
+        presenter?.view = self
+        presenter?.viewDidLoad()
     }
 }
 
@@ -142,16 +126,6 @@ private extension FavoriteNFTViewController {
         }
     }
 
-    func updateEmptyView() {
-        if favoriteNFTS.isEmpty {
-            self.emptyLabel.isHidden = false
-            collectionView.isHidden = true
-            navigationItem.title = ""
-        } else {
-            emptyLabel.isHidden = true
-        }
-    }
-
     // MARK: - Actions
     @objc func navBackButtonDidTap() {
         self.navigationController?.popViewController(animated: true)
@@ -167,7 +141,7 @@ extension FavoriteNFTViewController: UICollectionViewDataSource,
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return favoriteNFTS.count
+        return presenter?.likes.count ?? 0
     }
 
     func collectionView(
@@ -180,10 +154,38 @@ extension FavoriteNFTViewController: UICollectionViewDataSource,
         ) as? FavoriteNFTCell else {
             fatalError("Could not cast to FavoriteNFTCell")
         }
-        let favouriteNFT = favoriteNFTS[indexPath.row]
-        cell.configureCell(with: favouriteNFT)
+
+        guard let likes = presenter?.likes[indexPath.row] else {
+            return UICollectionViewCell()
+        }
+        cell.configureCell(with: likes)
         cell.selectedBackgroundView = .none
 
         return cell
+    }
+}
+
+extension FavoriteNFTViewController: FavoriteNFTViewControllerProtocol {
+    func updateFavoriteNFTs(_ likes: NFT?) {
+        guard let presenter = presenter else {
+            print("Presenter is nil")
+            return
+        }
+
+        guard let likes = likes else { return }
+
+        presenter.likes.append(likes)
+
+        DispatchQueue.main.async {
+            if  presenter.likes.isEmpty {
+                self.emptyLabel.isHidden = false
+                self.collectionView.isHidden = true
+                self.navigationItem.title = ""
+            } else {
+                self.emptyLabel.isHidden = true
+                self.collectionView.isHidden = false
+            }
+            self.collectionView.reloadData()
+        }
     }
 }

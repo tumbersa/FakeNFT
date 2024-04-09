@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 final class CartPresenter {
     private weak var view: CartView?

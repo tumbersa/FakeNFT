@@ -7,8 +7,18 @@
 
 import UIKit
 import WebKit
+import SafariServices
+
+protocol PayNftView: AnyObject {
+    func showSafariView() -> SFSafariViewController
+}
 
 final class PayNftViewController: UIViewController {
+        
+    private var presenter: PayNftPresenter?
+    
+    private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     
     private let cryptoImage: [String] = ["Bitcoin (BTC)", "Dogecoin (DOGE)", "Tether (USDT)", "ApeCoin (APE)", "Solana (SOL)", "Ethereum (ETH)", "Cardano (ADA)", "Shiba Inu (SHIB)"]
     
@@ -81,6 +91,7 @@ final class PayNftViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureVC()
+        presenter = PayNftPresenter()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -112,13 +123,8 @@ final class PayNftViewController: UIViewController {
     }
     
     @objc func showUserInfo() {
-        webInfo = WKWebView()
-        guard let webInfo = webInfo else { return }
-        webInfo.navigationDelegate = self
-        view = webInfo
-        let htmlString = "<html><body><iframe width=\"\(view.frame.width)\" height=\"\(view.frame.height)\" src=\"https://www.youtube.com/embed/gSMlVALgjEc\" frameborder=\"0\" allowfullscreen></iframe></body></html>"
-
-        webInfo.loadHTMLString(htmlString, baseURL: nil)
+        guard let vc = presenter?.showSafariView() else { return }
+        present(vc, animated: true)
     }
     
     private func setupViews() {
@@ -150,20 +156,6 @@ final class PayNftViewController: UIViewController {
             payButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             payButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             payButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12)])
-    }
-}
-
-extension PayNftViewController: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let url = navigationAction.request.url, url.absoluteString != "about:blank" {
-            // открыть ссылку в браузере
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            // отмена навигации внутри WKWebView
-            decisionHandler(.cancel)
-        } else {
-            // разрешение навигации внутри WKWebView
-            decisionHandler(.allow)
-        }
     }
 }
 

@@ -93,7 +93,8 @@ final class MyNFTViewController: UIViewController {
         super.viewWillAppear(animated)
         if let sortType = UserDefaults.standard.data(forKey: "sortType") {
             let type = try? PropertyListDecoder().decode(Filter.self, from: sortType)
-            self.myNFTs = applySortType(by: type ?? .rating)
+//            self.myNFTs = applySortType(by: type ?? .rating)
+            presenter?.nfts = applySortType(by: type ?? .rating)
             tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
     }
@@ -145,7 +146,10 @@ private extension MyNFTViewController {
     }
 
     func applySortType(by type: Filter) -> [NFT] {
-        let nfts = myNFTs
+//        let nfts = myNFTs
+        guard let nfts = presenter?.nfts else {
+            return []
+        }
 
         switch type {
         case .name:
@@ -170,7 +174,8 @@ private extension MyNFTViewController {
             title: L10n.Profile.byPrice,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .price) ?? []
+//            self?.myNFTs = self?.applySortType(by: .price) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .price) ?? []
             self?.saveSortType(type: .price)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
@@ -179,7 +184,8 @@ private extension MyNFTViewController {
             title: L10n.Profile.byRaiting,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .rating) ?? []
+//            self?.myNFTs = self?.applySortType(by: .rating) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .rating) ?? []
             self?.saveSortType(type: .rating)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
@@ -188,7 +194,8 @@ private extension MyNFTViewController {
             title: L10n.Profile.byName,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .name) ?? []
+//            self?.myNFTs = self?.applySortType(by: .name) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .name) ?? []
             self?.saveSortType(type: .name)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }

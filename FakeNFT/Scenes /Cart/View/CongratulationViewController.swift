@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CongratulationViewController: UIViewController {
+final class CongratulationViewController: UIViewController {
     
     private lazy var pictureImage: UIImageView = {
        let image = UIImage(named: "CongratulationImage")

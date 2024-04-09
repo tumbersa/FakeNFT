@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class PayNftViewController: UIViewController {
+final class PayNftViewController: UIViewController {
     
     private let cryptoImage: [String] = ["Bitcoin (BTC)", "Dogecoin (DOGE)", "Tether (USDT)", "ApeCoin (APE)", "Solana (SOL)", "Ethereum (ETH)", "Cardano (ADA)", "Shiba Inu (SHIB)"]
     
@@ -50,7 +50,7 @@ class PayNftViewController: UIViewController {
         return label
     }()
     
-    private var webInfo: WKWebView!
+    private var webInfo: WKWebView?
     
     private lazy var infoWebButton: UIButton = {
        let button = UIButton()
@@ -113,6 +113,7 @@ class PayNftViewController: UIViewController {
     
     @objc func showUserInfo() {
         webInfo = WKWebView()
+        guard let webInfo = webInfo else { return }
         webInfo.navigationDelegate = self
         view = webInfo
         let htmlString = "<html><body><iframe width=\"\(view.frame.width)\" height=\"\(view.frame.height)\" src=\"https://www.youtube.com/embed/gSMlVALgjEc\" frameborder=\"0\" allowfullscreen></iframe></body></html>"

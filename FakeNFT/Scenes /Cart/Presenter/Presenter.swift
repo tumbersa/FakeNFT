@@ -10,8 +10,12 @@ import UIKit
 final class CartPresenter {
     private weak var view: CartView?
     var imageCache = NSCache<NSString, UIImage>()
+    //переменная для хранения ID добавленных в корзину NFT
+    private var idAddedToCart: Set<String> = []
     private let cartService: CartService
     private let nftService: NftService
+    private var cartId: String = ""
+    var arrOfNFT: [Nft] = []
     
     init(view: CartView, cartService: CartService, nftService: NftService) {
         self.view = view
@@ -21,7 +25,6 @@ final class CartPresenter {
     
     func viewDidLoad() {
         view?.showLoader()
-        loadCart(httpMethod: .get, model: Nft.self)
     }
     
     // Метод для кэширования изображений
@@ -56,49 +59,57 @@ final class CartPresenter {
         }.resume()
     }
     
+    func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
+        cartService.loadCart(httpMethod: httpMethod, model: nil) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let cart):
+                self.idAddedToCart = Set(cart.nfts)
+                completion(nil)
+                self.cartId = cart.id
+            case .failure(let error):
+                print(error)
+                completion(error)
+            }
+        }
+        view?.reloadTableView()
+    }
+    
+    func processNFTsLoading() {
+        for id in idAddedToCart {
+            loadNft(id: id)
+        }
+        view?.hideLoader()
+        view?.reloadTableView()
+    }
+    
+    // Метод для загрузки NFT
+    private func loadNft(id: String) {
+        nftService.loadNft(id: id) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let nft):
+                self.cacheImages(for: [nft]) { cachedImages in
+                    // Действия с кэшированными изображениями
+                }
+                // Добавляем загруженный NFT в массив и обновляем представление
+                self.arrOfNFT.append(nft)
+                self.view?.reloadTableView()
+                DispatchQueue.main.async {
+                    self.view?.reloadTableView()
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+        view?.reloadTableView()
+    }
+    
     // Метод для кэширования загруженного изображения
     func cacheImage(_ image: UIImage, forKey key: String) {
         imageCache.setObject(image, forKey: key as NSString)
     }
-    
-    func loadCart(httpMethod: HttpMethod, model: Nft.Type) {
-        cartService.loadCart(httpMethod: httpMethod, model: model as? Encodable) { [weak self] result in
-            switch result {
-            case .success(let cart):
-                self?.loadNFTs(for: cart.nfts)
-            case .failure(let error):
-                self?.view?.hideLoader()
-                self?.view?.displayError(error.localizedDescription)
-            }
-        }
-    }
-    
-    private func loadNFTs(for ids: [String]) {
-        var nfts: [Nft] = []
-        let group = DispatchGroup()
-        
-        for id in ids {
-            group.enter()
-            nftService.loadNft(id: id) { result in
-                defer { group.leave() }
-                switch result {
-                case .success(let nft):
-                    nfts.append(nft)
-                case .failure(let error):
-                    print("Error loading NFT: \(error)")
-                }
-            }
-        }
-        
-        group.notify(queue: .main) { [weak self] in
-            self?.view?.hideLoader()
-            if nfts.isEmpty {
-                self?.view?.displayEmptyCart()
-            } else {
-                self?.view?.displayNFTs(nfts)
-            }
-        }
-    }
+
     
     func deleteNFT(withId id: String) {
         // Implement delete NFT logic

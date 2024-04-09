@@ -11,7 +11,7 @@ protocol NftDeleteDelegate: AnyObject {
     func deleteNFT(at index: IndexPath)
 }
 
-class DeleteViewController: UIViewController {
+final class DeleteViewController: UIViewController {
     
     weak var delegate: NftDeleteDelegate?
     

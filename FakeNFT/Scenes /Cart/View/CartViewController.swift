@@ -13,22 +13,21 @@ protocol CartView: AnyObject {
     func displayEmptyCart()
     func displayNFTs(_ nfts: [Nft])
     func displayError(_ message: String)
+    func reloadTableView()
 }
 
 final class CartViewController: UIViewController {
     
-    private var presenter: CartPresenter!
+    var arrOfNFT: [Nft] = []
     
-    private var cartId: String = ""
+    private var presenter: CartPresenter?
     
     private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     private var idAddedToCart: Set<String> = []
-    private var arrOfNFT: [Nft] = []
-    private var sortArrOfNFT: [Nft] = []
     
     private lazy var loaderIndicator: UIImageView = {
-       let image = UIImage(named: "Loader")
+        let image = UIImage(named: "Loader")
         let imageView = UIImageView(image: image)
         imageView.heightAnchor.constraint(equalToConstant: 25).isActive = true
         imageView.widthAnchor.constraint(equalToConstant: 25).isActive = true
@@ -38,7 +37,7 @@ final class CartViewController: UIViewController {
     }()
     
     private lazy var emptyCart: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.isHidden = false
         label.text = "Корзина пуста"
         label.font = .systemFont(ofSize: 17, weight: .bold)
@@ -56,10 +55,10 @@ final class CartViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
-
+    
     //Отделение с кнопкой оплаты
     private lazy var bottomView: UIView = {
-       let view = UIView()
+        let view = UIView()
         view.backgroundColor = UIColor(named: "ypLightGray")
         view.isHidden = true
         view.layer.masksToBounds = true
@@ -88,7 +87,7 @@ final class CartViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     private lazy var buttonPay: UIButton = {
         let button = UIButton()
         button.layer.masksToBounds = true
@@ -108,9 +107,11 @@ final class CartViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         configureVC()
-        loadCart(httpMethod: .get) {[weak self] error in
+        guard let presenter = presenter else { return }
+        presenter.loadCart(httpMethod: .get) {[weak self] error in
             self?.showLoader()
-            self?.processNFTsLoading()
+            //загружаем ID
+            presenter.processNFTsLoading()
         }
     }
     
@@ -119,6 +120,7 @@ final class CartViewController: UIViewController {
             view: self,
             cartService: cartService,
             nftService: nftService)
+        guard let presenter = presenter else { return }
         presenter.viewDidLoad()
         setupTableView()
         setupIndicator()
@@ -138,7 +140,8 @@ final class CartViewController: UIViewController {
     }
     
     private func setupEmptyOrNftViews() {
-        if arrOfNFT.isEmpty {
+        guard let presenter = presenter else { return }
+        if presenter.arrOfNFT.isEmpty {
             setupEmptyViews()
             nftCount.text = "0 NFT"
             nftPrice.text = "0,0 ETH"
@@ -152,54 +155,15 @@ final class CartViewController: UIViewController {
         }
     }
     
-    //MARK: NETWORK CLIENT
-    private func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
-        cartService.loadCart(httpMethod: httpMethod, model: nil) {[weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let cart):
-                idAddedToCart = Set(cart.nfts)
-                completion(nil)
-                cartId = cart.id
-            case .failure(let error):
-                print(error)
-                completion(error)
-            }
-        }
-    }
-        
-    private func processNFTsLoading() {
-        for id in idAddedToCart {
-            loadNft(id: id)
-        }
-        self.hideLoader()
-    }
-    
-    private func loadNft(id: String) {
-        nftService.loadNft(id: id) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let nft):
-                presenter.cacheImages(for: [nft]) { cachedImages in
-                    //тут изображения в кэше
-                }
-                self.arrOfNFT.append(nft)
-                self.setupEmptyOrNftViews()
-                self.tableView.reloadData()
-            case .failure(let error):
-                print(error)
-            }
-        }
-    }
-    
     //MARK: View
     @objc func addButtonTapped() {
+        guard let presenter = presenter else { return }
+        
         let alertController = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
         
         // Добавляем действия для каждой опции сортировки
         alertController.addAction(UIAlertAction(title: "По цене", style: .default) { _ in
-            self.sortArrOfNFT = self.arrOfNFT
-            self.arrOfNFT.sort { nftItem1, nftItem2 in
+            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.price < nftItem2.price
             }
             self.tableView.reloadData()
@@ -207,7 +171,7 @@ final class CartViewController: UIViewController {
         })
     
         alertController.addAction(UIAlertAction(title: "По рейтингу", style: .default) { _ in
-            self.arrOfNFT.sort { nftItem1, nftItem2 in
+            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.rating > nftItem2.rating
             }
             self.tableView.reloadData()
@@ -215,7 +179,7 @@ final class CartViewController: UIViewController {
         })
         
         alertController.addAction(UIAlertAction(title: "По названию", style: .default) { _ in
-            self.arrOfNFT.sort { nftItem1, nftItem2 in
+            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.name < nftItem2.name
             }
             self.tableView.reloadData()
@@ -315,57 +279,64 @@ extension CartViewController: UITableViewDelegate {
 
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        arrOfNFT.count
+        var presenterArrOfNFT = 0
+        if let presenter = presenter {
+            presenterArrOfNFT = presenter.arrOfNFT.count
+        }
+        return presenterArrOfNFT
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CartCustomCell else {
             return UITableViewCell()
         }
-        cell.delegate = self
-        cell.update(
-            name: arrOfNFT[indexPath.row].name,
-            price: "\(arrOfNFT[indexPath.row].price) ETH",
-            starsCount: arrOfNFT[indexPath.row].rating,
-            indexPath: indexPath
-        )
-        //Цена всех NFT
-        var cellCount = 0.0
-        cell.selectionStyle = .none
-        for count in arrOfNFT {
-            cellCount += count.price
-        }
-        let formatter = NumberFormatter()
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 2
-        formatter.numberStyle = .decimal
-        if let formattedString = formatter.string(from: NSNumber(value: cellCount)) {
-            nftPrice.text = "\(String(formattedString)) ETH"
-        }
-        nftCount.text = "\(arrOfNFT.count) NFT"
-        
-        //Картинка
-        let imagesURL = arrOfNFT[indexPath.row].images[0]
-        // Используем кэш для установки изображения
-        if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
-            cell.nftImage.image = cachedImage
-        } else {
-            // Если изображение не найдено в кэше, устанавливаем пустую картинку и начинаем загрузку
-            cell.nftImage.image = UIImage(named: "placeholder")
-            loadImage(imageUrl: imagesURL, indexPath: indexPath)
+        if let presenter = presenter {
+            cell.delegate = self
+            cell.update(
+                name: presenter.arrOfNFT[indexPath.row].name,
+                price: "\(presenter.arrOfNFT[indexPath.row].price) ETH",
+                starsCount: presenter.arrOfNFT[indexPath.row].rating,
+                indexPath: indexPath
+            )
+            //Цена всех NFT
+            var cellCount = 0.0
+            cell.selectionStyle = .none
+            for count in presenter.arrOfNFT {
+                cellCount += count.price
+            }
+            let formatter = NumberFormatter()
+            formatter.minimumFractionDigits = 2
+            formatter.maximumFractionDigits = 2
+            formatter.numberStyle = .decimal
+            if let formattedString = formatter.string(from: NSNumber(value: cellCount)) {
+                nftPrice.text = "\(String(formattedString)) ETH"
+            }
+            nftCount.text = "\(presenter.arrOfNFT.count) NFT"
+            
+            //Картинка
+            let imagesURL = presenter.arrOfNFT[indexPath.row].images[0]
+            // Используем кэш для установки изображения
+            if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
+                cell.nftImage.image = cachedImage
+            } else {
+                // Если изображение не найдено в кэше, устанавливаем пустую картинку и начинаем загрузку
+                cell.nftImage.image = UIImage(named: "placeholder")
+                loadImage(imageUrl: imagesURL, indexPath: indexPath)
+            }
         }
         return cell
     }
     
     private func loadImage(imageUrl: URL, indexPath: IndexPath) {
-        presenter.loadImage(from: imageUrl) { [weak self] image in
+        presenter?.loadImage(from: imageUrl) { [weak self] image in
             DispatchQueue.main.async {
                 guard let self = self, let image = image, let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
                     return
                 }
                 cell.nftImage.image = image
                 // Сохраняем загруженное изображение в кэше
-                self.presenter.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
+                self.presenter?.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
             }
         }
     }
@@ -379,13 +350,20 @@ extension CartViewController: CartCellDelegate {
 
 extension CartViewController: NftDeleteDelegate {
     func deleteNFT(at index: IndexPath) {
-        arrOfNFT.remove(at: index.row)
+        guard let presenter = presenter else { return }
+        presenter.arrOfNFT.remove(at: index.row)
         setupEmptyOrNftViews()
         tableView.reloadData()
     }
 }
 
 extension CartViewController: CartView {
+    func reloadTableView() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
+    }
+    
     //индикатор загрузки показать
     func showLoader() {
         loaderIndicator.isHidden = false

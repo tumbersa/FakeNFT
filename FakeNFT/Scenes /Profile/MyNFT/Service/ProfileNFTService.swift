@@ -34,7 +34,6 @@ final class ProfileNFTService {
 
         urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<NFT, Error>) in
             switch response {
-
             case .success(let NFTs):
                 self?.NFTs?.append(NFTs)
                 completion(.success(NFTs))

@@ -5,6 +5,7 @@
 //  Created by Dinara on 28.03.2024.
 //
 
+import Kingfisher
 import SnapKit
 import UIKit
 
@@ -119,6 +120,14 @@ final class MyNFTCell: UITableViewCell {
 
     // MARK: - Public Method
     func configureCell(with model: NFT) {
+
+        if let imageURLString = model.images.first,
+           let imageURL = URL(string: imageURLString) {
+            image.kf.setImage(with: imageURL)
+        } else {
+            image.image = UIImage(named: "avatar_icon")
+        }
+
         name.text = model.name
         ratingView.setRating(model.rating)
         author.text = "от \(model.author)"

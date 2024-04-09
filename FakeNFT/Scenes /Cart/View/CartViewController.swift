@@ -13,12 +13,12 @@ protocol CartView: AnyObject {
     func displayEmptyCart()
     func displayNFTs(_ nfts: [Nft])
     func displayError(_ message: String)
-    func reloadTableView()
+    func reloadTableView(nft: [Nft])
 }
 
 final class CartViewController: UIViewController {
     
-    var arrOfNFT: [Nft] = []
+    var viewArrOfNFT: [Nft] = []
     
     private var presenter: CartPresenter?
     
@@ -113,6 +113,7 @@ final class CartViewController: UIViewController {
             //загружаем ID
             presenter.processNFTsLoading()
         }
+        
     }
     
     private func configureVC() {
@@ -279,11 +280,8 @@ extension CartViewController: UITableViewDelegate {
 
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var presenterArrOfNFT = 0
-        if let presenter = presenter {
-            presenterArrOfNFT = presenter.arrOfNFT.count
-        }
-        return presenterArrOfNFT
+        print(viewArrOfNFT.count)
+        return viewArrOfNFT.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -293,16 +291,17 @@ extension CartViewController: UITableViewDataSource {
         }
         if let presenter = presenter {
             cell.delegate = self
+            print(viewArrOfNFT)
             cell.update(
-                name: presenter.arrOfNFT[indexPath.row].name,
-                price: "\(presenter.arrOfNFT[indexPath.row].price) ETH",
-                starsCount: presenter.arrOfNFT[indexPath.row].rating,
+                name: viewArrOfNFT[indexPath.row].name,
+                price: "\(viewArrOfNFT[indexPath.row].price) ETH",
+                starsCount: viewArrOfNFT[indexPath.row].rating,
                 indexPath: indexPath
             )
             //Цена всех NFT
             var cellCount = 0.0
             cell.selectionStyle = .none
-            for count in presenter.arrOfNFT {
+            for count in viewArrOfNFT {
                 cellCount += count.price
             }
             let formatter = NumberFormatter()
@@ -312,10 +311,10 @@ extension CartViewController: UITableViewDataSource {
             if let formattedString = formatter.string(from: NSNumber(value: cellCount)) {
                 nftPrice.text = "\(String(formattedString)) ETH"
             }
-            nftCount.text = "\(presenter.arrOfNFT.count) NFT"
+            nftCount.text = "\(viewArrOfNFT.count) NFT"
             
             //Картинка
-            let imagesURL = presenter.arrOfNFT[indexPath.row].images[0]
+            let imagesURL = viewArrOfNFT[indexPath.row].images[0]
             // Используем кэш для установки изображения
             if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
                 cell.nftImage.image = cachedImage
@@ -358,10 +357,13 @@ extension CartViewController: NftDeleteDelegate {
 }
 
 extension CartViewController: CartView {
-    func reloadTableView() {
-        DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadData()
+    func reloadTableView(nft: [Nft]) {
+        viewArrOfNFT = nft
+        print(viewArrOfNFT)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.setupEmptyOrNftViews()
         }
+        tableView.reloadData()
     }
     
     //индикатор загрузки показать

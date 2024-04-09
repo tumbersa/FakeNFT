@@ -15,7 +15,12 @@ final class CartPresenter {
     private let cartService: CartService
     private let nftService: NftService
     private var cartId: String = ""
-    var arrOfNFT: [Nft] = []
+    var arrOfNFT: [Nft] = [] {
+        didSet {
+            print("Добавился")
+            view?.reloadTableView(nft: arrOfNFT)
+        }
+    }
     
     init(view: CartView, cartService: CartService, nftService: NftService) {
         self.view = view
@@ -72,15 +77,15 @@ final class CartPresenter {
                 completion(error)
             }
         }
-        view?.reloadTableView()
+        view?.reloadTableView(nft: arrOfNFT)
     }
     
     func processNFTsLoading() {
         for id in idAddedToCart {
             loadNft(id: id)
         }
+        view?.reloadTableView(nft: arrOfNFT)
         view?.hideLoader()
-        view?.reloadTableView()
     }
     
     // Метод для загрузки NFT
@@ -94,15 +99,15 @@ final class CartPresenter {
                 }
                 // Добавляем загруженный NFT в массив и обновляем представление
                 self.arrOfNFT.append(nft)
-                self.view?.reloadTableView()
+                self.view?.reloadTableView(nft: arrOfNFT)
                 DispatchQueue.main.async {
-                    self.view?.reloadTableView()
+                    self.view?.reloadTableView(nft: self.arrOfNFT)
                 }
             case .failure(let error):
                 print(error)
             }
         }
-        view?.reloadTableView()
+        view?.reloadTableView(nft: arrOfNFT)
     }
     
     // Метод для кэширования загруженного изображения

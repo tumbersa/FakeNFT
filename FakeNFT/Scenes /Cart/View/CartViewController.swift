@@ -159,35 +159,8 @@ final class CartViewController: UIViewController {
     //MARK: View
     @objc func addButtonTapped() {
         guard let presenter = presenter else { return }
-        
-        let alertController = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
-        
-        // Добавляем действия для каждой опции сортировки
-        alertController.addAction(UIAlertAction(title: "По цене", style: .default) { _ in
-            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
-                nftItem1.price < nftItem2.price
-            }
-            self.tableView.reloadData()
-        })
-    
-        alertController.addAction(UIAlertAction(title: "По рейтингу", style: .default) { _ in
-            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
-                nftItem1.rating > nftItem2.rating
-            }
-            self.tableView.reloadData()
-        })
-        
-        alertController.addAction(UIAlertAction(title: "По названию", style: .default) { _ in
-            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
-                nftItem1.name < nftItem2.name
-            }
-            self.tableView.reloadData()
-        })
-        
-        alertController.addAction(UIAlertAction(title: "Закрыть", style: .cancel, handler: nil))
-        
-        // Показываем UIAlertController
-        present(alertController, animated: true, completion: nil)
+        let sortedAlert = presenter.sortedNft()
+        present(sortedAlert, animated: true)
     }
         
     @objc func payButtonClicked() {

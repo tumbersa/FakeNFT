@@ -32,6 +32,38 @@ final class CartPresenter {
         view?.showLoader()
     }
     
+    //Метод для сортировки
+    func sortedNft() -> UIAlertController {
+        let alertController = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
+        
+        // Добавляем действия для каждой опции сортировки
+        alertController.addAction(UIAlertAction(title: "По цене", style: .default) { _ in
+            self.arrOfNFT.sort { nftItem1, nftItem2 in
+                nftItem1.price < nftItem2.price
+            }
+            self.view?.reloadTableView(nft: self.arrOfNFT)
+        })
+        
+        
+        alertController.addAction(UIAlertAction(title: "По рейтингу", style: .default) { _ in
+            self.arrOfNFT.sort { nftItem1, nftItem2 in
+                nftItem1.rating > nftItem2.rating
+            }
+            self.view?.reloadTableView(nft: self.arrOfNFT)
+        })
+        
+        
+        alertController.addAction(UIAlertAction(title: "По названию", style: .default) { _ in
+            self.arrOfNFT.sort { nftItem1, nftItem2 in
+                nftItem1.name < nftItem2.name
+            }
+            self.view?.reloadTableView(nft: self.arrOfNFT)
+        })
+        
+        alertController.addAction(UIAlertAction(title: "Закрыть", style: .cancel, handler: nil))
+        return alertController
+    }
+    
     // Метод для кэширования изображений
     func cacheImages(for nfts: [Nft], completion: @escaping ([UIImage]) -> Void) {
         var cachedImages: [UIImage] = []

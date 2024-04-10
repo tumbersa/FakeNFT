@@ -259,6 +259,7 @@ extension ProfileViewController: UITableViewDelegate {
         case 2:
             print("About Developer cell did tap")
             let viewController = AboutDeveloperViewController()
+            viewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController, animated: true)
         default:
             break

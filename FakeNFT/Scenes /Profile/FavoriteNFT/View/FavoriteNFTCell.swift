@@ -42,8 +42,9 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var name: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.boldSystemFont(ofSize: 15)
         label.textColor = UIColor(named: "ypBlack")
+        label.numberOfLines = 0
         return label
     }()
 
@@ -54,7 +55,7 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var priceValue: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = UIColor(named: "ypBlack")
         return label
     }()
@@ -143,7 +144,8 @@ private extension FavoriteNFTCell {
         stackView.snp.makeConstraints { make in
             make.centerY.equalTo(image.snp.centerY)
             make.leading.equalTo(image.snp.trailing).offset(12)
-            // make.bottom.equalTo(image.snp.bottom).offset(-7)
+            make.width.equalTo(76)
+            make.height.equalTo(66)
         }
 
         ratingView.snp.makeConstraints { make in

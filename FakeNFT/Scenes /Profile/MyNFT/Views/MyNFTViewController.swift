@@ -83,6 +83,7 @@ final class MyNFTViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
+
         presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
         presenter?.view = self
         presenter?.viewDidLoad()
@@ -207,6 +208,23 @@ private extension MyNFTViewController {
 // MARK: - UITableViewDataSource
 extension MyNFTViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+
+        if let presenter = presenter {
+            if presenter.nfts.isEmpty {
+                emptyLabel.isHidden = false
+                tableView.isHidden = true
+                navigationItem.title = ""
+                filterButton.image = nil
+            } else {
+                emptyLabel.isHidden = true
+                tableView.isHidden = false
+                navigationItem.title = L10n.Profile.myNFT
+                filterButton.image = UIImage(named: "filter_button_icon")
+            }
+        } else {
+            print("presenter is nil")
+        }
+
         return presenter?.nfts.count ?? 0
     }
 
@@ -247,17 +265,6 @@ extension MyNFTViewController: MyNFTViewControllerProtocol {
 
         presenter.nfts.append(nfts)
 
-        DispatchQueue.main.async {
-            if  presenter.nfts.isEmpty {
-                self.emptyLabel.isHidden = false
-                self.tableView.isHidden = true
-                self.navigationItem.title = ""
-                self.filterButton.image = nil
-            } else {
-                self.emptyLabel.isHidden = true
-                self.tableView.isHidden = false
-            }
-            self.tableView.reloadData()
-        }
+        tableView.reloadData()
     }
 }

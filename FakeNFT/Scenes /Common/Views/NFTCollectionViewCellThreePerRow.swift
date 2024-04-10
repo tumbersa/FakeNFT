@@ -144,7 +144,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     }
     
     @objc private func cartTapped() {
-        likeButton.isUserInteractionEnabled = false
+        cartButton.isUserInteractionEnabled = false
         delegate?.cartTapped(id: id)
     }
     
@@ -173,13 +173,15 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         id = data.id
     }
     
-    func set(data: Nft) {
-        nftImageView.kf.setImage(with: data.images[0])
+    func set(data: CollectionCellModel) {
+        nftImageView.kf.setImage(with: data.image)
         nameLabel.text = data.name
         ratingStackView.set(rating: data.rating)
         let numStr = String(format: "%.2f", data.price)
         priceLabel.text = numStr + " ETH"
         id = data.id
+        setLikedStateToLikeButton(isLiked: data.isLiked)
+        setAddedStateToCart(isAdded: data.isAddedToCart)
     }
     
     func getId() -> String { id }
@@ -191,24 +193,5 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             likeButton.isUserInteractionEnabled = true
         }
     }
-    
-//    func set(mockData data: MockNftStatistics) {
-//        nftImageView.image = data.images[0]
-//        nameLabel.text = data.name
-//        ratingStackView.set(rating: data.rating)
-//        let numStr = String(format: "%.2f", data.price)
-//        priceLabel.text = numStr + " ETH"
-//        id = data.id
-//    }
-//    
-//    @objc private func mockLikeTapped() {
-//        isLike.toggle()
-//        setLikedStateToLikeButton(isLiked: isLike)
-//    }
-//    
-//    @objc private func mockCartTapped() {
-//        isCart.toggle()
-//        setAddedStateToCart(isAdded: isCart)
-//    }
 }
 

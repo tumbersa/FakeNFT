@@ -34,7 +34,7 @@ final class CollectionViewControllerPresenter {
     
     init(nftCatalogModel nftModel: NFTCatalogModel,
          nftService: NftService,
-         profileService: ProfileService, 
+         profileService: ProfileService,
          cartService: CartService) {
         self.nftModel = nftModel
         self.nftService = nftService
@@ -44,7 +44,7 @@ final class CollectionViewControllerPresenter {
     
     //MARK: - Public funcs
     
-    func getLikesCartAndNft() {
+    func controllerDidLoad() {
         ProgressHUD.show()
         
         dispatchGroup.enter()
@@ -79,19 +79,20 @@ final class CollectionViewControllerPresenter {
     }
     
     func prepareFullDataForShow() {
-        let viewData = CollectionViewModel(coverImageURL: nftModel.cover,
+        guard let coverURL = URL(string: nftModel.cover)  else { return assertionFailure("can't get cover URL") }
+        let viewData = CollectionViewModel(coverImageURL: coverURL,
                                            title: nftModel.name,
                                            description: nftModel.description,
                                            authorName: nftModel.author)
         viewController?.show(viewCollectionViewModel: viewData)
     }
     
-    #warning("Сообщение для ревьюера: Наставник сказал написать это уведомление для Вас, так как в ответе от сервера отсутствует ссылка на сайт автора коллекции и это недоработка сервера как он сказал, так что наставник разрешил брать сайт автора первой nft в коллекции (к сожалению сайты которые даны в nft не рабочие но переход осуществляется по правильной ссылке)")
+#warning("Сообщение для ревьюера: Наставник сказал написать это уведомление для Вас, так как в ответе от сервера отсутствует ссылка на сайт автора коллекции и это недоработка сервера как он сказал, так что наставник разрешил брать сайт автора первой nft в коллекции (к сожалению сайты которые даны в nft не рабочие но переход осуществляется по правильной ссылке)")
     func loadAuthorWebsite() {
         authorURL = nftArray[0].author
     }
     
-    func presentSFVC() {
+    func authorLinkTapped() {
         if let url = URL(string: authorURL) {
             let safaryVC = SFSafariViewController(url: url)
             viewController?.configNavBackButton()
@@ -103,50 +104,60 @@ final class CollectionViewControllerPresenter {
         viewController?.navigationController?.popViewController(animated: true)
     }
     
+    func returnCollectionCell(for index: Int) -> CollectionCellModel {
+        let nftForIndex = nftArray[index]
+            return CollectionCellModel(image: nftForIndex.images[0],
+                                                name: nftForIndex.name,
+                                                rating: nftForIndex.rating,
+                                                price: nftForIndex.price,
+                                                isLiked: self.isLiked(nftForIndex.id),
+                                                isAddedToCart: self.isAddedToCart(nftForIndex.id),
+                                                id: nftForIndex.id
+            )
+    }
+    
     //MARK: - Private funcs
     
     private func loadProfile(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void) {
-
-            var formData: String = ""
-            if let profile {
-                let profileDTO = Profile(
-                    name: profile.name,
-                    avatar: profile.avatar,
-                    description: profile.description,
-                    website: profile.website,
-                    nfts: profile.nfts,
-                    likes: Array(idLikesForRequests),
-                    id: profile.id
-                )
-                formData = profileDTO.toFormData()
+        var formData: String = ""
+        if let profile {
+            let profileDTO = Profile(
+                name: profile.name,
+                avatar: profile.avatar,
+                description: profile.description,
+                website: profile.website,
+                nfts: profile.nfts,
+                likes: Array(idLikesForRequests),
+                id: profile.id
+            )
+            formData = profileDTO.toFormData()
+        }
+        
+        profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let profile):
+                self.profile = profile
+                idLikes = Set(profile.likes)
+                completion(nil)
+            case .failure(let error):
+                let errorModel = self.makeErrorModel(error, option: {
+                    [weak self] in
+                    guard let self else { return }
+                    if let id {
+                        likeTapped(id: id)
+                    } else {
+                        controllerDidLoad()
+                    }
+                })
+                viewController?.showError(errorModel)
+                completion(error)
             }
-            
-            profileService.loadProfile(httpMethod: httpMethod, model: formData) {[weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let profile):
-                    self.profile = profile
-                    idLikes = Set(profile.likes)
-                    completion(nil)
-                case .failure(let error):
-                    let errorModel = self.makeErrorModel(error, option: {
-                        [weak self] in
-                            guard let self else { return }
-                            if let id {
-                                likeTapped(id: id)
-                            } else {
-                                getLikesCartAndNft()
-                            }
-                    })
-                    viewController?.showError(errorModel)
-                    completion(error)
-                }
-            }
-            
+        }
+        
     }
     
     private func loadCart(httpMethod: HttpMethod, id: String? = nil, completion: @escaping (Error?) -> Void ) {
-        
         var formData: String = ""
         if let cart {
             let cartDTO = Cart(
@@ -165,12 +176,12 @@ final class CollectionViewControllerPresenter {
             case .failure(let error):
                 let errorModel = self.makeErrorModel(error, option: {
                     [weak self] in
-                        guard let self else { return }
-                        if let id {
-                            cartTapped(id: id)
-                        } else {
-                            getLikesCartAndNft()
-                        }
+                    guard let self else { return }
+                    if let id {
+                        cartTapped(id: id)
+                    } else {
+                        controllerDidLoad()
+                    }
                 })
                 viewController?.showError(errorModel)
                 completion(error)
@@ -198,6 +209,22 @@ final class CollectionViewControllerPresenter {
             }
         }
     }
+    
+    private func makeDataForCollectionCell(from nftArray: [Nft]) -> [CollectionCellModel] {
+        var collectionCellModelArray: [CollectionCellModel] = []
+        for nft in nftArray {
+            let cellModel = CollectionCellModel(image: nft.images[0],
+                                                name: nft.name,
+                                                rating: nft.rating,
+                                                price: nft.price,
+                                                isLiked: self.isLiked(nft.id),
+                                                isAddedToCart: self.isAddedToCart(nft.id),
+                                                id: nft.id
+            )
+            collectionCellModelArray.append(cellModel)
+        }
+        return collectionCellModelArray
+    }
 }
 
 //MARK: - NFTCollectionViewCellThreePerRowDelegate
@@ -216,7 +243,8 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
         utilityQueue.async {[weak self] in
             self?.loadProfile(httpMethod: .put, id: id) { [weak self] _ in
                 guard let self else { return }
-                viewController?.reloadCollectionForLikesAndCard(with: nftArray, id: id, isCart: false)
+                let collectionCellModel = makeDataForCollectionCell(from: nftArray)
+                viewController?.reloadCollectionForLikesAndCard(with: collectionCellModel, id: id, isCart: false)
             }
         }
     }
@@ -234,7 +262,8 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
         utilityQueue.async {[weak self] in
             self?.loadCart(httpMethod: .put, id: id){ [weak self] _ in
                 guard let self else { return }
-                viewController?.reloadCollectionForLikesAndCard(with: nftArray, id: id, isCart: true)
+                let collectionCellModel = makeDataForCollectionCell(from: nftArray)
+                viewController?.reloadCollectionForLikesAndCard(with: collectionCellModel, id: id, isCart: true)
             }
         }
     }
@@ -252,7 +281,7 @@ extension CollectionViewControllerPresenter {
         default:
             message = L10n.Error.unknown
         }
-
+        
         let actionText = L10n.Error.repeat
         return ErrorModel(message: message, actionText: actionText) {
             if let option {
@@ -266,7 +295,7 @@ extension CollectionViewControllerPresenter {
             title: L10n.Catalog.sorting,
             message: nil,
             preferredStyle: .actionSheet)
-
+        
         for alert in alerts {
             let action = UIAlertAction(title: alert.title, style: alert.style) { _ in
                 if let completion = alert.completion {

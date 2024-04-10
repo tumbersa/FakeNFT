@@ -8,7 +8,7 @@
 import Foundation
 
 struct CollectionViewModel {
-    let coverImageURL: String
+    let coverImageURL: URL
     let title: String
     let description: String
     let authorName: String

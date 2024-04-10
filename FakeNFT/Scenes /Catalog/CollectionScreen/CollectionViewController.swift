@@ -138,15 +138,11 @@ final class CollectionViewController: UIViewController, ErrorView {
     //MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupPresenter()
+        presenter.controllerDidLoad()
         setupUI()
     }
     
     //MARK: - public funcs
-    
-    func setupPresenter() {
-        presenter.getLikesCartAndNft()
-    }
     
     func show(viewCollectionViewModel model: CollectionViewModel) {
         DispatchQueue.main.async {
@@ -161,14 +157,11 @@ final class CollectionViewController: UIViewController, ErrorView {
         nftCollectionView.reloadData()
     }
     
-    func reloadCollectionForLikesAndCard(with nfts: [Nft], id: String?, isCart: Bool?) {
+    func reloadCollectionForLikesAndCard(with nfts: [CollectionCellModel], id: String?, isCart: Bool?) {
         for (index, nft) in nfts.enumerated() {
             if let cell = nftCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
-                cell.set(data: nft)
-                
-                let idOfCell = nft.id
-                cell.setLikedStateToLikeButton(isLiked: presenter.isLiked(idOfCell))
-                cell.setAddedStateToCart(isAdded: presenter.isAddedToCart(idOfCell))
+                let retunedNft = presenter.returnCollectionCell(for: index)
+                cell.set(data: retunedNft)
                 
                 if let id,
                    let isCart,
@@ -189,15 +182,14 @@ final class CollectionViewController: UIViewController, ErrorView {
     //MARK: - private funcs
     
     @objc private func authorLinkTapped() {
-        presenter.presentSFVC()
+        presenter.authorLinkTapped()
     }
     
     @objc private func backButtonTapped() {
         presenter.backButtonTapped()
     }
     
-    private func loadCoverImage(url: String) {
-        let url = URL(string: url.encodeUrl)
+    private func loadCoverImage(url: URL) {
         coverImageView.kf.setImage(with: url)
     }
 }
@@ -214,12 +206,8 @@ extension CollectionViewController: UICollectionViewDataSource {
 
         let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
         cell.delegate = self.presenter
-        let nft = presenter.nftArray[indexPath.row]
+        let nft = presenter.returnCollectionCell(for: indexPath.row)
         cell.set(data: nft)
-        
-        let idOfCell = nft.id
-        cell.setLikedStateToLikeButton(isLiked: presenter.isLiked(idOfCell))
-        cell.setAddedStateToCart(isAdded: presenter.isAddedToCart(idOfCell))
         
         return cell
     }
@@ -241,7 +229,6 @@ extension CollectionViewController: UICollectionViewDelegateFlowLayout {
 
 private extension CollectionViewController {
     func setupUI() {
-        
         addingViews()
         configConstraints()
         configNavBackButton()

@@ -19,14 +19,3 @@ struct NftStatistics: Hashable {
     }
 }
 
-//struct MockNftStatistics: Hashable {
-//    let name: String
-//    let images: [UIImage]
-//    let rating: Int
-//    let price: Double
-//    let id: String
-//    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(id)
-//    }
-//}

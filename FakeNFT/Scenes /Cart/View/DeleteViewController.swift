@@ -98,14 +98,12 @@ final class DeleteViewController: UIViewController {
     }
     
     @objc private func removeNftButtonClicked() {
-        print("Удалить")
         guard let index = index else { return }
         delegate?.deleteNFT(at: index)
         dismiss(animated: true)
     }
     
     @objc private func backNftButtonClicked() {
-        print("Назад")
         dismiss(animated: true)
     }
     

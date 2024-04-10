@@ -47,12 +47,10 @@ final class CongratulationViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupAllViews()
-        print("CONGRATULATION")
     }
     
     // В вашем PayNftViewController:
     @objc private func backToCatalog() {
-        print("BACK N BLACK")
         dismiss(animated: true)
     }
 

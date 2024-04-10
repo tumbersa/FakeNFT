@@ -18,7 +18,6 @@ final class CartPresenter {
     private var cartId: String = ""
     var arrOfNFT: [Nft] = [] {
         didSet {
-            print("Добавился")
             view?.reloadTableView(nft: arrOfNFT)
         }
     }
@@ -40,8 +39,6 @@ final class CartPresenter {
             for imageUrl in nft.images {
                 if let cachedImage = imageCache.object(forKey: imageUrl.absoluteString as NSString) {
                     cachedImages.append(cachedImage)
-                } else {
-                    // Если изображение не найдено в кэше, пропускаем
                 }
             }
         }
@@ -101,14 +98,10 @@ final class CartPresenter {
                 // Добавляем загруженный NFT в массив и обновляем представление
                 self.arrOfNFT.append(nft)
                 self.view?.reloadTableView(nft: arrOfNFT)
-                DispatchQueue.main.async {
-                    self.view?.reloadTableView(nft: self.arrOfNFT)
-                }
             case .failure(let error):
                 print(error)
             }
         }
-        view?.reloadTableView(nft: arrOfNFT)
     }
     
     // Метод для кэширования загруженного изображения

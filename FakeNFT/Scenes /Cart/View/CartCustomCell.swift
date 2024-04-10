@@ -79,22 +79,21 @@ final class CartCustomCell: UITableViewCell {
     }()
     
     private func setupStarsView() {
-            //Рейтинг NFT
-            starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-
-            guard let starsCount = starsCount else { return }
-
-            for i in 0..<5 {
-                let fullStar = "fullStar"
-                let emptyStar = "emptyStar"
-                let starImageView = UIImageView(image: UIImage(named: i < starsCount ? fullStar : emptyStar))
-                starImageView.translatesAutoresizingMaskIntoConstraints = false
-                starImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
-                starImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
-                starImageView.tintColor = .systemYellow
-                starsStack.addArrangedSubview(starImageView)
-            }
+        //Рейтинг NFT
+        starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        guard let starsCount = starsCount else { return }
+        for i in 0..<5 {
+            let fullStar = "fullStar"
+            let emptyStar = "emptyStar"
+            let starImageView = UIImageView(image: UIImage(named: i < starsCount ? fullStar : emptyStar))
+            starImageView.translatesAutoresizingMaskIntoConstraints = false
+            starImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
+            starImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
+            starImageView.tintColor = .systemYellow
+            starsStack.addArrangedSubview(starImageView)
         }
+    }
         
     private lazy var nftPriceLabel: UILabel = {
        let label = UILabel()
@@ -126,7 +125,6 @@ final class CartCustomCell: UITableViewCell {
         guard let indexPath = indexPath else { return }
         guard let image = nftImage.image else { return }
         delegate?.deleteButtonTapped(at: indexPath, image: image)
-        print("DELETE")
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

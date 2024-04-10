@@ -115,7 +115,6 @@ final class PayNftViewController: UIViewController {
         back = true
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true)
-        print("PAY PAY PAY")
     }
     
     @objc func dismissModal() {

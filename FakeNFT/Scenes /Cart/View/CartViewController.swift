@@ -164,27 +164,24 @@ final class CartViewController: UIViewController {
         
         // Добавляем действия для каждой опции сортировки
         alertController.addAction(UIAlertAction(title: "По цене", style: .default) { _ in
-            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
+            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.price < nftItem2.price
             }
             self.tableView.reloadData()
-            print("Сортировка по цене")
         })
     
         alertController.addAction(UIAlertAction(title: "По рейтингу", style: .default) { _ in
-            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
+            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.rating > nftItem2.rating
             }
             self.tableView.reloadData()
-            print("Сортировка по рейтингу")
         })
         
         alertController.addAction(UIAlertAction(title: "По названию", style: .default) { _ in
-            presenter.arrOfNFT.sort { nftItem1, nftItem2 in
+            self.viewArrOfNFT.sort { nftItem1, nftItem2 in
                 nftItem1.name < nftItem2.name
             }
             self.tableView.reloadData()
-            print("Сортировка по названию")
         })
         
         alertController.addAction(UIAlertAction(title: "Закрыть", style: .cancel, handler: nil))
@@ -197,7 +194,6 @@ final class CartViewController: UIViewController {
         let viewController = UINavigationController(rootViewController:  PayNftViewController())
         viewController.modalPresentationStyle = .fullScreen
         present(viewController, animated:  true)
-        print("Оплатить!")
     }
     
     private func viewDeleteController(index: IndexPath, image: UIImage) {
@@ -280,7 +276,6 @@ extension CartViewController: UITableViewDelegate {
 
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(viewArrOfNFT.count)
         return viewArrOfNFT.count
     }
     
@@ -291,7 +286,6 @@ extension CartViewController: UITableViewDataSource {
         }
         if let presenter = presenter {
             cell.delegate = self
-            print(viewArrOfNFT)
             cell.update(
                 name: viewArrOfNFT[indexPath.row].name,
                 price: "\(viewArrOfNFT[indexPath.row].price) ETH",
@@ -359,7 +353,6 @@ extension CartViewController: NftDeleteDelegate {
 extension CartViewController: CartView {
     func reloadTableView(nft: [Nft]) {
         viewArrOfNFT = nft
-        print(viewArrOfNFT)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             self.setupEmptyOrNftViews()
         }

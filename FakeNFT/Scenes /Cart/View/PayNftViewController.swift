@@ -7,8 +7,18 @@
 
 import UIKit
 import WebKit
+import SafariServices
 
-class PayNftViewController: UIViewController {
+protocol PayNftView: AnyObject {
+    func showSafariView() -> SFSafariViewController
+}
+
+final class PayNftViewController: UIViewController {
+        
+    private var presenter: PayNftPresenter?
+    
+    private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     
     private let cryptoImage: [String] = ["Bitcoin (BTC)", "Dogecoin (DOGE)", "Tether (USDT)", "ApeCoin (APE)", "Solana (SOL)", "Ethereum (ETH)", "Cardano (ADA)", "Shiba Inu (SHIB)"]
     
@@ -50,15 +60,15 @@ class PayNftViewController: UIViewController {
         return label
     }()
     
-    private var webInfo: WKWebView!
+    private var webInfo: WKWebView?
     
     private lazy var infoWebButton: UIButton = {
        let button = UIButton()
         button.setTitle("Пользовательского соглашения", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .regular)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(UIColor(named: "ypUniBlue"), for: .normal)
         button.contentHorizontalAlignment = .left
-        button.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 26).isActive = true
         button.widthAnchor.constraint(equalToConstant: 202).isActive = true
         button.addTarget(self, action: #selector(showUserInfo), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -80,12 +90,8 @@ class PayNftViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        title = "Выберите способ оплаты"
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(.black, renderingMode: .alwaysOriginal)
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, style: .plain, target: self, action: #selector(dismissModal))
-        setupViews()
+        configureVC()
+        presenter = PayNftPresenter()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -95,12 +101,20 @@ class PayNftViewController: UIViewController {
         }
     }
     
+    private func configureVC() {
+        view.backgroundColor = .white
+        title = "Выберите способ оплаты"
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(.black, renderingMode: .alwaysOriginal)
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, style: .plain, target: self, action: #selector(dismissModal))
+        setupViews()
+    }
+    
     @objc func payButtonClicked() {
         let vc = CongratulationViewController()
         back = true
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true)
-        print("PAY PAY PAY")
     }
     
     @objc func dismissModal() {
@@ -108,23 +122,19 @@ class PayNftViewController: UIViewController {
     }
     
     @objc func showUserInfo() {
-        webInfo = WKWebView()
-        webInfo.navigationDelegate = self
-        view = webInfo
-        let htmlString = "<html><body><iframe width=\"\(view.frame.width)\" height=\"\(view.frame.height)\" src=\"https://www.youtube.com/embed/gSMlVALgjEc\" frameborder=\"0\" allowfullscreen></iframe></body></html>"
-
-        webInfo.loadHTMLString(htmlString, baseURL: nil)
+        guard let vc = presenter?.showSafariView() else { return }
+        present(vc, animated: true)
     }
     
     private func setupViews() {
         view.addSubview(bottomView)
         view.addSubview(selectedCollection)
-        bottomView.addSubview(infoLabel)
-        bottomView.addSubview(infoWebButton)
-        bottomView.addSubview(payButton)
+        [infoLabel, infoWebButton, payButton].forEach {
+            bottomView.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
-            selectedCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            selectedCollection.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             selectedCollection.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             selectedCollection.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             selectedCollection.bottomAnchor.constraint(equalTo: bottomView.topAnchor),
@@ -145,20 +155,6 @@ class PayNftViewController: UIViewController {
             payButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             payButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             payButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12)])
-    }
-}
-
-extension PayNftViewController: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let url = navigationAction.request.url, url.absoluteString != "about:blank" {
-            // открыть ссылку в браузере
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            // отмена навигации внутри WKWebView
-            decisionHandler(.cancel)
-        } else {
-            // разрешение навигации внутри WKWebView
-            decisionHandler(.allow)
-        }
     }
 }
 
@@ -196,7 +192,7 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let cellWidth: CGFloat = 168
-        let cellHeight: CGFloat = 46 // Желаемая высота ячейки
+        let cellHeight: CGFloat = 46
 
         return CGSize(width: cellWidth, height: cellHeight)
     }
@@ -218,5 +214,4 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
             cell.layer.borderWidth = 0 // Сбрасываем толщину рамки
         }
     }
-
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CongratulationViewController: UIViewController {
+final class CongratulationViewController: UIViewController {
     
     private lazy var pictureImage: UIImageView = {
        let image = UIImage(named: "CongratulationImage")
@@ -47,19 +47,17 @@ class CongratulationViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupAllViews()
-        print("CONGRATULATION")
     }
     
     // В вашем PayNftViewController:
     @objc private func backToCatalog() {
-        print("BACK N BLACK")
         dismiss(animated: true)
     }
 
     private func setupAllViews() {
-        view.addSubview(pictureImage)
-        view.addSubview(congratulationLabel)
-        view.addSubview(backCatalogButton)
+        [pictureImage, congratulationLabel, backCatalogButton].forEach {
+            view.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             pictureImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 196),

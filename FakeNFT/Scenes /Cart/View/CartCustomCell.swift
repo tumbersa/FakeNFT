@@ -8,14 +8,20 @@
 import UIKit
 
 protocol CartCellDelegate: AnyObject {
-    func deleteButtonTapped(at indexPath: IndexPath)
+    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage)
 }
 
-class CartCustomCell: UITableViewCell {
+final class CartCustomCell: UITableViewCell {
+    
+    private var starsCount: Int? {
+        didSet {
+            setupStarsView()
+        }
+    }
     
     weak var delegate: CartCellDelegate?
     
-    var indexPath: IndexPath?
+    private var indexPath: IndexPath?
     
     private lazy var nftView: UIView = {
         let view = UIView()
@@ -25,7 +31,7 @@ class CartCustomCell: UITableViewCell {
     
     lazy var nftImage: UIImageView = {
         let imageView = UIImageView()
-        let image = UIImage(named: "1-1")
+        let image = UIImage(named: "")
         imageView.image = image
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 12
@@ -33,7 +39,7 @@ class CartCustomCell: UITableViewCell {
         return imageView
     }()
     
-    lazy var nftName: UILabel = {
+    private lazy var nftName: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .bold)
         label.text = "April"
@@ -55,12 +61,12 @@ class CartCustomCell: UITableViewCell {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 2 // Расстояние между звездами
-
-        //MARK: - сюда будем передавать Array со звездами
+        stack.spacing = 2
         // Создаем пять звезд
-        for _ in 0..<5 {
-            let starImageView = UIImageView(image: UIImage(systemName: "star.fill"))
+        for i in 1...5 {
+            let fullStar = "star"
+            let emptyStar = "star.fill"
+            let starImageView = UIImageView(image: UIImage(systemName: emptyStar))
             starImageView.translatesAutoresizingMaskIntoConstraints = false
             starImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
             starImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
@@ -72,15 +78,23 @@ class CartCustomCell: UITableViewCell {
         return stack
     }()
     
-    private lazy var nftLabelAndPriceStack: UIStackView = {
-        let stack = UIStackView()
-        stack.addArrangedSubview(nftPriceLabel)
-        stack.addArrangedSubview(nftPrice)
-        stack.axis = .vertical
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
-    }()
-    
+    private func setupStarsView() {
+        //Рейтинг NFT
+        starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        guard let starsCount = starsCount else { return }
+        for i in 0..<5 {
+            let fullStar = "fullStar"
+            let emptyStar = "emptyStar"
+            let starImageView = UIImageView(image: UIImage(named: i < starsCount ? fullStar : emptyStar))
+            starImageView.translatesAutoresizingMaskIntoConstraints = false
+            starImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
+            starImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
+            starImageView.tintColor = .systemYellow
+            starsStack.addArrangedSubview(starImageView)
+        }
+    }
+        
     private lazy var nftPriceLabel: UILabel = {
        let label = UILabel()
         label.font = .systemFont(ofSize: 13, weight: .regular)
@@ -109,9 +123,8 @@ class CartCustomCell: UITableViewCell {
     
     @objc func deleteNFT() {
         guard let indexPath = indexPath else { return }
-        delegate?.deleteButtonTapped(at: indexPath)
-        print("DELETE")
-        
+        guard let image = nftImage.image else { return }
+        delegate?.deleteButtonTapped(at: indexPath, image: image)
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -124,13 +137,18 @@ class CartCustomCell: UITableViewCell {
         setupAllViews()
     }
     
+    func update(name: String, price: String, starsCount: Int, indexPath: IndexPath) {
+        nftName.text = name
+        nftPrice.text = price
+        self.starsCount = starsCount
+        self.indexPath = indexPath
+    }
+    
     private func setupAllViews() {
         contentView.addSubview(nftView)
-        nftView.addSubview(nftImage)
-        nftView.addSubview(nftName)
-        nftView.addSubview(starsStack)
-        nftView.addSubview(nftLabelAndPriceStack)
-        nftView.addSubview(deleteNftButton)
+        [nftImage, nftName, starsStack, nftPriceLabel, nftPrice, deleteNftButton].forEach {
+            nftView.addSubview($0)
+        }
         
         NSLayoutConstraint.activate([
             nftView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
@@ -145,14 +163,16 @@ class CartCustomCell: UITableViewCell {
             
             nftName.topAnchor.constraint(equalTo: nftView.topAnchor, constant: 24),
             nftName.leadingAnchor.constraint(equalTo: nftImage.trailingAnchor, constant: 20),
-            nftName.trailingAnchor.constraint(equalTo: nftView.trailingAnchor, constant: -147),
             
             starsStack.topAnchor.constraint(equalTo: nftName.bottomAnchor, constant: 4),
             starsStack.leadingAnchor.constraint(equalTo: nftImage.trailingAnchor, constant: 20),
             
-            nftLabelAndPriceStack.topAnchor.constraint(equalTo: starsStack.bottomAnchor, constant: 12),
-            nftLabelAndPriceStack.leadingAnchor.constraint(equalTo: nftImage.trailingAnchor, constant: 20),
-            nftLabelAndPriceStack.trailingAnchor.constraint(equalTo: nftView.trailingAnchor, constant: -147),
+            nftPriceLabel.topAnchor.constraint(equalTo: starsStack.bottomAnchor, constant: 12),
+            nftPriceLabel.leadingAnchor.constraint(equalTo: nftImage.trailingAnchor, constant: 20),
+            nftPriceLabel.trailingAnchor.constraint(equalTo: nftView.trailingAnchor, constant: -147),
+            
+            nftPrice.topAnchor.constraint(equalTo: nftPriceLabel.bottomAnchor, constant: 4),
+            nftPrice.leadingAnchor.constraint(equalTo: nftImage.trailingAnchor, constant: 20),
             
             deleteNftButton.centerYAnchor.constraint(equalTo: nftView.centerYAnchor),
             deleteNftButton.trailingAnchor.constraint(equalTo: nftView.trailingAnchor, constant: -16),

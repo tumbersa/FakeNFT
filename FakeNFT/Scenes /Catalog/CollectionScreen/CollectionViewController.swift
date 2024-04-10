@@ -7,7 +7,8 @@
 
 import UIKit
 
-final class CollectionViewController: UIViewController {
+
+final class CollectionViewController: UIViewController, ErrorView {
     
     private let collectionLabelsFont = UIFont.systemFont(ofSize: 13, weight: .regular)
     private var collectionViewHeightConstraint = NSLayoutConstraint()
@@ -100,6 +101,8 @@ final class CollectionViewController: UIViewController {
         return button
     }()
     
+    private let presenter: CollectionViewControllerPresenter
+    
     //MARK: - Constants
     
     private let coverImageHeight: CGFloat = 310
@@ -116,8 +119,6 @@ final class CollectionViewController: UIViewController {
     
     private var collectionCellWidth: CGFloat = 0
     
-    private var collectionOfMockNft: [MockNftStatistics] = []
-    
     private var topBarHeight: CGFloat {
         let statusBarHeight: CGFloat = 54.0
         let navBarHeight: CGFloat = 96
@@ -125,45 +126,71 @@ final class CollectionViewController: UIViewController {
         return statusBarHeight + navBarHeight
     }
     
-    //MARK: - viewDidLoad
+    init(presenter: CollectionViewControllerPresenter) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        setMockData()
+        presenter.controllerDidLoad()
         setupUI()
     }
     
     //MARK: - public funcs
     
-    func setMockData() {
-        collectionOfMockNft = [
-            MockNftStatistics(name: "Archie", images: [Asset.MockImages.Peach.Archie._1.image], rating: 2, price: 1, id: "1"),
-            MockNftStatistics(name: "Art", images: [Asset.MockImages.Peach.Art._1.image], rating: 3, price: 2, id: "2"),
-            MockNftStatistics(name: "Biscuit", images: [Asset.MockImages.Peach.Biscuit._1.image], rating: 1, price: 3, id: "3"),
-            MockNftStatistics(name: "Daisy", images: [Asset.MockImages.Peach.Daisy._1.image], rating: 4, price: 13, id: "4"),
-            MockNftStatistics(name: "Nacho", images: [Asset.MockImages.Peach.Nacho._1.image], rating: 5, price: 4, id: "5"),
-            MockNftStatistics(name: "Oreo", images: [Asset.MockImages.Peach.Oreo._1.image], rating: 2, price: 2, id: "6"),
-            MockNftStatistics(name: "Pixi", images: [Asset.MockImages.Peach.Pixi._1.image], rating: 1, price: 1, id: "7"),
-            MockNftStatistics(name: "Ruby", images: [Asset.MockImages.Peach.Ruby._1.image], rating: 3, price: 3, id: "8"),
-            MockNftStatistics(name: "Susan", images: [Asset.MockImages.Peach.Susan._1.image], rating: 2, price: 41, id: "9"),
-            MockNftStatistics(name: "Tater", images: [Asset.MockImages.Peach.Tater._1.image], rating: 2, price: 2, id: "10")
-        ]
-        
-        coverImageView.image = Asset.MockImages.CollectionCovers.beige.image
-        titleLabel.text = "Beige"
-        authorLinkLabel.text = "Mock Link"
-        collectionDescriptionLabel.text = "Персиковый — как облака над закатным солнцем в океане. В этой коллекции совмещены трогательная нежность и живая игривость сказочных зефирных зверей."
-        
+    func show(viewCollectionViewModel model: CollectionViewModel) {
+        DispatchQueue.main.async {
+            self.loadCoverImage(url: model.coverImageURL)
+            self.titleLabel.text = model.title
+            self.authorLinkLabel.text = model.authorName
+            self.collectionDescriptionLabel.text = model.description
+        }
+    }
+    
+    func reloadCollectionView() {
+        nftCollectionView.reloadData()
+    }
+    
+    func reloadCollectionForLikesAndCard(with nfts: [CollectionCellModel], id: String?, isCart: Bool?) {
+        for (index, nft) in nfts.enumerated() {
+            if let cell = nftCollectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? NFTCollectionViewCellThreePerRow {
+                let retunedNft = presenter.returnCollectionCell(for: index)
+                cell.set(data: retunedNft)
+                
+                if let id,
+                   let isCart,
+                   cell.getId() == id {
+                    cell.setIsUserInteractionEnabledToTrue(isCart: isCart)
+                }
+                
+                cell.delegate = presenter
+            }
+        }
+    }
+    
+    func configNavBackButton() {
+        navigationController?.navigationBar.tintColor = Asset.Colors.ypBlack.color
+        navigationItem.leftBarButtonItem = backButton
     }
     
     //MARK: - private funcs
     
     @objc private func authorLinkTapped() {
-        
+        presenter.authorLinkTapped()
     }
     
     @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
+        presenter.backButtonTapped()
+    }
+    
+    private func loadCoverImage(url: URL) {
+        coverImageView.kf.setImage(with: url)
     }
 }
 
@@ -171,15 +198,17 @@ final class CollectionViewController: UIViewController {
 
 extension CollectionViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        calculateCollectionHeight(itemCount: collectionOfMockNft.count, cellHeight: self.collectionCellWidth * 1.78)
-        return collectionOfMockNft.count
+        calculateCollectionHeight(itemCount: presenter.nftArray.count, cellHeight: self.collectionCellWidth * 1.78)
+        return presenter.nftArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
         let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
+        cell.delegate = self.presenter
+        let nft = presenter.returnCollectionCell(for: indexPath.row)
+        cell.set(data: nft)
         
-        cell.set(mockData: collectionOfMockNft[indexPath.row])
         return cell
     }
 }
@@ -200,7 +229,6 @@ extension CollectionViewController: UICollectionViewDelegateFlowLayout {
 
 private extension CollectionViewController {
     func setupUI() {
-        
         addingViews()
         configConstraints()
         configNavBackButton()
@@ -265,7 +293,7 @@ private extension CollectionViewController {
         ])
     }
     
-    private func calculateCollectionHeight(itemCount: Int, cellHeight: CGFloat) {
+    func calculateCollectionHeight(itemCount: Int, cellHeight: CGFloat) {
         let itemsPerRow = 3
         let bottomMargin: CGFloat = 40
         let numRows = (itemCount + itemsPerRow) / itemsPerRow // Вычисляем количество строк
@@ -273,15 +301,10 @@ private extension CollectionViewController {
         collectionViewHeightConstraint.constant = CGFloat(numRows) * cellHeight + bottomMargin
     }
     
-    private func calculateCellWidth(frameWidth: CGFloat) -> CGFloat {
+    func calculateCellWidth(frameWidth: CGFloat) -> CGFloat {
         let availableWidth = (frameWidth - (10 * 2 + 16 * 2))
         let itemWidth = availableWidth / 3
         return itemWidth
-    }
-    
-    func configNavBackButton() {
-        navigationController?.navigationBar.tintColor = Asset.Colors.ypBlack.color
-        navigationItem.leftBarButtonItem = backButton
     }
 }
 

@@ -8,7 +8,7 @@
 import UIKit
 
 
-final class CatalogViewCell: UITableViewCell {
+final class CatalogViewCell: UITableViewCell, ReuseIdentifying {
     
     lazy var cellImage = {
         let imageView = UIImageView()

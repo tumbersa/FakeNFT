@@ -562,6 +562,10 @@ internal enum Asset {
   internal enum StartPages {
     internal static let ypLogo = ImageAsset(name: "YPLogo")
   }
+  internal enum StatisticsImages {
+    internal static let cartAdd = ImageAsset(name: "cartAdd")
+    internal static let cartDelete = ImageAsset(name: "cartDelete")
+  }
   internal static let close = ImageAsset(name: "close")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name

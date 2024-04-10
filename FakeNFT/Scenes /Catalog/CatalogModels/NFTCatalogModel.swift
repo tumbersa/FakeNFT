@@ -12,6 +12,8 @@ struct NFTCatalogModel: Codable {
     let cover: String
     let nfts: [String]
     let id: String
+    let description: String
+    let author: String
     var nftCount: Int {
         nfts.count
     }

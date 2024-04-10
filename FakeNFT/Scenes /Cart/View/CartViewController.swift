@@ -113,6 +113,7 @@ final class CartViewController: UIViewController {
             //загружаем ID
             presenter.processNFTsLoading()
         }
+        print("START 3/3")
         
     }
     

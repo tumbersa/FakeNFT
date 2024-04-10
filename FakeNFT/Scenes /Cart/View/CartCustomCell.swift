@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CartCellDelegate: AnyObject {
-    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage)
+    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage, id: String)
 }
 
 final class CartCustomCell: UITableViewCell {
@@ -21,7 +21,8 @@ final class CartCustomCell: UITableViewCell {
     
     weak var delegate: CartCellDelegate?
     
-    private var indexPath: IndexPath?
+    var indexPath: IndexPath?
+    var deleteNftId: String?
     
     private lazy var nftView: UIView = {
         let view = UIView()
@@ -122,9 +123,9 @@ final class CartCustomCell: UITableViewCell {
     }()
     
     @objc func deleteNFT() {
-        guard let indexPath = indexPath else { return }
-        guard let image = nftImage.image else { return }
-        delegate?.deleteButtonTapped(at: indexPath, image: image)
+        if let indexPath = indexPath, let image = nftImage.image, let deleteNftId = deleteNftId {
+            delegate?.deleteButtonTapped(at: indexPath, image: image, id: deleteNftId)
+        }
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

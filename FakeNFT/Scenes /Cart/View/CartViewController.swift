@@ -17,7 +17,7 @@ protocol CartView: AnyObject {
 }
 
 final class CartViewController: UIViewController {
-    
+        
     var viewArrOfNFT: [Nft] = []
     
     private var presenter: CartPresenter?
@@ -114,7 +114,6 @@ final class CartViewController: UIViewController {
             presenter.processNFTsLoading()
         }
         print("START 3/3")
-        
     }
     
     private func configureVC() {
@@ -241,6 +240,7 @@ final class CartViewController: UIViewController {
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CartCustomCell else { return }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -310,8 +310,18 @@ extension CartViewController: UITableViewDataSource {
 }
 
 extension CartViewController: CartCellDelegate {
-    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage) {
+    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage, id: String) {
         viewDeleteController(index: indexPath, image: image)
+        self.viewArrOfNFT.removeAll { $0.id == id }
+        let newId = self.viewArrOfNFT.map { $0.id }
+        self.cartService.updateOrder(nftsIds: newId, isPaymentDone: false) { (result: Result<Cart, Error>) in
+            switch result {
+            case .success(let order):
+                print(order)
+            case .failure:
+                print("Error")
+            }
+        }
     }
 }
 

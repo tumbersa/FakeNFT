@@ -5,6 +5,7 @@
 //  Created by Dinara on 24.03.2024.
 //
 
+import Kingfisher
 import SnapKit
 import UIKit
 
@@ -311,6 +312,12 @@ private extension EditProfileViewController {
         nameTextField.text = name
         descriptionTextView.text = descriptionText
         siteTextField.text = website
+
+        guard let avatarURLString = avatar,
+              let avatarURL = URL(string: avatarURLString) else {
+            return
+        }
+        avatarImageView.kf.setImage(with: avatarURL)
     }
 }
 

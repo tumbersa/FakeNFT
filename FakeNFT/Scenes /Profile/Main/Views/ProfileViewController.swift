@@ -286,7 +286,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 }
 
 extension ProfileViewController: ProfilePresenterDelegate {
-    func navigateToEditProfileScreen(name: String, avatar: String?, description: String, website: String) {
+    func navigateToEditProfileScreen() {
 
         let editProfileViewController = EditProfileViewController(
             editProfile: profileService.profile

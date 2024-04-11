@@ -10,6 +10,7 @@ import Foundation
 protocol ProfilePresenterDelegate: AnyObject {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String])
     func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String])
+    func navigateToEditProfileScreen(name: String, avatar: String?, description: String, website: String)
 }
 
 protocol ProfilePresenterProtocol: AnyObject {
@@ -17,6 +18,7 @@ protocol ProfilePresenterProtocol: AnyObject {
     func viewWillAppear()
     func didTapMyNFT()
     func didTapFavoriteNFT()
+    func didTapEditProfile()
 }
 
 // MARK: - ProfilePresenter Class
@@ -28,6 +30,14 @@ final class ProfilePresenter {
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
+    func didTapEditProfile() {
+        let name = profileService.profile?.name ?? ""
+        let avatar = profileService.profile?.avatar ?? ""
+        let description = profileService.profile?.description ?? ""
+        let website = profileService.profile?.website ?? ""
+        delegate?.navigateToEditProfileScreen(name: name, avatar: avatar, description: description, website: website)
+    }
+
     func didTapFavoriteNFT() {
         let nftID = profileService.profile?.nfts ?? []
         let likedNFT = profileService.profile?.likes ?? []

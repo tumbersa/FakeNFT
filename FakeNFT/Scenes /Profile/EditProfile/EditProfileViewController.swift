@@ -11,6 +11,26 @@ import UIKit
 // MARK: - EditProfileViewController Class
 final class EditProfileViewController: UIViewController {
 
+    var editProfile: Profile?
+
+    private var name: String
+    private var avatar: String?
+    private var descriptionText: String
+    private var website: String
+
+    init(editProfile: Profile?) {
+        self.editProfile = editProfile
+        self.name = editProfile?.name ?? ""
+        self.avatar = editProfile?.avatar ?? ""
+        self.descriptionText = editProfile?.description ?? ""
+        self.website = editProfile?.website ?? ""
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     // MARK: - UI
     private lazy var closeButton: UIButton = {
         let button = UIButton()
@@ -39,8 +59,6 @@ final class EditProfileViewController: UIViewController {
 
     private lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "avatar_icon")
-        // заменить моковые данные
         imageView.layer.cornerRadius = 35
         imageView.contentMode = .scaleAspectFill
         imageView.layer.masksToBounds = true
@@ -76,8 +94,6 @@ final class EditProfileViewController: UIViewController {
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor(named: "ypUniBlack")
         textField.backgroundColor = UIColor(named: "ypLightGray")
-        textField.text = "Joaquin Phoenix"
-        // заменить моковые данные
         textField.layer.cornerRadius = 12
         textField.layer.masksToBounds = true
         textField.clearButtonMode = .whileEditing
@@ -115,8 +131,6 @@ final class EditProfileViewController: UIViewController {
         textView.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textView.textColor = UIColor(named: "ypUniBlack")
         textView.backgroundColor = UIColor(named: "ypLightGray")
-        textView.text = "Дизайнер из Казани, люблю цифровое искусство и бейглы. В моей коллекции уже 100+ NFT, и еще больше — на моём сайте. Открыт к коллаборациям."
-        // заменить моковые данные
         textView.layer.cornerRadius = 12
         textView.layer.masksToBounds = true
         textView.textContainerInset = UIEdgeInsets(
@@ -149,8 +163,6 @@ final class EditProfileViewController: UIViewController {
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor(named: "ypUniBlack")
         textField.backgroundColor = UIColor(named: "ypLightGray")
-        textField.text = "Joaquin Phoenix.com"
-        // заменить моковые данные
         textField.layer.cornerRadius = 12
         textField.layer.masksToBounds = true
         textField.clearButtonMode = .whileEditing
@@ -233,6 +245,8 @@ private extension EditProfileViewController {
             action: #selector(handleTapGesture)
         )
         view.addGestureRecognizer(tapGesture)
+
+        updateUI()
     }
 
     func setupConstraints() {
@@ -291,6 +305,12 @@ private extension EditProfileViewController {
         nameTextField.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
         siteTextField.resignFirstResponder()
+    }
+
+    func updateUI() {
+        nameTextField.text = name
+        descriptionTextView.text = descriptionText
+        siteTextField.text = website
     }
 }
 

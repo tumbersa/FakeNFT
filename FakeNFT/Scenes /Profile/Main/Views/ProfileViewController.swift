@@ -9,11 +9,6 @@ import Kingfisher
 import SnapKit
 import UIKit
 
-// MARK: - ProfileViewControllerDelegate
-protocol ProfileViewControllerDelegate: AnyObject {
-    func didTapMyNFT()
-}
-
 // MARK: - ProfileViewControllerProtocol
 protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenter? { get set }
@@ -28,6 +23,7 @@ final class ProfileViewController: UIViewController {
     let servicesAssembly: ServicesAssembly
     var presenter: ProfilePresenter?
     weak var delegate: ProfilePresenterDelegate?
+    private let profileService = ProfileService.shared
 
     // MARK: - Private Properties
     private var profile: Profile?
@@ -204,9 +200,7 @@ private extension ProfileViewController {
     // MARK: - Actions
     @objc func editBarButtonTapped() {
         print("editBarButton Did Tap")
-        let editProfileViewController = EditProfileViewController()
-        editProfileViewController.modalPresentationStyle = .popover
-        self.present(editProfileViewController, animated: true)
+        presenter?.didTapEditProfile()
     }
 }
 
@@ -292,6 +286,15 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 }
 
 extension ProfileViewController: ProfilePresenterDelegate {
+    func navigateToEditProfileScreen(name: String, avatar: String?, description: String, website: String) {
+
+        let editProfileViewController = EditProfileViewController(
+            editProfile: profileService.profile
+        )
+        editProfileViewController.modalPresentationStyle = .popover
+        self.present(editProfileViewController, animated: true)
+    }
+
     func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String]) {
         let favoriteNFTViewController = FavoriteNFTViewController(nftID: nftID, likedID: likedNFT)
         favoriteNFTViewController.hidesBottomBarWhenPushed = true

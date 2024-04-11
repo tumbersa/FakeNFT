@@ -17,6 +17,17 @@ protocol CartView: AnyObject {
 }
 
 final class CartViewController: UIViewController {
+    
+    let servicesAssembly: ServicesAssembly
+    
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
         
     var viewArrOfNFT: [Nft] = []
     
@@ -105,15 +116,24 @@ final class CartViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNetwork()
         view.backgroundColor = .systemBackground
         configureVC()
+        print("START 3/3")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        setupNetwork()
+    }
+    
+    private func setupNetwork() {
         guard let presenter = presenter else { return }
         presenter.loadCart(httpMethod: .get) {[weak self] error in
             self?.showLoader()
             //загружаем ID
             presenter.processNFTsLoading()
         }
-        print("START 3/3")
     }
     
     private func configureVC() {
@@ -164,7 +184,9 @@ final class CartViewController: UIViewController {
     }
         
     @objc func payButtonClicked() {
-        let viewController = UINavigationController(rootViewController:  PayNftViewController())
+        let vc = PayNftViewController(servicesAssembly: servicesAssembly)
+        vc.paymentID = ""
+        let viewController = UINavigationController(rootViewController:  vc)
         viewController.modalPresentationStyle = .fullScreen
         present(viewController, animated:  true)
     }
@@ -241,6 +263,7 @@ extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CartCustomCell else { return }
+        cell.indexPath = indexPath
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -291,6 +314,7 @@ extension CartViewController: UITableViewDataSource {
                 cell.nftImage.image = UIImage(named: "placeholder")
                 loadImage(imageUrl: imagesURL, indexPath: indexPath)
             }
+            cell.deleteNftId = viewArrOfNFT[indexPath.row].id
         }
         return cell
     }
@@ -321,6 +345,7 @@ extension CartViewController: CartCellDelegate {
             case .failure:
                 print("Error")
             }
+            self.tableView.reloadData()
         }
     }
 }

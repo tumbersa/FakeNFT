@@ -33,7 +33,6 @@ final class CryptoWalletCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.text = "Bitcoin"
         label.heightAnchor.constraint(equalToConstant: 18).isActive = true
-        label.widthAnchor.constraint(equalToConstant: 60).isActive = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -43,7 +42,6 @@ final class CryptoWalletCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 13, weight: .regular)
         label.text = "BTC"
         label.heightAnchor.constraint(equalToConstant: 18).isActive = true
-        label.widthAnchor.constraint(equalToConstant: 37).isActive = true
         label.textColor = UIColor(named: "ypUniGreen")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -69,7 +67,6 @@ final class CryptoWalletCell: UICollectionViewCell {
         
             fullNameCrypto.leadingAnchor.constraint(equalTo: cryptoImage.trailingAnchor, constant: 4),
             fullNameCrypto.topAnchor.constraint(equalTo: cryptoBacground.topAnchor, constant: 5),
-            fullNameCrypto.trailingAnchor.constraint(equalTo: cryptoBacground.trailingAnchor, constant: -64),
             
             shortNameCrypto.topAnchor.constraint(equalTo: fullNameCrypto.bottomAnchor),
             shortNameCrypto.leadingAnchor.constraint(equalTo: cryptoImage.trailingAnchor, constant: 4)
@@ -78,5 +75,10 @@ final class CryptoWalletCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupUiElements(currency: Currency) {
+        fullNameCrypto.text = currency.title
+        shortNameCrypto.text = currency.name
     }
 }

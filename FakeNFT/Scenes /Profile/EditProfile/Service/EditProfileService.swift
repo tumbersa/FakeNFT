@@ -17,28 +17,9 @@ final class EditProfileService {
         self.urlSessionTask = urlSessionTask
     }
 
-    func putProfileDetails(name: String, avatar: String, description: String, website: String, likes: [String]) {
-        let profile = EditProfileModel(
-            name: name,
-            avatar: avatar,
-            description: description,
-            website: website,
-            likes: likes
-        )
+    func updateProfile(with model: EditProfileModel, completion: @escaping (Result<Profile, Error>) -> Void) {
 
-//        updateProfileDetails(editProfileModel: profile) { [weak self] result in
-//            switch result {
-//            case .success(let profile):
-//                self?.view.updateNewProfileDetails(profile)
-//            case .failure(let error):
-//                print("Failed to update profile details: \(error)")
-//            }
-//        }
-    }
-
-    func updateProfileDetails(editProfileModel: EditProfileModel,completion: @escaping (Result<Profile, Error>) -> Void) {
-        
-        guard let request = makePutRequest() else {
+        guard let request = makePutRequest(with: model) else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
             return
@@ -56,10 +37,11 @@ final class EditProfileService {
 }
 
 private extension EditProfileService {
-    func makePutRequest() -> URLRequest? {
+    func makePutRequest(with profile: EditProfileModel) -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
+//        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
+        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
         urlComponents.path = "/api/v1/profile/1"
 
         guard let url = urlComponents.url else {
@@ -68,10 +50,14 @@ private extension EditProfileService {
 
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
-
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
+        let profileData = "name=\(profile.name ?? "")&description=\(profile.description ?? "")&website=\(profile.website ?? "")"
+        request.httpBody = profileData.data(using: .utf8)
+
+        print("request: \(request)")
         return request
+
     }
 }

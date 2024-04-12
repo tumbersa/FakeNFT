@@ -7,19 +7,35 @@
 
 import Kingfisher
 import SnapKit
+import ProgressHUD
 import UIKit
+
+protocol EditProfileViewControllerProtocol: AnyObject {
+    func showLoading()
+    func hideLoading()
+    func displayError(_ error: Error)
+    func profileUpdateSuccessful()
+}
+
+protocol EditProfileViewControllerDelegate: AnyObject {
+    func didUpdateAvatar(_ newAvatar: UIImage)
+}
 
 // MARK: - EditProfileViewController Class
 final class EditProfileViewController: UIViewController {
 
     var editProfile: Profile?
+    var presenter: EditProfilePresenter?
+    private var updatedImage: UIImage?
+    weak var delegate: EditProfileViewControllerDelegate?
 
     private var name: String
     private var avatar: String?
     private var descriptionText: String
     private var website: String
 
-    init(editProfile: Profile?) {
+    init(editProfile: Profile?, presenter: EditProfilePresenter?) {
+        self.presenter = presenter
         self.editProfile = editProfile
         self.name = editProfile?.name ?? ""
         self.avatar = editProfile?.avatar ?? ""
@@ -49,9 +65,9 @@ final class EditProfileViewController: UIViewController {
         label.textAlignment = .center
         label.numberOfLines = 2
         label.lineBreakMode = .byWordWrapping
-        let action = UIGestureRecognizer(
+        let action = UITapGestureRecognizer(
             target: self,
-            action: #selector(changeImageDidTap)
+            action: #selector(changeImageDidTap(_:))
         )
         label.addGestureRecognizer(action)
         label.isUserInteractionEnabled = true
@@ -72,6 +88,7 @@ final class EditProfileViewController: UIViewController {
         label.textColor = UIColor(named: "ypUniBlack")
         label.text = L10n.Profile.loadAvatar
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
 
@@ -294,11 +311,70 @@ private extension EditProfileViewController {
 
     // MARK: - Actions
     @objc func closeButtonDidTap() {
-        print("Close button did tap")
+        let name = nameTextField.text
+        let description = descriptionTextView.text
+        let website = siteTextField.text
+        print("Переданные данные: name - \(name), description - \(description), website - \(website)")
+        presenter?.updateProfile(name: name, description: description, website: website)
+        if let avatar = updatedImage {
+            delegate?.didUpdateAvatar(avatar)
+        }
+        self.dismiss(animated: true, completion: nil)
     }
 
-    @objc func changeImageDidTap() {
+    @objc func changeImageDidTap(_ sender: UITapGestureRecognizer) {
         print("Change image did tap")
+        loadAvatarLabel.isHidden = false
+
+        let alert = UIAlertController(
+            title: L10n.Profile.loadImage,
+            message: L10n.Profile.linkToImage,
+            preferredStyle: .alert
+        )
+
+        alert.addTextField { textField in
+            textField.placeholder = L10n.Profile.placeLink
+        }
+
+        alert.addAction(
+            UIAlertAction(
+                title: "ОK",
+                style: .default) { [weak self] _ in
+                    guard
+                    let self = self,
+                    let textField = alert.textFields?[0],
+                    let URL = textField.text
+                else { return }
+
+                if validateURLFormat(urlString: URL) {
+                    self.loadAvatarLabel.text = URL
+                } else {
+                    let wrongURL = UIAlertController(
+                        title: L10n.Profile.invalidLink,
+                        message: L10n.Profile.checkLink,
+                        preferredStyle: .alert)
+                    wrongURL.addAction(
+                        UIAlertAction(
+                            title: "ОK",
+                            style: .cancel
+                        ) { _ in
+                            wrongURL.dismiss(animated: true)
+                        }
+                    )
+                    self.present(wrongURL, animated: true)
+                }
+                alert.dismiss(animated: true)
+            }
+        )
+
+        self.present(alert, animated: true)
+    }
+
+    private func validateURLFormat(urlString: String?) -> Bool {
+        guard
+            let urlString = urlString,
+            let url = NSURL(string: urlString) else { return false }
+        return UIApplication.shared.canOpenURL(url as URL)
     }
 
     @objc func handleTapGesture() {
@@ -325,5 +401,23 @@ extension EditProfileViewController: UITextFieldDelegate, UITextViewDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension EditProfileViewController: EditProfileViewControllerProtocol {
+    func showLoading() {
+        ProgressHUD.show()
+    }
+
+    func hideLoading() {
+        ProgressHUD.dismiss()
+    }
+
+    func displayError(_ error: Error) {
+        ProgressHUD.showError("\(error.localizedDescription)")
+    }
+
+    func profileUpdateSuccessful() {
+        ProgressHUD.showSucceed("Профиль успешно обновлен", delay: 2.0)
     }
 }

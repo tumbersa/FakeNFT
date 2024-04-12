@@ -48,7 +48,8 @@ private extension ProfileNFTService {
     func makeFetchNFTRequest(id: String) -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
+//        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
+        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
         urlComponents.path = "/api/v1/nft/\(id)"
 
         guard let url = urlComponents.url else {

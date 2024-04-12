@@ -19,6 +19,7 @@ protocol ProfilePresenterProtocol: AnyObject {
     func didTapMyNFT()
     func didTapFavoriteNFT()
     func didTapEditProfile()
+    func updateUserProfile(with profile: Profile)
 }
 
 // MARK: - ProfilePresenter Class
@@ -27,14 +28,19 @@ final class ProfilePresenter {
     private let profileService = ProfileService.shared
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
     weak var delegate: ProfilePresenterDelegate?
+    private(set) var userProfile: Profile?
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
+    func updateUserProfile(with profile: Profile) {
+        DispatchQueue.main.async { [weak self] in
+            self?.userProfile = profile
+            print("Обновление профиля пользователя: \(profile)")
+            self?.view?.updateProfileDetails(profile)
+        }
+    }
+
     func didTapEditProfile() {
-        let name = profileService.profile?.name ?? ""
-        let avatar = profileService.profile?.avatar ?? ""
-        let description = profileService.profile?.description ?? ""
-        let website = profileService.profile?.website ?? ""
         delegate?.navigateToEditProfileScreen()
     }
 

@@ -24,6 +24,7 @@ final class ProfileViewController: UIViewController {
     var presenter: ProfilePresenter?
     weak var delegate: ProfilePresenterDelegate?
     private let profileService = ProfileService.shared
+    private var avatarImage: UIImage?
 
     // MARK: - Private Properties
     private var profile: Profile?
@@ -199,8 +200,11 @@ private extension ProfileViewController {
 
     // MARK: - Actions
     @objc func editBarButtonTapped() {
-        print("editBarButton Did Tap")
         presenter?.didTapEditProfile()
+    }
+
+    func updateAvatarImage(_ newImage: UIImage) {
+        avatarImageView.image = newImage
     }
 }
 
@@ -287,10 +291,18 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 
 extension ProfileViewController: ProfilePresenterDelegate {
     func navigateToEditProfileScreen() {
-
+        let editProfileService = EditProfileService.shared
         let editProfileViewController = EditProfileViewController(
-            editProfile: profileService.profile
+            editProfile: profileService.profile,
+            presenter: nil
         )
+        editProfileViewController.delegate = self
+        let editProfilePresenter = EditProfilePresenter(
+            view: editProfileViewController,
+            editProfileService: editProfileService
+        )
+        editProfilePresenter.delegate = self
+        editProfileViewController.presenter = editProfilePresenter
         editProfileViewController.modalPresentationStyle = .popover
         self.present(editProfileViewController, animated: true)
     }
@@ -311,5 +323,20 @@ extension ProfileViewController: ProfilePresenterDelegate {
             myNFTViewController,
             animated: true
         )
+    }
+}
+
+// MARK: - EditProfilePresenterDelegate
+extension ProfileViewController: EditProfilePresenterDelegate {
+    func profileDidUpdate(_ profile: Profile) {
+        self.updateProfileDetails(profile)
+        self.presenter?.updateUserProfile(with: profile)
+    }
+}
+
+// MARK: - EditProfileViewControllerDelegate
+extension ProfileViewController: EditProfileViewControllerDelegate {
+    func didUpdateAvatar(_ newAvatar: UIImage) {
+        self.updateAvatarImage(newAvatar)
     }
 }

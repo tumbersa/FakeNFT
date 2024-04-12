@@ -13,11 +13,14 @@ final class CartPresenter {
     var imageCache = NSCache<NSString, UIImage>()
     //переменная для хранения ID добавленных в корзину NFT
     private var idAddedToCart: Set<String> = []
+    
     private let cartService: CartService
     private let nftService: NftService
-    private var cartId: String = ""
+    
+    var cartId: String = ""
     var arrOfNFT: [Nft] = [] {
         didSet {
+            print(arrOfNFT)
             view?.reloadTableView(nft: arrOfNFT)
         }
     }
@@ -107,15 +110,12 @@ final class CartPresenter {
                 completion(error)
             }
         }
-        view?.reloadTableView(nft: arrOfNFT)
     }
     
     func processNFTsLoading() {
         for id in idAddedToCart {
             loadNft(id: id)
         }
-        view?.reloadTableView(nft: arrOfNFT)
-        view?.hideLoader()
     }
     
     // Метод для загрузки NFT

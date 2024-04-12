@@ -8,7 +8,7 @@
 import UIKit
 
 protocol NftDeleteDelegate: AnyObject {
-    func deleteNFT(at index: IndexPath)
+    func deleteNFT(at id: String)
 }
 
 final class DeleteViewController: UIViewController {
@@ -17,6 +17,7 @@ final class DeleteViewController: UIViewController {
     
     var index: IndexPath? = nil
     var image: UIImage?
+    var idDeleteNft: String?
     
     lazy var nftImage: UIImageView = {
         let imageView = UIImageView()
@@ -98,8 +99,9 @@ final class DeleteViewController: UIViewController {
     }
     
     @objc private func removeNftButtonClicked() {
-        guard let index = index else { return }
-        delegate?.deleteNFT(at: index)
+        guard let index = index,
+            let idDeleteNft = idDeleteNft else { return }
+        delegate?.deleteNFT(at: idDeleteNft)
         dismiss(animated: true)
     }
     

@@ -116,14 +116,8 @@ final class CartViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupNetwork()
         view.backgroundColor = .systemBackground
         configureVC()
-        print("START 3/3")
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
         setupNetwork()
     }
     
@@ -161,11 +155,14 @@ final class CartViewController: UIViewController {
     }
     
     private func setupEmptyOrNftViews() {
-        guard let presenter = presenter else { return }
-        if presenter.arrOfNFT.isEmpty {
+        if viewArrOfNFT.isEmpty {
             setupEmptyViews()
-            nftCount.text = "0 NFT"
-            nftPrice.text = "0,0 ETH"
+            emptyCart.isHidden = false
+            nftCount.isHidden = true
+            nftPrice.isHidden = true
+            bottomView.isHidden = true
+            buttonPay.isHidden = true
+            navigationItem.rightBarButtonItem = nil
         } else {
             setupAllViews()
             buttonPay.isHidden = false
@@ -191,12 +188,13 @@ final class CartViewController: UIViewController {
         present(viewController, animated:  true)
     }
     
-    private func viewDeleteController(index: IndexPath, image: UIImage) {
+    private func viewDeleteController(index: IndexPath, image: UIImage, id: String) {
         applyBlurEffect()
         let vc = DeleteViewController()
         vc.delegate = self
         vc.image = image
         vc.index = index
+        vc.idDeleteNft = id
         present(vc, animated: true)
     }
     
@@ -335,27 +333,31 @@ extension CartViewController: UITableViewDataSource {
 
 extension CartViewController: CartCellDelegate {
     func deleteButtonTapped(at indexPath: IndexPath, image: UIImage, id: String) {
-        viewDeleteController(index: indexPath, image: image)
-        self.viewArrOfNFT.removeAll { $0.id == id }
-        let newId = self.viewArrOfNFT.map { $0.id }
-        self.cartService.updateOrder(nftsIds: newId, isPaymentDone: false) { (result: Result<Cart, Error>) in
-            switch result {
-            case .success(let order):
-                print(order)
-            case .failure:
-                print("Error")
-            }
-            self.tableView.reloadData()
-        }
+        viewDeleteController(index: indexPath, image: image, id: id)
     }
 }
 
 extension CartViewController: NftDeleteDelegate {
-    func deleteNFT(at index: IndexPath) {
-        guard let presenter = presenter else { return }
-        presenter.arrOfNFT.remove(at: index.row)
-        setupEmptyOrNftViews()
-        tableView.reloadData()
+    func deleteNFT(at id: String) {
+        self.viewArrOfNFT.removeAll { $0.id == id }
+        let newId = self.viewArrOfNFT.map { $0.id }
+        
+        // Вызываем метод updateOrder с замыканием, которое будет выполняться после завершения запроса
+        self.cartService.updateOrder(nftsIds: newId) { [weak self] error in
+            guard let self = self else { return }
+            
+            // Проверяем, была ли ошибка при выполнении запроса
+            if let error = error {
+                print("Ошибка при обновлении заказа: \(error.localizedDescription)")
+                return
+            }
+            
+            // Если ошибки нет, то вызываем reloadData и setupEmptyOrNftViews на главной очереди
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+                self.setupEmptyOrNftViews()
+            }
+        }
     }
 }
 

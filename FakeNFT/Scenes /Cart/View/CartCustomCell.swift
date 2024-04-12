@@ -123,17 +123,9 @@ final class CartCustomCell: UITableViewCell {
     }()
     
     @objc func deleteNFT() {
-        print("Delete button tapped")
-        guard let indexPath = indexPath else {
-            print("indexPath is nil")
-            return
-        }
-        guard let image = nftImage.image else {
-            print("Image is nil")
-            return
-        }
-        guard let deleteNftId = deleteNftId else {
-            print("deleteNftId is nil")
+        guard let indexPath = indexPath,
+              let image = nftImage.image,
+              let deleteNftId = deleteNftId else {
             return
         }
         delegate?.deleteButtonTapped(at: indexPath, image: image, id: deleteNftId)

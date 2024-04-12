@@ -131,7 +131,10 @@ final class PayNftViewController: UIViewController {
     }
     
     @objc func payButtonClicked() {
-        paymentConfirmationRequest(for: self.paymentID)
+        let vc = CongratulationViewController()
+        self.back = true
+        vc.modalPresentationStyle = .fullScreen
+        self.present(vc, animated: true)
     }
     
     private func getCurrencyList() {
@@ -146,20 +149,6 @@ final class PayNftViewController: UIViewController {
         }
     }
     
-    private func paymentConfirmationRequest(for id: String) {
-        servicesAssembly.nftService.paymentConfirmationRequest(currencyId: id) {(result: Result<PaymentConfirmation, Error>) in
-            switch result {
-            case .success:
-                let vc = CongratulationViewController()
-                self.back = true
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: true)
-                self.selectedCollection.reloadData()
-            case .failure:
-                self.showErrorBuyAlert()
-            }
-        }
-    }
     
     //MARK: -добавить функцию повтора
     private func showErrorBuyAlert() {

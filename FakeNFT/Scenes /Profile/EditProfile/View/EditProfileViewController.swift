@@ -18,7 +18,7 @@ protocol EditProfileViewControllerProtocol: AnyObject {
 }
 
 protocol EditProfileViewControllerDelegate: AnyObject {
-    func didUpdateAvatar(_ newAvatar: UIImage)
+    func didUpdateAvatar(url: String)
 }
 
 // MARK: - EditProfileViewController Class
@@ -26,9 +26,10 @@ final class EditProfileViewController: UIViewController {
 
     var editProfile: Profile?
     var presenter: EditProfilePresenter?
-    private var updatedImage: UIImage?
+    private var updatedImage: String?
     weak var delegate: EditProfileViewControllerDelegate?
     weak var editProfilePresenterDelegate: EditProfilePresenterDelegate?
+    private var newAvatarURL: String?
 
     private var name: String
     private var avatar: String?
@@ -315,10 +316,10 @@ private extension EditProfileViewController {
         let name = nameTextField.text
         let description = descriptionTextView.text
         let website = siteTextField.text
-        print("Переданные данные: name - \(name), description - \(description), website - \(website)")
         presenter?.updateProfile(name: name, description: description, website: website)
-        if let avatar = updatedImage {
-            delegate?.didUpdateAvatar(avatar)
+        if let avatarURL = newAvatarURL {
+            delegate?.didUpdateAvatar(url: avatarURL)
+            updatedImage = avatarURL
         }
         self.dismiss(animated: true, completion: nil)
     }
@@ -349,6 +350,7 @@ private extension EditProfileViewController {
 
                 if validateURLFormat(urlString: URL) {
                     self.loadAvatarLabel.text = URL
+                    self.newAvatarURL = URL
                 } else {
                     let wrongURL = UIAlertController(
                         title: L10n.Profile.invalidLink,
@@ -367,7 +369,6 @@ private extension EditProfileViewController {
                 alert.dismiss(animated: true)
             }
         )
-
         self.present(alert, animated: true)
     }
 

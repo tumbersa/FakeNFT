@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol ProfilePresenterDelegate: AnyObject {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String])
@@ -77,5 +78,15 @@ extension ProfilePresenter: EditProfilePresenterDelegate {
     func profileDidUpdate(_ profile: Profile) {
         self.userProfile = profile
         view?.updateProfileDetails(profile)
+    }
+}
+
+extension ProfilePresenter: EditProfileViewControllerDelegate {
+    func didUpdateAvatar(url: String) {
+        if let imageURL = URL(string: url) {
+            view?.updateAvatar(url: imageURL)
+        } else {
+            print("Invalid imageURL format")
+        }
     }
 }

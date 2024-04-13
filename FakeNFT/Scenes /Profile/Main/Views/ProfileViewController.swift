@@ -137,6 +137,11 @@ final class ProfileViewController: UIViewController {
         super.viewWillAppear(animated)
         presenter?.viewWillAppear()
     }
+
+    func updateAvatarImage(_ url: String) {
+        let urlString = URL(string: url)
+        avatarImageView.kf.setImage(with: urlString)
+    }
 }
 
 // MARK: - ProfileViewController Class
@@ -201,10 +206,6 @@ private extension ProfileViewController {
     // MARK: - Actions
     @objc func editBarButtonTapped() {
         presenter?.didTapEditProfile()
-    }
-
-    func updateAvatarImage(_ newImage: UIImage) {
-        avatarImageView.image = newImage
     }
 }
 
@@ -285,7 +286,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
     }
 
     func updateAvatar(url: URL) {
-        avatarImageView.kf.setImage(with: url)
+        avatarImageView.kf.setImage(with: url, options: [.forceRefresh])
     }
 }
 
@@ -337,7 +338,7 @@ extension ProfileViewController: EditProfilePresenterDelegate {
 
 // MARK: - EditProfileViewControllerDelegate
 extension ProfileViewController: EditProfileViewControllerDelegate {
-    func didUpdateAvatar(_ newAvatar: UIImage) {
-        self.updateAvatarImage(newAvatar)
+    func didUpdateAvatar(url: String) {
+        self.updateAvatarImage(url)
     }
 }

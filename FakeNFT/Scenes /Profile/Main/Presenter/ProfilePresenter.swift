@@ -72,3 +72,10 @@ extension ProfilePresenter: ProfilePresenterProtocol {
         view?.updateProfileDetails(profile)
     }
 }
+
+extension ProfilePresenter: EditProfilePresenterDelegate {
+    func profileDidUpdate(_ profile: Profile) {
+        self.userProfile = profile
+        view?.updateProfileDetails(profile)
+    }
+}

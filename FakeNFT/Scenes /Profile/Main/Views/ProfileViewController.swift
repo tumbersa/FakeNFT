@@ -297,6 +297,7 @@ extension ProfileViewController: ProfilePresenterDelegate {
             presenter: nil
         )
         editProfileViewController.delegate = self
+        editProfileViewController.editProfilePresenterDelegate = self
         let editProfilePresenter = EditProfilePresenter(
             view: editProfileViewController,
             editProfileService: editProfileService

@@ -28,6 +28,7 @@ final class EditProfileViewController: UIViewController {
     var presenter: EditProfilePresenter?
     private var updatedImage: UIImage?
     weak var delegate: EditProfileViewControllerDelegate?
+    weak var editProfilePresenterDelegate: EditProfilePresenterDelegate?
 
     private var name: String
     private var avatar: String?

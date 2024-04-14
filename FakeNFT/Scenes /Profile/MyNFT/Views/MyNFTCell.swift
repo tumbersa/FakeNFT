@@ -22,8 +22,6 @@ final class MyNFTCell: UITableViewCell {
 
     // MARK: - Private Properties
     private var id: String?
-    // моковое значение лайка
-    private var isLiked: Bool = false
 
     // MARK: - Delegate
     weak var delegate: MyNFTCellDelegate?

@@ -9,6 +9,10 @@ import Kingfisher
 import SnapKit
 import UIKit
 
+protocol FavoriteNFTCellDelegate: AnyObject {
+    func didTapLikeButton(in cell: FavoriteNFTCell)
+}
+
 final class FavoriteNFTCell: UICollectionViewCell {
     // MARK: - Public properties
     public static let cellID = String(describing: FavoriteNFTCell.self)
@@ -16,8 +20,8 @@ final class FavoriteNFTCell: UICollectionViewCell {
     // MARK: - Private Properties
     private var id: String?
 
-    // моковое значение лайка
-    private var isLiked: Bool = false
+    // MARK: - Delegate
+    weak var delegate: FavoriteNFTCellDelegate?
 
     // MARK: - UI
     private lazy var image: UIImageView = {
@@ -29,10 +33,6 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var favoriteButton: UIButton = {
         let button = UIButton()
-        button.setImage(
-            UIImage(named: "favorite_button_inactive"),
-            for: .normal
-        )
         button.addTarget(
             self,
             action: #selector(likeButtonDidTap),
@@ -121,7 +121,7 @@ private extension FavoriteNFTCell {
          favoriteButton,
          stackView
         ].forEach {
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
     }
 
@@ -156,6 +156,10 @@ private extension FavoriteNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-        setIsLikedNFT(isLiked)
+        print("Like button on Favorite NFT Sceen tapped")
+        if let id = id {
+            delegate?.didTapLikeButton(in: self)
+
+        }
     }
 }

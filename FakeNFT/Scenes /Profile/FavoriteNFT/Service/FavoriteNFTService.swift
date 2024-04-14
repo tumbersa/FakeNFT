@@ -24,7 +24,7 @@ final class FavoriteNFTService {
         self.urlSessionTask = urlSessionTask
     }
 
-    func fetchNFTs(_ id: String, completion: @escaping (Result<NFT, Error>) -> Void) {
+    func fetchNFTs(_ id: String, completion: @escaping (Result<[NFT], Error>) -> Void) {
         guard let request = makeFetchNFTRequest(id: id) else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
@@ -34,8 +34,12 @@ final class FavoriteNFTService {
         urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<NFT, Error>) in
             switch response {
             case .success(let likes):
-                self?.NFTs?.append(likes)
-                completion(.success(likes))
+                self?.NFTs = [likes]
+                if let NFTs = self?.NFTs {
+                    completion(.success(NFTs))
+                } else {
+                    completion(.failure(NetworkError.invalidResponse))
+                }
             case .failure(let error):
                 completion(.failure(error))
             }

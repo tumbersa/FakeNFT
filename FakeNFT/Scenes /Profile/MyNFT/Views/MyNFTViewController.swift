@@ -21,6 +21,7 @@ final class MyNFTViewController: UIViewController {
     private var myNFTs: [NFT] = []
     private var nftID: [String]
     private var likedNFT: [String]
+    private let editProfileService = EditProfileService.shared
 
     init(nftID: [String], likedID: [String]) {
         self.nftID = nftID
@@ -84,7 +85,7 @@ final class MyNFTViewController: UIViewController {
         setupViews()
         setupConstraints()
 
-        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT)
+        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT, editProfileService: editProfileService)
         presenter?.view = self
         presenter?.viewDidLoad()
     }
@@ -238,10 +239,20 @@ extension MyNFTViewController: UITableViewDataSource {
             return UITableViewCell()
         }
 
+        cell.delegate = self
+
         cell.configureCell(with: nft)
         cell.selectionStyle = .none
 
         return cell
+    }
+}
+
+// MARK: - MyNFTCellDelegate
+extension MyNFTViewController: MyNFTCellDelegate {
+    func didTapLikeButton(with nftID: String) {
+        print("Tapped like for NFT with id: \(nftID)")
+
     }
 }
 

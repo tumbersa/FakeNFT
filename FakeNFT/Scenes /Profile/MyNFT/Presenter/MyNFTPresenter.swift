@@ -18,10 +18,22 @@ final class MyNFTPresenter {
     var nfts: [NFT] = []
     var nftID: [String]
     var likedNFT: [String]
+    private let editProfileService: EditProfileService
 
-    init(nftID: [String], likedNFT: [String]) {
+    init(nftID: [String], likedNFT: [String], editProfileService: EditProfileService) {
         self.nftID = nftID
         self.likedNFT = likedNFT
+        self.editProfileService = editProfileService
+    }
+
+    func tapLike(id: String) {
+        if likedNFT.contains(id) {
+            likedNFT.removeAll(where: {$0 == id})
+        } else {
+            likedNFT.append(id)
+        }
+        updateLikes()
+       
     }
 }
 
@@ -41,6 +53,24 @@ private extension MyNFTPresenter {
                 case .failure(let error):
                     print("Failed to fetch NFTs: \(error)")
                 }
+            }
+        }
+    }
+
+    func updateLikes() {
+        let model = EditProfileModel(
+            name: nil,
+            description: nil,
+            website: nil,
+            likes: likedNFT
+        )
+
+        editProfileService.updateProfile(with: model) { result in
+            switch result {
+            case .success:
+                print("Успешно")
+            case .failure(let error):
+                print("\(error.localizedDescription)")
             }
         }
     }

@@ -138,7 +138,7 @@ final class MyNFTCell: UITableViewCell {
         id = model.id
     }
 
-    func setIsLiked(_ isLiked: Bool) {
+    func setIsLiked(isLiked: Bool) {
         if isLiked {
             favoriteButton.setImage(UIImage(named: "favorite_button_active"), for: .normal)
         } else {
@@ -211,6 +211,9 @@ private extension MyNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-         setIsLiked(isLiked)
+        if let id = id {
+            delegate?.didTapLikeButton(with: id)
+
+        }
     }
 }

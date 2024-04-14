@@ -9,6 +9,10 @@ import UIKit
 
 final class CongratulationViewController: UIViewController {
     
+    var allPaymentNft: [Nft] = []
+    
+    private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    
     private lazy var pictureImage: UIImageView = {
        let image = UIImage(named: "CongratulationImage")
         let imageView = UIImageView(image: image)
@@ -47,11 +51,24 @@ final class CongratulationViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupAllViews()
+        getPaymentOrder()
     }
     
     // В вашем PayNftViewController:
     @objc private func backToCatalog() {
         dismiss(animated: true)
+    }
+    
+    func getPaymentOrder() {
+        let newId: [String] = []
+        
+        self.cartService.updateOrder(nftsIds: newId, update: false) { [weak self] error in
+            guard let self = self else { return }
+            if let error = error {
+                print("Ошибка при обновлении заказа: \(error.localizedDescription)")
+                return
+            }
+        }
     }
 
     private func setupAllViews() {

@@ -16,12 +16,18 @@ protocol PayNftView: AnyObject {
 
 final class PayNftViewController: UIViewController {
     
+    var allPaymentNft: [Nft] = []
+    
+    var selecterCrypto: String = ""
+    
     var paymentID: String = "" {
         didSet {
             payButton.alpha = 1
             payButton.isEnabled = true
         }
     }
+    
+    
     
     let servicesAssembly: ServicesAssembly
     
@@ -110,8 +116,8 @@ final class PayNftViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureVC()
-        presenter = PayNftPresenter()
         getCurrencyList()
+        presenter = PayNftPresenter()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -131,10 +137,26 @@ final class PayNftViewController: UIViewController {
     }
     
     @objc func payButtonClicked() {
-        let vc = CongratulationViewController()
-        self.back = true
-        vc.modalPresentationStyle = .fullScreen
-        self.present(vc, animated: true)
+        paymentConfirmationRequest()
+    }
+    
+    private func paymentConfirmationRequest() {
+        servicesAssembly.nftService.paymentConfirmationRequest() {(result: Result<PaymentConfirmation, Error>) in
+            switch result {
+            case .success(let getOrder):
+                if getOrder.success, getOrder.id == self.selecterCrypto {
+                    let vc = CongratulationViewController()
+                    vc.allPaymentNft = self.allPaymentNft
+                    self.back = true
+                    vc.modalPresentationStyle = .fullScreen
+                    self.present(vc, animated: true)
+                } else {
+                    self.showErrorBuyAlert()
+                }
+            case .failure:
+                self.showErrorBuyAlert()
+            }
+        }
     }
     
     private func getCurrencyList() {
@@ -142,7 +164,6 @@ final class PayNftViewController: UIViewController {
             switch result {
             case .success(let currencies):
                 self.currencies = currencies
-                print(currencies)
             case .failure:
                 print("ERROR")
             }
@@ -153,8 +174,10 @@ final class PayNftViewController: UIViewController {
     //MARK: -добавить функцию повтора
     private func showErrorBuyAlert() {
         let alert = UIAlertController(title: "Не удалось произвести оплату", message: nil, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
-        let returnAction = UIAlertAction(title: "Повторить", style: .default) {_ in 
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) {_ in
+            self.dismiss(animated: true)
+        }
+        let returnAction = UIAlertAction(title: "Повторить", style: .default) {_ in
             print("повторить - повторить")
         }
         alert.addAction(cancelAction)
@@ -268,6 +291,7 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as? CryptoWalletCell
         paymentID = currencies[indexPath.item].id
+        selecterCrypto = currencies[indexPath.item].name
         cell?.layer.borderWidth = 1
         cell?.layer.cornerRadius = 12
         cell?.layer.borderColor = UIColor.black.cgColor

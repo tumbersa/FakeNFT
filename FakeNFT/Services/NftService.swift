@@ -6,7 +6,7 @@ typealias CurrencyListCompletion = (Result<[Currency], Error>) -> Void
 
 protocol NftService {
     func loadNft(id: String, completion: @escaping NftCompletion)
-    func paymentConfirmationRequest(currencyId: String, completion: @escaping PaymentCompletion)
+    func paymentConfirmationRequest(completion: @escaping PaymentCompletion)
     func loadCurrencyList(completion: @escaping CurrencyListCompletion)
 }
 
@@ -49,9 +49,8 @@ final class NftServiceImpl: NftService {
         }
     }
     
-    func paymentConfirmationRequest(currencyId: String, completion: @escaping PaymentCompletion) {
-        
-        let request = PaymentConfirmationRequest(currencyId: currencyId)
+    func paymentConfirmationRequest(completion: @escaping PaymentCompletion) {
+        let request = PaymentConfirmationRequest()
         networkClient.send(request: request, type: PaymentConfirmation.self) { result in
             switch result {
             case .success(let paymentConfirmation):

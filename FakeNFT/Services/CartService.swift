@@ -13,12 +13,14 @@ typealias NftOrderCompletion = (Result<Cart, Error>) -> Void
 protocol CartService {
     func loadCart(httpMethod: HttpMethod, model: (any Encodable)?, completion: @escaping CartCompletion)
     func deleteFromCart(nftId: String, completion: @escaping CartCompletion)
-    func updateOrder(nftsIds: [String], completion: @escaping (Error?) -> Void)
+    func updateOrder(nftsIds: [String], update: Bool, completion: @escaping (Error?) -> Void)
 }
 
 final class CartServiceImpl: CartService {
     
     private let networkClient: NetworkClient
+    
+    let url = URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1")
     
     init(networkClient: NetworkClient) {
         self.networkClient = networkClient
@@ -51,11 +53,9 @@ final class CartServiceImpl: CartService {
         }
     }
     
-    func updateOrder(nftsIds: [String], completion: @escaping (Error?) -> Void) {
-        guard let url = URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1") else {
-            print("Invalid URL")
-            return
-        }
+    func updateOrder(nftsIds: [String], update: Bool, completion: @escaping (Error?) -> Void) {
+        guard let url = url else { return }
+        
         // тело запроса
         let nftsString = nftsIds.joined(separator: ",")
         let bodyString = "nfts=\(nftsString)"
@@ -70,21 +70,20 @@ final class CartServiceImpl: CartService {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
-        request.httpBody = bodyData
+        //request.httpBody = bodyData
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
-                completion(error) // Вызываем замыкание completion с передачей ошибки
+                completion(error)
                 return
             }
             
             if let data = data, let responseString = String(data: data, encoding: .utf8) {
                 print("Response: \(responseString)")
             }
-            completion(nil) // Вызываем замыкание completion без ошибки, т.к. запрос выполнен успешно
+            completion(nil)
         }
         task.resume()
     }
 }
-

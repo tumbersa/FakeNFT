@@ -117,8 +117,12 @@ final class CartViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        configureVC()
-        setupNetwork()
+        updatesAllSetups()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updatesAllSetups()
     }
     
     private func setupNetwork() {
@@ -127,7 +131,13 @@ final class CartViewController: UIViewController {
             self?.showLoader()
             //загружаем ID
             presenter.processNFTsLoading()
+            self?.reloadTableView(nft: presenter.arrOfNFT)
         }
+    }
+    
+    func updatesAllSetups() {
+        configureVC()
+        setupNetwork()
     }
     
     private func configureVC() {
@@ -156,6 +166,7 @@ final class CartViewController: UIViewController {
     
     private func setupEmptyOrNftViews() {
         if viewArrOfNFT.isEmpty {
+            loaderIndicator.isHidden = true
             setupEmptyViews()
             emptyCart.isHidden = false
             nftCount.isHidden = true
@@ -184,6 +195,7 @@ final class CartViewController: UIViewController {
         let vc = PayNftViewController(servicesAssembly: servicesAssembly)
         vc.paymentID = ""
         let viewController = UINavigationController(rootViewController:  vc)
+        vc.allPaymentNft = viewArrOfNFT
         viewController.modalPresentationStyle = .fullScreen
         present(viewController, animated:  true)
     }
@@ -342,17 +354,14 @@ extension CartViewController: NftDeleteDelegate {
         self.viewArrOfNFT.removeAll { $0.id == id }
         let newId = self.viewArrOfNFT.map { $0.id }
         
-        // Вызываем метод updateOrder с замыканием, которое будет выполняться после завершения запроса
-        self.cartService.updateOrder(nftsIds: newId) { [weak self] error in
+        self.cartService.updateOrder(nftsIds: newId, update: true) { [weak self] error in
             guard let self = self else { return }
             
-            // Проверяем, была ли ошибка при выполнении запроса
             if let error = error {
                 print("Ошибка при обновлении заказа: \(error.localizedDescription)")
                 return
             }
             
-            // Если ошибки нет, то вызываем reloadData и setupEmptyOrNftViews на главной очереди
             DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.setupEmptyOrNftViews()

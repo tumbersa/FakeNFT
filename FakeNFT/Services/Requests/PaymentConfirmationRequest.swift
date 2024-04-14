@@ -14,9 +14,8 @@ struct PaymentConfirmationRequest: NetworkRequest {
     
     var headers: [String: String]? = ["X-Practicum-Mobile-Token": "6209b976-c7aa-4061-8574-573765a55e71"]
     
-    let currencyId: String
     
     var endpoint: URL? {
-        URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1/payment/\(currencyId)")
+        URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1/payment/1")
     }
 }

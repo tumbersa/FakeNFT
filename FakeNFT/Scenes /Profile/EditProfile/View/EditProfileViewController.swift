@@ -316,16 +316,18 @@ private extension EditProfileViewController {
         let name = nameTextField.text
         let description = descriptionTextView.text
         let website = siteTextField.text
-        presenter?.updateProfile(name: name, description: description, website: website)
+        presenter?.updateProfile(
+            name: name, description: description,
+            website: website,
+            newAvatarURL: newAvatarURL
+        )
         if let avatarURL = newAvatarURL {
             delegate?.didUpdateAvatar(url: avatarURL)
-            updatedImage = avatarURL
         }
         self.dismiss(animated: true, completion: nil)
     }
 
     @objc func changeImageDidTap(_ sender: UITapGestureRecognizer) {
-        print("Change image did tap")
         loadAvatarLabel.isHidden = false
 
         let alert = UIAlertController(
@@ -380,7 +382,6 @@ private extension EditProfileViewController {
     }
 
     @objc func handleTapGesture() {
-        print("Tap Gesture did tap")
         nameTextField.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
         siteTextField.resignFirstResponder()

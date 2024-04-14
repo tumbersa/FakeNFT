@@ -140,7 +140,15 @@ final class ProfileViewController: UIViewController {
 
     func updateAvatarImage(_ url: String) {
         let urlString = URL(string: url)
-        avatarImageView.kf.setImage(with: urlString)
+        avatarImageView.kf.setImage(with: urlString) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.presenter?.viewWillAppear()
+            case .failure(let error):
+                print("Error loading avatar: \(error)")
+            }
+        }
     }
 }
 
@@ -244,13 +252,10 @@ extension ProfileViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
-            print("My NFTs cell did tap")
             presenter?.didTapMyNFT()
         case 1:
-            print("My Favourite NFTs cell did tap")
             presenter?.didTapFavoriteNFT()
         case 2:
-            print("About Developer cell did tap")
             let viewController = AboutDeveloperViewController()
             viewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController, animated: true)
@@ -271,7 +276,8 @@ extension ProfileViewController: ProfileViewControllerProtocol {
                   let avatarURL = URL(string: avatarURLString) else {
                 return
             }
-            updateAvatar(url: avatarURL)
+            avatarImageView.kf.setImage(with: avatarURL, options: [.forceRefresh])
+
             let myNFTs = tableView.cellForRow(at: [0, 0]) as? ProfileCell
             myNFTs?.configureCell(label: nil, value: "(\(String(profile.nfts.count)))")
 
@@ -283,6 +289,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             siteLabel.text = ""
             avatarImageView.image = UIImage()
         }
+
     }
 
     func updateAvatar(url: URL) {
@@ -330,9 +337,15 @@ extension ProfileViewController: ProfilePresenterDelegate {
 
 // MARK: - EditProfilePresenterDelegate
 extension ProfileViewController: EditProfilePresenterDelegate {
-    func profileDidUpdate(_ profile: Profile) {
-        self.updateProfileDetails(profile)
-        self.presenter?.updateUserProfile(with: profile)
+    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
+        DispatchQueue.main.async { [weak self] in
+            if let newAvatarURL = newAvatarURL {
+                self?.updateAvatarImage(newAvatarURL)
+
+            }
+            self?.updateProfileDetails(profile)
+            self?.presenter?.updateUserProfile(with: profile, newAvatarURL: newAvatarURL)
+        }
     }
 }
 

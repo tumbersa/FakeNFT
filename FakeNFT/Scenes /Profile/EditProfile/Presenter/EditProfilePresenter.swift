@@ -8,11 +8,11 @@
 import Foundation
 
 protocol EditProfilePresenterProtocol {
-    func updateProfile(name: String?, description: String?, website: String?)
+    func updateProfile(name: String?, description: String?, website: String?, newAvatarURL: String?)
 }
 
 protocol EditProfilePresenterDelegate: AnyObject {
-    func profileDidUpdate(_ profile: Profile)
+    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?)
 }
 
 final class EditProfilePresenter {
@@ -28,8 +28,7 @@ final class EditProfilePresenter {
 }
 
 extension EditProfilePresenter: EditProfilePresenterProtocol {
-    func updateProfile(name: String?, description: String?, website: String?) {
-        print("Отправка запроса на обновление профиля")
+    func updateProfile(name: String?, description: String?, website: String?, newAvatarURL: String?) {
         view?.showLoading()
 
         let updatedProfile = EditProfileModel(
@@ -38,15 +37,13 @@ extension EditProfilePresenter: EditProfilePresenterProtocol {
             website: website ?? "",
             likes: nil
         )
-        print("Обновляемый профиль: \(updatedProfile)")
         editProfileService.updateProfile(with: updatedProfile) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let profile):
-                    self?.delegate?.profileDidUpdate(profile)
+                    self?.delegate?.profileDidUpdate(profile, newAvatarURL: newAvatarURL)
                     self?.view?.profileUpdateSuccessful()
                 case .failure(let error):
-                    print("Ошибка при обновлении профиля:", error)
                     self?.view?.displayError(error)
                     self?.view?.hideLoading()
                 }

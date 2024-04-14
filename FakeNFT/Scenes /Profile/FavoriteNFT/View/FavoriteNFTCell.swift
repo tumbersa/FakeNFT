@@ -156,7 +156,6 @@ private extension FavoriteNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-        print("Favorite button did tap")
         setIsLikedNFT(isLiked)
     }
 }

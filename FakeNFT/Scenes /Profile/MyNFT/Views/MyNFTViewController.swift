@@ -156,8 +156,6 @@ private extension MyNFTViewController {
     }
 
     @objc func filterButtonDidTap() {
-        print("Filter button did tap")
-
         let alert = UIAlertController(
             title: nil,
             message: L10n.Profile.filter,

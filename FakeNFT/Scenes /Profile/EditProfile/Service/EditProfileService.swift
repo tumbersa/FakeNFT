@@ -56,7 +56,6 @@ private extension EditProfileService {
         let profileData = "name=\(profile.name ?? "")&description=\(profile.description ?? "")&website=\(profile.website ?? "")"
         request.httpBody = profileData.data(using: .utf8)
 
-        print("request: \(request)")
         return request
 
     }

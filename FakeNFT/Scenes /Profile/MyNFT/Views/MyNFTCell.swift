@@ -211,7 +211,6 @@ private extension MyNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-        print("Favorite button did tap")
          setIsLiked(isLiked)
     }
 }

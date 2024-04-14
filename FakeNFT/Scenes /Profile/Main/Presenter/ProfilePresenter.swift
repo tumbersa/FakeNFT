@@ -20,7 +20,7 @@ protocol ProfilePresenterProtocol: AnyObject {
     func didTapMyNFT()
     func didTapFavoriteNFT()
     func didTapEditProfile()
-    func updateUserProfile(with profile: Profile)
+    func updateUserProfile(with profile: Profile, newAvatarURL: String?)
 }
 
 // MARK: - ProfilePresenter Class
@@ -33,11 +33,13 @@ final class ProfilePresenter {
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
-    func updateUserProfile(with profile: Profile) {
+    func updateUserProfile(with profile: Profile, newAvatarURL: String?) {
         DispatchQueue.main.async { [weak self] in
             self?.userProfile = profile
-            print("Обновление профиля пользователя: \(profile)")
             self?.view?.updateProfileDetails(profile)
+            if let urlString = URL(string: newAvatarURL ?? "") {
+                self?.view?.updateAvatar(url: urlString)
+            }
         }
     }
 
@@ -75,7 +77,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
 }
 
 extension ProfilePresenter: EditProfilePresenterDelegate {
-    func profileDidUpdate(_ profile: Profile) {
+    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
         self.userProfile = profile
         view?.updateProfileDetails(profile)
     }

@@ -20,7 +20,6 @@ final class CartPresenter {
     var cartId: String = ""
     var arrOfNFT: [Nft] = [] {
         didSet {
-            print(arrOfNFT)
             view?.reloadTableView(nft: arrOfNFT)
         }
     }

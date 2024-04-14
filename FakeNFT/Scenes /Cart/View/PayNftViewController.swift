@@ -27,8 +27,6 @@ final class PayNftViewController: UIViewController {
         }
     }
     
-    
-    
     let servicesAssembly: ServicesAssembly
     
     init(servicesAssembly: ServicesAssembly) {
@@ -165,7 +163,7 @@ final class PayNftViewController: UIViewController {
             case .success(let currencies):
                 self.currencies = currencies
             case .failure:
-                print("ERROR")
+                print("error")
             }
         }
     }
@@ -177,9 +175,7 @@ final class PayNftViewController: UIViewController {
         let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) {_ in
             self.dismiss(animated: true)
         }
-        let returnAction = UIAlertAction(title: "Повторить", style: .default) {_ in
-            print("повторить - повторить")
-        }
+        let returnAction = UIAlertAction(title: "Повторить", style: .default, handler: nil)
         alert.addAction(cancelAction)
         alert.addAction(returnAction)
         present(alert, animated: true, completion: nil)

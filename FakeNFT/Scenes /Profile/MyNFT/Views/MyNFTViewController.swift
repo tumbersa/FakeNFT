@@ -240,8 +240,11 @@ extension MyNFTViewController: UITableViewDataSource {
         }
 
         cell.delegate = self
-
         cell.configureCell(with: nft)
+
+        let isLiked = presenter?.isLiked(id: nft.id) ?? true
+        cell.setIsLiked(isLiked: isLiked)
+
         cell.selectionStyle = .none
 
         return cell
@@ -252,7 +255,13 @@ extension MyNFTViewController: UITableViewDataSource {
 extension MyNFTViewController: MyNFTCellDelegate {
     func didTapLikeButton(with nftID: String) {
         print("Tapped like for NFT with id: \(nftID)")
+        presenter?.tapLike(id: nftID)
 
+        if let index = self.presenter?.nfts.firstIndex(where: { $0.id == nftID }) {
+            let indexPath = IndexPath(row: index, section: 0)
+
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 }
 

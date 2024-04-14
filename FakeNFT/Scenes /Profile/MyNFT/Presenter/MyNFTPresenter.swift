@@ -35,6 +35,10 @@ final class MyNFTPresenter {
         updateLikes()
         view?.updateMyNFTs(nfts)
     }
+
+    func isLiked(id: String) -> Bool {
+        return likedNFT.contains(id)
+    }
 }
 
 extension MyNFTPresenter: MyNFTPresenterProtocol {

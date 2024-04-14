@@ -38,10 +38,6 @@ final class MyNFTCell: UITableViewCell {
 
     private lazy var favoriteButton: UIButton = {
         let button = UIButton()
-        button.setImage(
-            UIImage(named: "favorite_button_inactive"),
-            for: .normal
-        )
         button.addTarget(
             self,
             action: #selector(likeButtonDidTap),
@@ -171,7 +167,7 @@ private extension MyNFTCell {
          stackView,
          priceStackView
         ].forEach {
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
     }
 
@@ -211,6 +207,7 @@ private extension MyNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
+        print("Like button tapped")
         if let id = id {
             delegate?.didTapLikeButton(with: id)
 

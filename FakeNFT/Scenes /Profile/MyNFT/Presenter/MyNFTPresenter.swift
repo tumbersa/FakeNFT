@@ -33,7 +33,7 @@ final class MyNFTPresenter {
             likedNFT.append(id)
         }
         updateLikes()
-       
+        view?.updateMyNFTs(nfts)
     }
 }
 

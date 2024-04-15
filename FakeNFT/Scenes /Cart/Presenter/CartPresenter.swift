@@ -11,13 +11,13 @@ import SafariServices
 final class CartPresenter {
     private weak var view: CartView?
     var imageCache = NSCache<NSString, UIImage>()
-    //переменная для хранения ID добавленных в корзину NFT
+    
     private var idAddedToCart: Set<String> = []
     
     private let cartService: CartService
     private let nftService: NftService
     
-    var cartId: String = ""
+    private var cartId: String = ""
     var arrOfNFT: [Nft] = [] {
         didSet {
             view?.reloadTableView(nft: arrOfNFT)
@@ -139,9 +139,18 @@ final class CartPresenter {
     func cacheImage(_ image: UIImage, forKey key: String) {
         imageCache.setObject(image, forKey: key as NSString)
     }
-
     
-    func deleteNFT(withId id: String) {
-        // Implement delete NFT logic
+    func deleteNFT(at id: String, completion: @escaping () -> Void) {
+        arrOfNFT.removeAll { $0.id == id }
+        let newId = arrOfNFT.map { $0.id }
+        
+        self.cartService.updateOrder(nftsIds: newId, update: true) { [weak self] error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                return
+            }
+            completion()
+        }
     }
 }

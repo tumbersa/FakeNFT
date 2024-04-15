@@ -7,11 +7,15 @@
 
 import UIKit
 
+protocol CongratulationView: AnyObject {
+    func getPaymentOrder()
+}
+
 final class CongratulationViewController: UIViewController {
     
     var allPaymentNft: [Nft] = []
     
-    private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    private let presenter = CongratulationPresenter()
     
     private lazy var pictureImage: UIImageView = {
        let image = UIImage(named: "CongratulationImage")
@@ -54,21 +58,12 @@ final class CongratulationViewController: UIViewController {
         getPaymentOrder()
     }
     
-    // В вашем PayNftViewController:
     @objc private func backToCatalog() {
         dismiss(animated: true)
     }
     
     func getPaymentOrder() {
-        let newId: [String] = []
-        
-        self.cartService.updateOrder(nftsIds: newId, update: false) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
-                print("Ошибка при обновлении заказа: \(error.localizedDescription)")
-                return
-            }
-        }
+        presenter.getPaymentOrder()
     }
 
     private func setupAllViews() {

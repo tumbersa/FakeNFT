@@ -16,9 +16,9 @@ protocol PayNftView: AnyObject {
 
 final class PayNftViewController: UIViewController {
     
-    var allPaymentNft: [Nft] = []
+    private var selecterCrypto: String = ""
     
-    var selecterCrypto: String = ""
+    var allPaymentNft: [Nft] = []
     
     var paymentID: String = "" {
         didSet {
@@ -26,8 +26,10 @@ final class PayNftViewController: UIViewController {
             payButton.isEnabled = true
         }
     }
+        
+    private var presenter: PayNftPresenter?
     
-    let servicesAssembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
@@ -37,8 +39,6 @@ final class PayNftViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
-    private var presenter: PayNftPresenter?
     
     private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
@@ -114,8 +114,8 @@ final class PayNftViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureVC()
+        presenter = PayNftPresenter(servicesAssembly: servicesAssembly)
         getCurrencyList()
-        presenter = PayNftPresenter()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -139,48 +139,40 @@ final class PayNftViewController: UIViewController {
     }
     
     private func paymentConfirmationRequest() {
-        servicesAssembly.nftService.paymentConfirmationRequest() {(result: Result<PaymentConfirmation, Error>) in
-            switch result {
-            case .success(let getOrder):
-                if getOrder.success, getOrder.id == self.selecterCrypto {
-                    let vc = CongratulationViewController()
-                    vc.allPaymentNft = self.allPaymentNft
-                    self.back = true
-                    vc.modalPresentationStyle = .fullScreen
-                    self.present(vc, animated: true)
-                } else {
-                    self.showErrorBuyAlert()
-                }
-            case .failure:
-                self.showErrorBuyAlert()
+        presenter?.paymentConfirmationRequest(selectedCrypto: selecterCrypto, allPaymentNft: allPaymentNft) { viewController in
+            if let viewController = viewController {
+                self.present(viewController, animated: true, completion: nil)
+                self.back = true
+            } else {
+                self.showBuyErrorAlert()
             }
         }
     }
     
-    private func getCurrencyList() {
-        servicesAssembly.nftService.loadCurrencyList { (result: Result<[Currency], Error>) in
-            switch result {
-            case .success(let currencies):
-                self.currencies = currencies
-            case .failure:
-                print("error")
-            }
-        }
-    }
-    
-    
-    //MARK: -добавить функцию повтора
-    private func showErrorBuyAlert() {
+    private func showBuyErrorAlert() {
         let alert = UIAlertController(title: "Не удалось произвести оплату", message: nil, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) {_ in
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) { _ in
             self.dismiss(animated: true)
         }
         let returnAction = UIAlertAction(title: "Повторить", style: .default, handler: nil)
         alert.addAction(cancelAction)
         alert.addAction(returnAction)
-        present(alert, animated: true, completion: nil)
+        present(alert, animated: true)
     }
-
+    
+    private func getCurrencyList() {
+        presenter?.loadCurrencyList { [weak self] currencies, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                return
+            }
+            
+            guard let currencies = currencies else { return }
+            self.currencies = currencies
+        }
+    }
+    
     
     @objc func dismissModal() {
         dismiss(animated: true, completion: nil)

@@ -70,7 +70,7 @@ final class CartServiceImpl: CartService {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
-        //request.httpBody = bodyData
+        update ? request.httpBody = bodyData : nil 
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {

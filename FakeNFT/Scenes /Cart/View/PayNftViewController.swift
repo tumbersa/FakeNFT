@@ -16,8 +16,7 @@ protocol PayNftView: AnyObject {
 
 final class PayNftViewController: UIViewController {
     
-    private var selecterCrypto: String = ""
-    
+    //MARK: - Public properies
     var allPaymentNft: [Nft] = []
     
     var paymentID: String = "" {
@@ -26,21 +25,20 @@ final class PayNftViewController: UIViewController {
             payButton.isEnabled = true
         }
     }
-        
+    
+    //MARK: - Private properies
+    private var back = false
+    
+    private var webInfo: WKWebView?
+    
+    private var selecterCrypto: String = ""
+    
     private var presenter: PayNftPresenter?
     
     private let servicesAssembly: ServicesAssembly
     
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     
     private var currencies: [Currency] = [] {
@@ -48,8 +46,6 @@ final class PayNftViewController: UIViewController {
             selectedCollection.reloadData()
         }
     }
-    
-    var back = false
     
     private lazy var selectedCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -63,7 +59,6 @@ final class PayNftViewController: UIViewController {
         return collection
     }()
 
-    //Отделение с кнопкой оплаты
     private lazy var bottomView: UIView = {
        let view = UIView()
         view.backgroundColor = UIColor(named: "ypLightGray")
@@ -82,8 +77,6 @@ final class PayNftViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private var webInfo: WKWebView?
     
     private lazy var infoWebButton: UIButton = {
        let button = UIButton()
@@ -111,6 +104,17 @@ final class PayNftViewController: UIViewController {
        return button
     }()
     
+    // MARK: - Initializers
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureVC()
@@ -125,21 +129,30 @@ final class PayNftViewController: UIViewController {
         }
     }
     
+    // MARK: - Private Methods
     private func configureVC() {
         view.backgroundColor = .white
         title = "Выберите способ оплаты"
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", 
+                                                                style: .plain,
+                                                                target: nil,
+                                                                action: nil)
         let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(.black, renderingMode: .alwaysOriginal)
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, style: .plain, target: self, action: #selector(dismissModal))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, 
+                                                                style: .plain,
+                                                                target: self,
+                                                                action: #selector(dismissModal))
         setupViews()
     }
     
-    @objc func payButtonClicked() {
+    @objc 
+    private func payButtonClicked() {
         paymentConfirmationRequest()
     }
     
     private func paymentConfirmationRequest() {
-        presenter?.paymentConfirmationRequest(selectedCrypto: selecterCrypto, allPaymentNft: allPaymentNft) { viewController in
+        presenter?.paymentConfirmationRequest(selectedCrypto: selecterCrypto, 
+                                              allPaymentNft: allPaymentNft) { viewController in
             if let viewController = viewController {
                 self.present(viewController, animated: true, completion: nil)
                 self.back = true
@@ -150,11 +163,16 @@ final class PayNftViewController: UIViewController {
     }
     
     private func showBuyErrorAlert() {
-        let alert = UIAlertController(title: "Не удалось произвести оплату", message: nil, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) { _ in
+        let alert = UIAlertController(title: "Не удалось произвести оплату", 
+                                      message: nil,
+                                      preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Отмена", 
+                                         style: .cancel) { _ in
             self.dismiss(animated: true)
         }
-        let returnAction = UIAlertAction(title: "Повторить", style: .default, handler: nil)
+        let returnAction = UIAlertAction(title: "Повторить", 
+                                         style: .default,
+                                         handler: nil)
         alert.addAction(cancelAction)
         alert.addAction(returnAction)
         present(alert, animated: true)
@@ -163,22 +181,19 @@ final class PayNftViewController: UIViewController {
     private func getCurrencyList() {
         presenter?.loadCurrencyList { [weak self] currencies, error in
             guard let self = self else { return }
-            
-            if let error = error {
-                return
-            }
-            
             guard let currencies = currencies else { return }
             self.currencies = currencies
         }
     }
     
     
-    @objc func dismissModal() {
+    @objc
+    private  func dismissModal() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func showUserInfo() {
+    @objc
+    private func showUserInfo() {
         guard let vc = presenter?.showSafariView() else { return }
         present(vc, animated: true)
     }
@@ -215,6 +230,8 @@ final class PayNftViewController: UIViewController {
     }
 }
 
+
+// MARK: - UICollectionViewDataSource
 extension PayNftViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         currencies.count
@@ -227,9 +244,7 @@ extension PayNftViewController: UICollectionViewDataSource {
         let currency = currencies[indexPath.item]
         cell.setupUiElements(currency: currency)
         
-        //Картинка
         let imagesURL = currency.image
-        // Используем кэш для установки изображения
         if let presenter = presenter {
             if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
                 cell.cryptoImage.image = cachedImage
@@ -251,13 +266,13 @@ extension PayNftViewController: UICollectionViewDataSource {
                     return
                 }
                 cell.cryptoImage.image = image
-                // Сохраняем загруженное изображение в кэше
                 self.presenter?.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
             }
         }
     }
 }
 
+//MARK: - UICollectionViewDelegate
 extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -272,7 +287,6 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        //отступы от краев секции
         return UIEdgeInsets(top: 20, left: 0, bottom: 7, right: 0)
     }
     
@@ -287,7 +301,7 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? CryptoWalletCell {
-            cell.layer.borderWidth = 0 // Сбрасываем толщину рамки
+            cell.layer.borderWidth = 0
         }
     }
 }

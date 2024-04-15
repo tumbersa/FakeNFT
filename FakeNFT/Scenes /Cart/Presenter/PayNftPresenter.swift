@@ -13,7 +13,7 @@ final class PayNftPresenter {
     var imageCache = NSCache<NSString, UIImage>()
     
     
-    let servicesAssembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
@@ -33,21 +33,21 @@ final class PayNftPresenter {
     func loadImage(from imageUrl: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: imageUrl) { data, response, error in
             guard let data = data, error == nil else {
-                print("Ошибка при загрузке изображения: \(error?.localizedDescription ?? "Unknown error")")
                 completion(nil)
                 return
             }
             if let image = UIImage(data: data) {
                 completion(image)
             } else {
-                print("Не удалось создать изображение из загруженных данных")
                 completion(nil)
             }
-        }.resume()
+        }
+        .resume()
     }
     
     
-    func cacheImages(for nfts: [Nft], completion: @escaping ([UIImage]) -> Void) {
+    private func cacheImages(for nfts: [Nft], 
+                             completion: @escaping ([UIImage]) -> Void) {
         var cachedImages: [UIImage] = []
         for nft in nfts {
             for imageUrl in nft.images {
@@ -59,7 +59,9 @@ final class PayNftPresenter {
         completion(cachedImages)
     }
     
-    func paymentConfirmationRequest(selectedCrypto: String, allPaymentNft: [Nft], completion: @escaping (UIViewController?) -> Void) {
+    func paymentConfirmationRequest(selectedCrypto: String, 
+                                    allPaymentNft: [Nft],
+                                    completion: @escaping (UIViewController?) -> Void) {
         servicesAssembly.nftService.paymentConfirmationRequest() { result in
             switch result {
             case .success(let getOrder):
@@ -83,7 +85,6 @@ final class PayNftPresenter {
             case .success(let currencies):
                 completion(currencies, nil)
             case .failure(let error):
-                print("Ошибка при загрузке списка валют: \(error)")
                 completion(nil, error)
             }
         }

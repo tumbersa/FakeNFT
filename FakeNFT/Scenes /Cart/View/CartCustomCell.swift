@@ -13,22 +13,10 @@ protocol CartCellDelegate: AnyObject {
 
 final class CartCustomCell: UITableViewCell {
     
-    private var starsCount: Int? {
-        didSet {
-            setupStarsView()
-        }
-    }
-    
+    // MARK: Public Properties
     weak var delegate: CartCellDelegate?
-    
     var indexPath: IndexPath?
     var deleteNftId: String?
-    
-    private lazy var nftView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     
     lazy var nftImage: UIImageView = {
         let imageView = UIImageView()
@@ -40,6 +28,19 @@ final class CartCustomCell: UITableViewCell {
         return imageView
     }()
     
+    // MARK: Private Properties
+    private var starsCount: Int? {
+        didSet {
+            setupStarsView()
+        }
+    }
+    
+    private lazy var nftView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     private lazy var nftName: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 17, weight: .bold)
@@ -63,8 +64,7 @@ final class CartCustomCell: UITableViewCell {
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = 2
-        // Создаем пять звезд
-        for i in 1...5 {
+        for _ in 1...5 {
             let fullStar = "star"
             let emptyStar = "star.fill"
             let starImageView = UIImageView(image: UIImage(systemName: emptyStar))
@@ -79,15 +79,42 @@ final class CartCustomCell: UITableViewCell {
         return stack
     }()
     
-    private func setupStarsView() {
-        //Рейтинг NFT
-        starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    // MARK: - Initializers / Public Methods
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupAllViews()
+    }
         
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupAllViews()
+    }
+    
+    func update(name: String, price: String, starsCount: Int, indexPath: IndexPath) {
+        nftName.text = name
+        nftPrice.text = price
+        self.starsCount = starsCount
+        self.indexPath = indexPath
+    }
+    
+    // MARK: - Private Methods
+    @objc
+    private func deleteNFT() {
+        guard let indexPath = indexPath,
+              let image = nftImage.image,
+              let deleteNftId = deleteNftId else {
+            return
+        }
+        delegate?.deleteButtonTapped(at: indexPath, image: image, id: deleteNftId)
+    }
+    
+    private func setupStarsView() {
+        starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         guard let starsCount = starsCount else { return }
-        for i in 0..<5 {
+        for index in 0..<5 {
             let fullStar = "fullStar"
             let emptyStar = "emptyStar"
-            let starImageView = UIImageView(image: UIImage(named: i < starsCount ? fullStar : emptyStar))
+            let starImageView = UIImageView(image: UIImage(named: index < starsCount ? fullStar : emptyStar))
             starImageView.translatesAutoresizingMaskIntoConstraints = false
             starImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
             starImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
@@ -121,32 +148,6 @@ final class CartCustomCell: UITableViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
-    @objc func deleteNFT() {
-        guard let indexPath = indexPath,
-              let image = nftImage.image,
-              let deleteNftId = deleteNftId else {
-            return
-        }
-        delegate?.deleteButtonTapped(at: indexPath, image: image, id: deleteNftId)
-    }
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupAllViews()
-    }
-        
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupAllViews()
-    }
-    
-    func update(name: String, price: String, starsCount: Int, indexPath: IndexPath) {
-        nftName.text = name
-        nftPrice.text = price
-        self.starsCount = starsCount
-        self.indexPath = indexPath
-    }
     
     private func setupAllViews() {
         contentView.addSubview(nftView)

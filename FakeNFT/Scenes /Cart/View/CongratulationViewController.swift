@@ -13,8 +13,10 @@ protocol CongratulationView: AnyObject {
 
 final class CongratulationViewController: UIViewController {
     
+    // MARK: - Public Properties
     var allPaymentNft: [Nft] = []
     
+    // MARK: - Private Properties
     private let presenter = CongratulationPresenter()
     
     private lazy var pictureImage: UIImageView = {
@@ -51,6 +53,7 @@ final class CongratulationViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -58,11 +61,13 @@ final class CongratulationViewController: UIViewController {
         getPaymentOrder()
     }
     
-    @objc private func backToCatalog() {
+    // MARK: - Private Methods
+    @objc
+    private func backToCatalog() {
         dismiss(animated: true)
     }
     
-    func getPaymentOrder() {
+    private func getPaymentOrder() {
         presenter.getPaymentOrder()
     }
 

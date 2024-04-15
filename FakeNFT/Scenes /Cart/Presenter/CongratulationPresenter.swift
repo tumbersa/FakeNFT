@@ -15,11 +15,6 @@ final class CongratulationPresenter {
     
     func getPaymentOrder() {
         let newId: [String] = []
-        self.cartService.updateOrder(nftsIds: newId, update: false) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
-                return
-            }
-        }
+        self.cartService.updateOrder(nftsIds: newId, update: false) { _ in }
     }
 }

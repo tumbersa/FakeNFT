@@ -18,18 +18,10 @@ protocol CartView: AnyObject {
 
 final class CartViewController: UIViewController {
     
+    //MARK: - Private properies
     private let servicesAssembly: ServicesAssembly
     
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-        
-    var viewArrOfNFT: [Nft] = []
+    private var viewArrOfNFT: [Nft] = []
     
     private var presenter: CartPresenter?
     
@@ -113,6 +105,17 @@ final class CartViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Initializers
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -124,6 +127,16 @@ final class CartViewController: UIViewController {
         updatesAllSetups()
     }
     
+    // MARK: - Private Methods
+    private func showErrorAlert() {
+        let alert = UIAlertController(title: "Произошла ошибка", message: nil, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Ok", style: .cancel) { _ in
+            self.dismiss(animated: true)
+        }
+        alert.addAction(cancelAction)
+        present(alert, animated: true)
+    }
+    
     private func setupNetwork() {
         guard let presenter = presenter else { return }
         presenter.loadCart(httpMethod: .get) {[weak self] error in
@@ -133,7 +146,7 @@ final class CartViewController: UIViewController {
         }
     }
     
-    func updatesAllSetups() {
+    private func updatesAllSetups() {
         configureVC()
         setupNetwork()
     }
@@ -182,14 +195,13 @@ final class CartViewController: UIViewController {
         }
     }
     
-    //MARK: View
-    @objc func addButtonTapped() {
+    @objc private func addButtonTapped() {
         guard let presenter = presenter else { return }
         let sortedAlert = presenter.sortedNft()
         present(sortedAlert, animated: true)
     }
         
-    @objc func payButtonClicked() {
+    @objc private func payButtonClicked() {
         let vc = PayNftViewController(servicesAssembly: servicesAssembly)
         vc.paymentID = ""
         let viewController = UINavigationController(rootViewController:  vc)
@@ -198,7 +210,9 @@ final class CartViewController: UIViewController {
         present(viewController, animated:  true)
     }
     
-    private func viewDeleteController(index: IndexPath, image: UIImage, id: String) {
+    private func viewDeleteController(index: IndexPath, 
+                                      image: UIImage,
+                                      id: String) {
         applyBlurEffect()
         let vc = DeleteViewController()
         vc.delegate = self
@@ -216,7 +230,7 @@ final class CartViewController: UIViewController {
         window.addSubview(blurEffectView)
     }
 
-    func removeBlurEffect() {
+    private func removeBlurEffect() {
         guard let window = UIApplication.shared.windows.first else { return }
         for subview in window.subviews {
             if let blurView = subview as? UIVisualEffectView {
@@ -233,7 +247,9 @@ final class CartViewController: UIViewController {
     }
     
     private func setupAllViews() {
-        let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, style: .plain, target: self, action: #selector(addButtonTapped))
+        let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, 
+                                        style: .plain, target: self,
+                                        action: #selector(addButtonTapped))
         addButton.tintColor = .black
         navigationItem.rightBarButtonItem = addButton
         view.addSubview(tableView)
@@ -265,6 +281,7 @@ final class CartViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -277,6 +294,7 @@ extension CartViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - UITableViewDataSource
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewArrOfNFT.count
@@ -325,7 +343,9 @@ extension CartViewController: UITableViewDataSource {
     private func loadImage(imageUrl: URL, indexPath: IndexPath) {
         presenter?.loadImage(from: imageUrl) { [weak self] image in
             DispatchQueue.main.async {
-                guard let self = self, let image = image, let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
+                guard let self = self,
+                        let image = image,
+                        let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
                     return
                 }
                 cell.nftImage.image = image
@@ -335,12 +355,14 @@ extension CartViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - CartCellDelegate
 extension CartViewController: CartCellDelegate {
     func deleteButtonTapped(at indexPath: IndexPath, image: UIImage, id: String) {
         viewDeleteController(index: indexPath, image: image, id: id)
     }
 }
 
+// MARK: - NftDeleteDelegate
 extension CartViewController: NftDeleteDelegate {
     func deleteNFT(at id: String) {
         presenter?.deleteNFT(at: id) { [weak self] in
@@ -352,10 +374,12 @@ extension CartViewController: NftDeleteDelegate {
     }
 }
 
+// MARK: - CartView
 extension CartViewController: CartView {
     func reloadTableView(nft: [Nft]) {
         viewArrOfNFT = nft
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            guard let self = self else { return }
             self.setupEmptyOrNftViews()
         }
         tableView.reloadData()
@@ -382,6 +406,6 @@ extension CartViewController: CartView {
     }
     
     func displayError(_ message: String) {
-        // Display error message
+        showErrorAlert()
     }
 }

@@ -56,15 +56,12 @@ final class CartServiceImpl: CartService {
     func updateOrder(nftsIds: [String], update: Bool, completion: @escaping (Error?) -> Void) {
         guard let url = url else { return }
         
-        // тело запроса
         let nftsString = nftsIds.joined(separator: ",")
         let bodyString = "nfts=\(nftsString)"
         guard let bodyData = bodyString.data(using: .utf8) else {
-            print("Failed to encode body")
             return
         }
-        
-        // Создаем URLRequest
+
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -74,13 +71,8 @@ final class CartServiceImpl: CartService {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Error: \(error.localizedDescription)")
                 completion(error)
                 return
-            }
-            
-            if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                print("Response: \(responseString)")
             }
             completion(nil)
         }

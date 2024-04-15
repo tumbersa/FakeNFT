@@ -206,9 +206,6 @@ private extension MyNFTCell {
     // MARK: - Actions
     @objc func likeButtonDidTap() {
         print("Like button tapped")
-        if let id = id {
-            delegate?.didTapLikeButton(with: id)
-
-        }
+        delegate?.didTapLikeButton(with: id)
     }
 }

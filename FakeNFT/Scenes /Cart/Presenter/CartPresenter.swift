@@ -9,21 +9,28 @@ import UIKit
 import SafariServices
 
 final class CartPresenter {
-    private weak var view: CartView?
+    
+    // MARK: - Public Properties
     var imageCache = NSCache<NSString, UIImage>()
     
-    private var idAddedToCart: Set<String> = []
-    
-    private let cartService: CartService
-    private let nftService: NftService
-    
-    private var cartId: String = ""
     var arrOfNFT: [Nft] = [] {
         didSet {
             view?.reloadTableView(nft: arrOfNFT)
         }
     }
     
+    // MARK: - Private Properties
+    private var idAddedToCart: Set<String> = []
+    
+    private weak var view: CartView?
+    
+    private let cartService: CartService
+    
+    private let nftService: NftService
+    
+    private var cartId: String = ""
+    
+    // MARK: - Initializers
     init(view: CartView,
          cartService: CartService,
          nftService: NftService) {
@@ -32,6 +39,7 @@ final class CartPresenter {
         self.nftService = nftService
     }
     
+    // MARK: - Public Methods
     func viewDidLoad() {
         view?.showLoader()
     }
@@ -74,20 +82,6 @@ final class CartPresenter {
         return alertController
     }
     
-    private func cacheImages(for nfts: [Nft], 
-                             completion: @escaping ([UIImage]) -> Void) {
-        var cachedImages: [UIImage] = []
-        for nft in nfts {
-            for imageUrl in nft.images {
-                if let cachedImage = imageCache.object(
-                    forKey: imageUrl.absoluteString as NSString) {
-                    cachedImages.append(cachedImage)
-                }
-            }
-        }
-        completion(cachedImages)
-    }
-    
     func loadImage(from imageUrl: URL, completion: @escaping (UIImage?) -> Void) {
         URLSession.shared.dataTask(with: imageUrl) { data, response, error in
             guard let data = data, error == nil else {
@@ -102,7 +96,7 @@ final class CartPresenter {
         }.resume()
     }
     
-    func loadCart(httpMethod: HttpMethod, id: String? = nil, 
+    func loadCart(httpMethod: HttpMethod, id: String? = nil,
                   completion: @escaping (Error?) -> Void ) {
         cartService.loadCart(httpMethod: httpMethod, model: nil) { [weak self] result in
             guard let self = self else { return }
@@ -123,6 +117,33 @@ final class CartPresenter {
         }
     }
     
+    func deleteNFT(at id: String, completion: @escaping () -> Void) {
+        arrOfNFT.removeAll { $0.id == id }
+        let newId = arrOfNFT.map { $0.id }
+        
+        self.cartService.updateOrder(nftsIds: newId, update: true) { error in
+            if error != nil {
+                return
+            }
+            completion()
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func cacheImages(for nfts: [Nft],
+                             completion: @escaping ([UIImage]) -> Void) {
+        var cachedImages: [UIImage] = []
+        for nft in nfts {
+            for imageUrl in nft.images {
+                if let cachedImage = imageCache.object(
+                    forKey: imageUrl.absoluteString as NSString) {
+                    cachedImages.append(cachedImage)
+                }
+            }
+        }
+        completion(cachedImages)
+    }
+    
     private func loadNft(id: String) {
         nftService.loadNft(id: id) { [weak self] result in
             guard let self = self else { return }
@@ -138,17 +159,5 @@ final class CartPresenter {
     
     private func cacheImage(_ image: UIImage, forKey key: String) {
         imageCache.setObject(image, forKey: key as NSString)
-    }
-    
-    func deleteNFT(at id: String, completion: @escaping () -> Void) {
-        arrOfNFT.removeAll { $0.id == id }
-        let newId = arrOfNFT.map { $0.id }
-        
-        self.cartService.updateOrder(nftsIds: newId, update: true) { error in
-            if error != nil {
-                return
-            }
-            completion()
-        }
     }
 }

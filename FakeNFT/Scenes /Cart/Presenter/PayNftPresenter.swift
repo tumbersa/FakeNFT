@@ -9,12 +9,16 @@ import Foundation
 import SafariServices
 
 final class PayNftPresenter {
-    private weak var view: PayNftView?
+    
+    // MARK: - Public Properties
     var imageCache = NSCache<NSString, UIImage>()
     
+    // MARK: - Private Properties
+    private weak var view: PayNftView?
     
     private let servicesAssembly: ServicesAssembly
     
+    // MARK: - Initializers
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
     }
@@ -23,6 +27,7 @@ final class PayNftPresenter {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
     func showSafariView() -> SFSafariViewController {
         let urlString = "https://yandex.ru/legal/practicum_termsofuse/"
         guard let url = URL(string: urlString) else { fatalError("Invalid URL") }
@@ -45,21 +50,7 @@ final class PayNftPresenter {
         .resume()
     }
     
-    
-    private func cacheImages(for nfts: [Nft], 
-                             completion: @escaping ([UIImage]) -> Void) {
-        var cachedImages: [UIImage] = []
-        for nft in nfts {
-            for imageUrl in nft.images {
-                if let cachedImage = imageCache.object(forKey: imageUrl.absoluteString as NSString) {
-                    cachedImages.append(cachedImage)
-                }
-            }
-        }
-        completion(cachedImages)
-    }
-    
-    func paymentConfirmationRequest(selectedCrypto: String, 
+    func paymentConfirmationRequest(selectedCrypto: String,
                                     allPaymentNft: [Nft],
                                     completion: @escaping (UIViewController?) -> Void) {
         servicesAssembly.nftService.paymentConfirmationRequest() { result in
@@ -88,5 +79,19 @@ final class PayNftPresenter {
                 completion(nil, error)
             }
         }
+    }
+    
+    // MARK: - Private Methods
+    private func cacheImages(for nfts: [Nft],
+                             completion: @escaping ([UIImage]) -> Void) {
+        var cachedImages: [UIImage] = []
+        for nft in nfts {
+            for imageUrl in nft.images {
+                if let cachedImage = imageCache.object(forKey: imageUrl.absoluteString as NSString) {
+                    cachedImages.append(cachedImage)
+                }
+            }
+        }
+        completion(cachedImages)
     }
 }

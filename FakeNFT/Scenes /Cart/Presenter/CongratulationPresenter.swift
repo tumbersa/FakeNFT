@@ -9,10 +9,12 @@ import Foundation
 
 final class CongratulationPresenter {
     
+    // MARK: - Private Properties
     private weak var view: CongratulationView?
     
     private var cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
     
+    // MARK: - Public Methods
     func getPaymentOrder() {
         let newId: [String] = []
         self.cartService.updateOrder(nftsIds: newId, update: false) { _ in }

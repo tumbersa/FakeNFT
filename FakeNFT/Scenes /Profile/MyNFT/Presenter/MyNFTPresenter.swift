@@ -49,15 +49,27 @@ extension MyNFTPresenter: MyNFTPresenterProtocol {
 
 private extension MyNFTPresenter {
     func fetchNFTs() {
+        var allNFTs: [NFT] = []
+        let group = DispatchGroup()
+
         for id in nftID {
-            profileNFTService.fetchNFTs(id) { [weak self] result in
+            group.enter()
+
+            profileNFTService.fetchNFTs(id) { result in
+                defer {
+                    group.leave()
+                }
                 switch result {
                 case .success(let nfts):
-                    self?.view?.updateMyNFTs(nfts)
+                    allNFTs.append(nfts)
                 case .failure(let error):
                     print("Failed to fetch NFTs: \(error)")
                 }
             }
+            group.notify(queue: .main) { [weak self] in
+                self?.view?.updateMyNFTs(allNFTs)
+            }
+
         }
     }
 

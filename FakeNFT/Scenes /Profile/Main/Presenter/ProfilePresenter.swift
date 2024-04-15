@@ -64,6 +64,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
             profileService.fetchProfile(tokenKey) { [weak self] result in
                 switch result {
                 case .success(let profile):
+                    print("Профиль: \(profile)")
                     self?.view?.updateProfileDetails(profile)
                 case .failure(let error):
                     print("Failed to fetch profile: \(error)")

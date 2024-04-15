@@ -279,11 +279,12 @@ extension MyNFTViewController: MyNFTViewControllerProtocol {
             return
         }
 
-        guard let nfts = nfts else { return }
-
-        for nft in nfts {
-            presenter.nfts.append(nft)
+        guard let nfts = nfts else {
+            print("Received nil NFTs")
+            return
         }
+
+        presenter.nfts = nfts
 
         tableView.reloadData()
     }

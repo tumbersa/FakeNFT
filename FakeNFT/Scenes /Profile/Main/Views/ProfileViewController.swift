@@ -276,7 +276,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
                   let avatarURL = URL(string: avatarURLString) else {
                 return
             }
-            avatarImageView.kf.setImage(with: avatarURL, options: [.forceRefresh])
+            updateAvatar(url: avatarURL)
 
             let myNFTs = tableView.cellForRow(at: [0, 0]) as? ProfileCell
             myNFTs?.configureCell(label: nil, value: "(\(String(profile.nfts.count)))")

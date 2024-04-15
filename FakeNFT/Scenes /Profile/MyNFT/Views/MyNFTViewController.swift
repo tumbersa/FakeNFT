@@ -8,6 +8,10 @@
 import SnapKit
 import UIKit
 
+protocol MyNFTLikesDelegate: AnyObject {
+    func didUpdateLikedNFTCount(_ count: Int)
+}
+
 protocol MyNFTViewControllerProtocol: AnyObject {
     var presenter: MyNFTPresenter? { get set }
     func updateMyNFTs(_ nfts: [NFT]?)
@@ -286,6 +290,8 @@ extension MyNFTViewController: MyNFTViewControllerProtocol {
 
         presenter.nfts = nfts
 
-        tableView.reloadData()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
 }

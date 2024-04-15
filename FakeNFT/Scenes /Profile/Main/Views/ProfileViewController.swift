@@ -278,11 +278,14 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             }
             updateAvatar(url: avatarURL)
 
+            let myNFTsCount = profile.nfts.count
+            let likesCount = profile.likes.count
+
             let myNFTs = tableView.cellForRow(at: [0, 0]) as? ProfileCell
-            myNFTs?.configureCell(label: nil, value: "(\(String(profile.nfts.count)))")
+            myNFTs?.configureCell(label: nil, value: "(\(String(myNFTsCount)))")
 
             let myFavorites = tableView.cellForRow(at: [0, 1]) as? ProfileCell
-            myFavorites?.configureCell(label: nil, value: "(\(String(profile.likes.count)))")
+            myFavorites?.configureCell(label: nil, value: "(\(String(likesCount)))")
         } else {
             nameLabel.text = ""
             descriptionLabel.text = ""
@@ -353,5 +356,12 @@ extension ProfileViewController: EditProfilePresenterDelegate {
 extension ProfileViewController: EditProfileViewControllerDelegate {
     func didUpdateAvatar(url: String) {
         self.updateAvatarImage(url)
+    }
+}
+
+extension ProfileViewController: MyNFTLikesDelegate {
+    func didUpdateLikedNFTCount(_ count: Int) {
+        let myFavorites = tableView.cellForRow(at: [0, 1]) as? ProfileCell
+        myFavorites?.configureCell(label: nil, value: "\(count)")
     }
 }

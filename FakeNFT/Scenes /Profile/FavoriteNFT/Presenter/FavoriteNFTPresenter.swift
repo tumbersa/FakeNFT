@@ -51,14 +51,25 @@ extension FavoriteNFTPresenter: FavoriteNFTPresenterProtocol {
 
 private extension FavoriteNFTPresenter {
     func fetchFavoriteNFTs() {
+        var allNFTs: [NFT] = []
+        let group = DispatchGroup()
+
         for id in likedNFT {
-            favoriteNFTService.fetchNFTs(id) { [weak self] result in
+            group.enter()
+
+            favoriteNFTService.fetchNFTs(id) { result in
+                defer {
+                    group.leave()
+                }
                 switch result {
                 case .success(let likes):
-                    self?.view?.updateFavoriteNFTs(likes)
+                    allNFTs.append(likes)
                 case .failure(let error):
                     print("Failed to fetch NFTs: \(error)")
                 }
+            }
+            group.notify(queue: .main) { [weak self] in
+                self?.view?.updateFavoriteNFTs(allNFTs)
             }
         }
     }

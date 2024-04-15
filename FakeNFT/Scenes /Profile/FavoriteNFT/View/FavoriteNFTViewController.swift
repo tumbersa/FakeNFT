@@ -204,12 +204,19 @@ extension FavoriteNFTViewController: FavoriteNFTViewControllerProtocol {
             return
         }
 
-        guard let likes = likes else { return }
-
-        for like in likes {
-            presenter.likes.append(like)
+        guard let likes = likes else {
+            print("Received nil Likes")
+            return
         }
 
-        self.collectionView.reloadData()
+        //        for like in likes {
+        //            presenter.likes.append(like)
+        //        }
+
+        presenter.likes = likes
+
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
 }

@@ -19,6 +19,7 @@ final class MyNFTPresenter {
     var nftID: [String]
     var likedNFT: [String]
     private let editProfileService: EditProfileService
+    weak var likesDelegate: MyNFTLikesDelegate?
 
     init(nftID: [String], likedNFT: [String], editProfileService: EditProfileService) {
         self.nftID = nftID
@@ -85,6 +86,7 @@ private extension MyNFTPresenter {
             switch result {
             case .success:
                 print("Успешно")
+                self.likesDelegate?.didUpdateLikedNFTCount(self.likedNFT.count)
             case .failure(let error):
                 print("\(error.localizedDescription)")
             }

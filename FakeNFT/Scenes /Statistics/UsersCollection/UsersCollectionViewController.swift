@@ -29,7 +29,6 @@ final class UsersCollectionViewController: UIViewController, ErrorView {
                 let cell: NFTCollectionViewCellThreePerRow = collectionView.dequeueReusableCell(indexPath: indexPath)
                 
                 cell.delegate = presenter
-                
                 return cell
             })
     }()

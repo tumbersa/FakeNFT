@@ -65,7 +65,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         layoutUI()
     }
     

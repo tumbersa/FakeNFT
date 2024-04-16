@@ -1,11 +1,18 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-
+    
     var controllersFactory: ControllersFactory
-
-    init(controllersFactory: ControllersFactory) {
+    
+    init(controllersFactory: ControllersFactory, servicesAssembly: ServicesAssembly) {
         self.controllersFactory = controllersFactory
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+        
     var servicesAssembly: ServicesAssembly!
 
     private let catalogTabBarItem = UITabBarItem(
@@ -20,14 +27,6 @@ final class TabBarController: UITabBarController {
         tag: 1
     )
 
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
-        super.init(nibName: nil, bundle: nil)
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -35,19 +34,10 @@ final class TabBarController: UITabBarController {
     
         let statisticsController = createStatisticsVC()
         
-        self.setViewControllers([catalogNavigationItem, statisticsController], animated: true)
-        let catalogController = TestCatalogViewController(
-            servicesAssembly: servicesAssembly
-        )
-        let cartViewController = UINavigationController( rootViewController: CartViewController(servicesAssembly: servicesAssembly))
-        
-        catalogController.tabBarItem = catalogTabBarItem
+        let cartViewController = UINavigationController(rootViewController: CartViewController(servicesAssembly: servicesAssembly))
         cartViewController.tabBarItem = cartTabBarItem
-
-        viewControllers = [catalogController, cartViewController]
-
-        self.setViewControllers([catalogController, cartViewController], animated: true)
-
+        
+        self.setViewControllers([catalogNavigationItem, cartViewController, statisticsController], animated: true)
         view.backgroundColor = .systemBackground
     }
 

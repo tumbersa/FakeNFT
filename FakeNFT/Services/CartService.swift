@@ -20,7 +20,7 @@ final class CartServiceImpl: CartService {
     
     private let networkClient: NetworkClient
     
-    let url = URL(string: "\(RequestConstants.baseURL)/api/v1/orders/1")
+    let url = URL(string: "\(NetworkConstants.baseURL)/api/v1/orders/1")
     
     init(networkClient: NetworkClient) {
         self.networkClient = networkClient

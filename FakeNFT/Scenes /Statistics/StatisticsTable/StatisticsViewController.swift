@@ -28,6 +28,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
                 guard let self else { return UITableViewCell()}
                 let cell: StatisticsTableViewCell = tableView.dequeueReusableCell()
                 cell.set(user: user)
+                cell.selectionStyle = .none
                 return cell
             })
     }()

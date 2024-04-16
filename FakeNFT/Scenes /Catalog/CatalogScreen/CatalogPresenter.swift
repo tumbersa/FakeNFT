@@ -46,16 +46,9 @@ final class CatalogPresenter: CatalogPresenterProtocol {
     }
     
     private func makeErrorModel(_ error: Error) -> ErrorModel {
-        let message: String
-        switch error {
-        case is NetworkClientError:
-            message = L10n.Error.network
-        default:
-            message = L10n.Error.unknown
-        }
 
         let actionText = L10n.Error.repeat
-        return ErrorModel(message: message, actionText: actionText) { [weak self] in
+        return ErrorModel { [weak self] in
             self?.fetchCollections()
         }
     }

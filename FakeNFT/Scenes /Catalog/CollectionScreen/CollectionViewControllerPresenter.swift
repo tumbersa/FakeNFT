@@ -274,16 +274,9 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
 extension CollectionViewControllerPresenter {
     
     private func makeErrorModel(_ error: Error, option: (()->Void)?) -> ErrorModel {
-        let message: String
-        switch error {
-        case is NetworkClientError:
-            message = L10n.Error.network
-        default:
-            message = L10n.Error.unknown
-        }
         
         let actionText = L10n.Error.repeat
-        return ErrorModel(message: message, actionText: actionText) {
+        return ErrorModel {
             if let option {
                 option()
             }

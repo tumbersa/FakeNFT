@@ -24,4 +24,3 @@ struct CartRequest: NetworkRequest {
         URL(string: "\(NetworkConstants.baseURL)/api/v1/orders/1")
     }
 }
-

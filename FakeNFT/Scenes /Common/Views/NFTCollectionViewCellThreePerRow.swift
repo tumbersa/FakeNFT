@@ -2,7 +2,7 @@
 //  NFTCollectionViewCellThreePerRow.swift
 //  FakeNFT
 //
-//  Created by admin on 28.03.2024.
+//  Created by Глеб Капустин on 24.03.2024.
 //
 
 import UIKit
@@ -20,7 +20,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         nftImageView.layer.cornerRadius = 12
         nftImageView.layer.masksToBounds = true
         nftImageView.image = Asset.MockImages.Beige.April._1.image
-        nftImageView.translatesAutoresizingMaskIntoConstraints = false
         return nftImageView
     }()
     
@@ -31,7 +30,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             for: .normal)
         likeButton.tintColor = .white
         likeButton.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
-        likeButton.translatesAutoresizingMaskIntoConstraints = false
         return likeButton
     }()
     
@@ -41,8 +39,8 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     private lazy var nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.font = .bodyBold
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.text = "Archie"
+        
         nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         nameLabel.numberOfLines = 2
         nameLabel.adjustsFontSizeToFitWidth = true
@@ -51,7 +49,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
     
     private lazy var priceLabel: UILabel = {
         let priceLabel = UILabel()
-        priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.font = .systemFont(ofSize: 10, weight: .medium)
         priceLabel.text = "1,78 ETH"
         return priceLabel
@@ -61,14 +58,10 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         let cartButton = UIButton()
         cartButton.setImage(UIImage(resource: .cartAdd).withTintColor(.label), for: .normal)
         cartButton.addTarget(self, action: #selector(cartTapped), for: .touchUpInside)
-        cartButton.translatesAutoresizingMaskIntoConstraints = false
         return cartButton
     }()
     
     weak var delegate: NFTCollectionViewCellThreePerRowDelegate?
-    
-    private var isCart: Bool = false
-    private var isLike: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -97,7 +90,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             make.top.equalToSuperview()
         }
         
-        ratingStackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(ratingStackView)
         ratingStackView.snp.makeConstraints { make in
             make.top.equalTo(nftImageView.snp.bottom).offset(8)
@@ -105,7 +97,6 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
             make.trailing.equalTo(nftImageView.snp.trailing).offset(-40)
         }
         
-        bottomContainerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(bottomContainerView)
         bottomContainerView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -194,4 +185,3 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         }
     }
 }
-

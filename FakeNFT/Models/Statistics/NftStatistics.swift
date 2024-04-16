@@ -2,10 +2,10 @@
 //  NftStatistics.swift
 //  FakeNFT
 //
-//  Created by admin on 28.03.2024.
+//  Created by Глеб Капустин on 25.03.2024.
 //
 
-import UIKit
+import Foundation
 
 struct NftStatistics: Hashable {
     let name: String
@@ -18,4 +18,3 @@ struct NftStatistics: Hashable {
         hasher.combine(id)
     }
 }
-

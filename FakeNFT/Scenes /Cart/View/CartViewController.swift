@@ -18,7 +18,10 @@ protocol CartView: AnyObject {
 
 final class CartViewController: UIViewController {
     
-    var viewArrOfNFT: [Nft] = []
+    //MARK: - Private properies
+    private let servicesAssembly: ServicesAssembly
+    
+    private var viewArrOfNFT: [Nft] = []
     
     private var presenter: CartPresenter?
     
@@ -56,7 +59,6 @@ final class CartViewController: UIViewController {
         return table
     }()
     
-    //Отделение с кнопкой оплаты
     private lazy var bottomView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(named: "ypLightGray")
@@ -103,17 +105,50 @@ final class CartViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Initializers
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        configureVC()
+        updatesAllSetups()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updatesAllSetups()
+    }
+    
+    // MARK: - Private Methods
+    private func showErrorAlert() {
+        let alert = UIAlertController(title: "Произошла ошибка", message: nil, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Ok", style: .cancel) { _ in
+            self.dismiss(animated: true)
+        }
+        alert.addAction(cancelAction)
+        present(alert, animated: true)
+    }
+    
+    private func setupNetwork() {
         guard let presenter = presenter else { return }
         presenter.loadCart(httpMethod: .get) {[weak self] error in
             self?.showLoader()
-            //загружаем ID
             presenter.processNFTsLoading()
+            self?.reloadTableView(nft: presenter.arrOfNFT)
         }
-        
+    }
+    
+    private func updatesAllSetups() {
+        configureVC()
+        setupNetwork()
     }
     
     private func configureVC() {
@@ -141,11 +176,15 @@ final class CartViewController: UIViewController {
     }
     
     private func setupEmptyOrNftViews() {
-        guard let presenter = presenter else { return }
-        if presenter.arrOfNFT.isEmpty {
+        if viewArrOfNFT.isEmpty {
+            loaderIndicator.isHidden = true
             setupEmptyViews()
-            nftCount.text = "0 NFT"
-            nftPrice.text = "0,0 ETH"
+            emptyCart.isHidden = false
+            nftCount.isHidden = true
+            nftPrice.isHidden = true
+            bottomView.isHidden = true
+            buttonPay.isHidden = true
+            navigationItem.rightBarButtonItem = nil
         } else {
             setupAllViews()
             buttonPay.isHidden = false
@@ -156,29 +195,33 @@ final class CartViewController: UIViewController {
         }
     }
     
-    //MARK: View
-    @objc func addButtonTapped() {
+    @objc private func addButtonTapped() {
         guard let presenter = presenter else { return }
         let sortedAlert = presenter.sortedNft()
         present(sortedAlert, animated: true)
     }
         
-    @objc func payButtonClicked() {
-        let viewController = UINavigationController(rootViewController:  PayNftViewController())
+    @objc private func payButtonClicked() {
+        let vc = PayNftViewController(servicesAssembly: servicesAssembly)
+        vc.paymentID = ""
+        let viewController = UINavigationController(rootViewController:  vc)
+        vc.allPaymentNft = viewArrOfNFT
         viewController.modalPresentationStyle = .fullScreen
         present(viewController, animated:  true)
     }
     
-    private func viewDeleteController(index: IndexPath, image: UIImage) {
+    private func viewDeleteController(index: IndexPath, 
+                                      image: UIImage,
+                                      id: String) {
         applyBlurEffect()
         let vc = DeleteViewController()
         vc.delegate = self
         vc.image = image
         vc.index = index
+        vc.idDeleteNft = id
         present(vc, animated: true)
     }
     
-    //применяем блюр
     private func applyBlurEffect() {
         guard let window = UIApplication.shared.windows.first else { return }
         let blurEffect = UIBlurEffect(style: .regular)
@@ -186,9 +229,8 @@ final class CartViewController: UIViewController {
         blurEffectView.frame = window.bounds
         window.addSubview(blurEffectView)
     }
-    
-    // Находим размытое представление и удаляем его
-    func removeBlurEffect() {
+
+    private func removeBlurEffect() {
         guard let window = UIApplication.shared.windows.first else { return }
         for subview in window.subviews {
             if let blurView = subview as? UIVisualEffectView {
@@ -205,7 +247,9 @@ final class CartViewController: UIViewController {
     }
     
     private func setupAllViews() {
-        let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, style: .plain, target: self, action: #selector(addButtonTapped))
+        let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, 
+                                        style: .plain, target: self,
+                                        action: #selector(addButtonTapped))
         addButton.tintColor = .black
         navigationItem.rightBarButtonItem = addButton
         view.addSubview(tableView)
@@ -237,9 +281,12 @@ final class CartViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CartCustomCell else { return }
+        cell.indexPath = indexPath
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -247,6 +294,7 @@ extension CartViewController: UITableViewDelegate {
     }
 }
 
+// MARK: - UITableViewDataSource
 extension CartViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewArrOfNFT.count
@@ -265,7 +313,7 @@ extension CartViewController: UITableViewDataSource {
                 starsCount: viewArrOfNFT[indexPath.row].rating,
                 indexPath: indexPath
             )
-            //Цена всех NFT
+
             var cellCount = 0.0
             cell.selectionStyle = .none
             for count in viewArrOfNFT {
@@ -280,16 +328,14 @@ extension CartViewController: UITableViewDataSource {
             }
             nftCount.text = "\(viewArrOfNFT.count) NFT"
             
-            //Картинка
             let imagesURL = viewArrOfNFT[indexPath.row].images[0]
-            // Используем кэш для установки изображения
             if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
                 cell.nftImage.image = cachedImage
             } else {
-                // Если изображение не найдено в кэше, устанавливаем пустую картинку и начинаем загрузку
                 cell.nftImage.image = UIImage(named: "placeholder")
                 loadImage(imageUrl: imagesURL, indexPath: indexPath)
             }
+            cell.deleteNftId = viewArrOfNFT[indexPath.row].id
         }
         return cell
     }
@@ -297,42 +343,48 @@ extension CartViewController: UITableViewDataSource {
     private func loadImage(imageUrl: URL, indexPath: IndexPath) {
         presenter?.loadImage(from: imageUrl) { [weak self] image in
             DispatchQueue.main.async {
-                guard let self = self, let image = image, let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
+                guard let self = self,
+                        let image = image,
+                        let cell = self.tableView.cellForRow(at: indexPath) as? CartCustomCell else {
                     return
                 }
                 cell.nftImage.image = image
-                // Сохраняем загруженное изображение в кэше
                 self.presenter?.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
             }
         }
     }
 }
 
+// MARK: - CartCellDelegate
 extension CartViewController: CartCellDelegate {
-    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage) {
-        viewDeleteController(index: indexPath, image: image)
+    func deleteButtonTapped(at indexPath: IndexPath, image: UIImage, id: String) {
+        viewDeleteController(index: indexPath, image: image, id: id)
     }
 }
 
+// MARK: - NftDeleteDelegate
 extension CartViewController: NftDeleteDelegate {
-    func deleteNFT(at index: IndexPath) {
-        guard let presenter = presenter else { return }
-        presenter.arrOfNFT.remove(at: index.row)
-        setupEmptyOrNftViews()
-        tableView.reloadData()
+    func deleteNFT(at id: String) {
+        presenter?.deleteNFT(at: id) { [weak self] in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+                self?.setupEmptyOrNftViews()
+            }
+        }
     }
 }
 
+// MARK: - CartView
 extension CartViewController: CartView {
     func reloadTableView(nft: [Nft]) {
         viewArrOfNFT = nft
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            guard let self = self else { return }
             self.setupEmptyOrNftViews()
         }
         tableView.reloadData()
     }
     
-    //индикатор загрузки показать
     func showLoader() {
         loaderIndicator.isHidden = false
         UIView.animate(withDuration: 1, delay: 0, options: [.repeat, .curveLinear], animations: {
@@ -340,7 +392,6 @@ extension CartViewController: CartView {
         }, completion: nil)
     }
     
-    //индикатор загрузки убрать
     func hideLoader() {
         loaderIndicator.isHidden = true
         loaderIndicator.layer.removeAllAnimations()
@@ -355,6 +406,6 @@ extension CartViewController: CartView {
     }
     
     func displayError(_ message: String) {
-        // Display error message
+        showErrorAlert()
     }
 }

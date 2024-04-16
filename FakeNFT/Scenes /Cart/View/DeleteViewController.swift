@@ -8,17 +8,20 @@
 import UIKit
 
 protocol NftDeleteDelegate: AnyObject {
-    func deleteNFT(at index: IndexPath)
+    func deleteNFT(at id: String)
 }
 
 final class DeleteViewController: UIViewController {
     
+    //MARK: - Public properies
     weak var delegate: NftDeleteDelegate?
     
     var index: IndexPath? = nil
     var image: UIImage?
+    var idDeleteNft: String?
     
-    lazy var nftImage: UIImageView = {
+    //MARK: - Private properies
+    private lazy var nftImage: UIImageView = {
         let imageView = UIImageView()
         let image = image
         imageView.image = image
@@ -77,6 +80,7 @@ final class DeleteViewController: UIViewController {
         return stack
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
@@ -87,7 +91,7 @@ final class DeleteViewController: UIViewController {
         removeBlurEffect()
     }
     
-    // метод удаления блюра
+    // MARK: - Private Methods
     private func removeBlurEffect() {
         guard let window = UIApplication.shared.windows.first else { return }
         for subview in window.subviews {
@@ -97,13 +101,15 @@ final class DeleteViewController: UIViewController {
         }
     }
     
-    @objc private func removeNftButtonClicked() {
-        guard let index = index else { return }
-        delegate?.deleteNFT(at: index)
+    @objc 
+    private func removeNftButtonClicked() {
+        guard let idDeleteNft = idDeleteNft else { return }
+        delegate?.deleteNFT(at: idDeleteNft)
         dismiss(animated: true)
     }
     
-    @objc private func backNftButtonClicked() {
+    @objc 
+    private func backNftButtonClicked() {
         dismiss(animated: true)
     }
     

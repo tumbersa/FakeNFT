@@ -7,7 +7,17 @@
 
 import UIKit
 
+protocol CongratulationView: AnyObject {
+    func getPaymentOrder()
+}
+
 final class CongratulationViewController: UIViewController {
+    
+    // MARK: - Public Properties
+    var allPaymentNft: [Nft] = []
+    
+    // MARK: - Private Properties
+    private let presenter = CongratulationPresenter()
     
     private lazy var pictureImage: UIImageView = {
        let image = UIImage(named: "CongratulationImage")
@@ -43,15 +53,22 @@ final class CongratulationViewController: UIViewController {
         return button
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupAllViews()
+        getPaymentOrder()
     }
     
-    // В вашем PayNftViewController:
-    @objc private func backToCatalog() {
+    // MARK: - Private Methods
+    @objc
+    private func backToCatalog() {
         dismiss(animated: true)
+    }
+    
+    private func getPaymentOrder() {
+        presenter.getPaymentOrder()
     }
 
     private func setupAllViews() {

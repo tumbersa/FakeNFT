@@ -11,22 +11,41 @@ import SafariServices
 
 protocol PayNftView: AnyObject {
     func showSafariView() -> SFSafariViewController
+    func loadImage(from imageUrl: URL, completion: @escaping (UIImage?) -> Void)
 }
 
 final class PayNftViewController: UIViewController {
-        
+    
+    //MARK: - Public properies
+    var allPaymentNft: [Nft] = []
+    
+    var paymentID: String = "" {
+        didSet {
+            payButton.alpha = 1
+            payButton.isEnabled = true
+        }
+    }
+    
+    //MARK: - Private properies
+    private var back = false
+    
+    private var webInfo: WKWebView?
+    
+    private var selecterCrypto: String = ""
+    
     private var presenter: PayNftPresenter?
     
+    private let servicesAssembly: ServicesAssembly
+    
     private let cartService: CartService = CartServiceImpl(networkClient: DefaultNetworkClient())
+    
     private let nftService: NftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: NftStorageImpl())
     
-    private let cryptoImage: [String] = ["Bitcoin (BTC)", "Dogecoin (DOGE)", "Tether (USDT)", "ApeCoin (APE)", "Solana (SOL)", "Ethereum (ETH)", "Cardano (ADA)", "Shiba Inu (SHIB)"]
-    
-    private let cryptoFullName: [String] = ["Bitcoin", "Dogecoin", "Tether", "Apecoin", "Solana", "Ethereum", "Cardano", "Shiba Inu"]
-    
-    private let cryptoShortName: [String] = ["BTC", "DOGE", "USDT", "APE", "SOL", "ETH", "ADA", "SHIB"]
-    
-    var back = false
+    private var currencies: [Currency] = [] {
+        didSet {
+            selectedCollection.reloadData()
+        }
+    }
     
     private lazy var selectedCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -40,7 +59,6 @@ final class PayNftViewController: UIViewController {
         return collection
     }()
 
-    //Отделение с кнопкой оплаты
     private lazy var bottomView: UIView = {
        let view = UIView()
         view.backgroundColor = UIColor(named: "ypLightGray")
@@ -59,8 +77,6 @@ final class PayNftViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private var webInfo: WKWebView?
     
     private lazy var infoWebButton: UIButton = {
        let button = UIButton()
@@ -88,10 +104,22 @@ final class PayNftViewController: UIViewController {
        return button
     }()
     
+    // MARK: - Initializers
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureVC()
-        presenter = PayNftPresenter()
+        presenter = PayNftPresenter(servicesAssembly: servicesAssembly)
+        getCurrencyList()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -101,27 +129,71 @@ final class PayNftViewController: UIViewController {
         }
     }
     
+    // MARK: - Private Methods
     private func configureVC() {
         view.backgroundColor = .white
         title = "Выберите способ оплаты"
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", 
+                                                                style: .plain,
+                                                                target: nil,
+                                                                action: nil)
         let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(.black, renderingMode: .alwaysOriginal)
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, style: .plain, target: self, action: #selector(dismissModal))
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, 
+                                                                style: .plain,
+                                                                target: self,
+                                                                action: #selector(dismissModal))
         setupViews()
     }
     
-    @objc func payButtonClicked() {
-        let vc = CongratulationViewController()
-        back = true
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true)
+    @objc 
+    private func payButtonClicked() {
+        paymentConfirmationRequest()
     }
     
-    @objc func dismissModal() {
+    private func paymentConfirmationRequest() {
+        presenter?.paymentConfirmationRequest(selectedCrypto: selecterCrypto, 
+                                              allPaymentNft: allPaymentNft) { viewController in
+            if let viewController = viewController {
+                self.present(viewController, animated: true, completion: nil)
+                self.back = true
+            } else {
+                self.showBuyErrorAlert()
+            }
+        }
+    }
+    
+    private func showBuyErrorAlert() {
+        let alert = UIAlertController(title: "Не удалось произвести оплату", 
+                                      message: nil,
+                                      preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Отмена", 
+                                         style: .cancel) { _ in
+            self.dismiss(animated: true)
+        }
+        let returnAction = UIAlertAction(title: "Повторить", 
+                                         style: .default,
+                                         handler: nil)
+        alert.addAction(cancelAction)
+        alert.addAction(returnAction)
+        present(alert, animated: true)
+    }
+    
+    private func getCurrencyList() {
+        presenter?.loadCurrencyList { [weak self] currencies, error in
+            guard let self = self else { return }
+            guard let currencies = currencies else { return }
+            self.currencies = currencies
+        }
+    }
+    
+    
+    @objc
+    private  func dismissModal() {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc func showUserInfo() {
+    @objc
+    private func showUserInfo() {
         guard let vc = presenter?.showSafariView() else { return }
         present(vc, animated: true)
     }
@@ -158,32 +230,49 @@ final class PayNftViewController: UIViewController {
     }
 }
 
+
+// MARK: - UICollectionViewDataSource
 extension PayNftViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 8
+        currencies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CryptoCell", for: indexPath) as? CryptoWalletCell else {
             return UICollectionViewCell()
         }
+        let currency = currencies[indexPath.item]
+        cell.setupUiElements(currency: currency)
         
-        let imageName = cryptoImage[indexPath.row]
-        let image = UIImage(named: imageName)
-        cell.cryptoImage.image = image
-        
-        let cryptoFullName = cryptoFullName[indexPath.row]
-        cell.fullNameCrypto.text = cryptoFullName
-        
-        let cryptoShortName = cryptoShortName[indexPath.row]
-        cell.shortNameCrypto.text = cryptoShortName
-        
+        let imagesURL = currency.image
+        if let presenter = presenter {
+            if let cachedImage = presenter.imageCache.object(forKey: imagesURL.absoluteString as NSString) {
+                cell.cryptoImage.image = cachedImage
+            } else {
+                cell.cryptoImage.image = UIImage(named: "placeholder")
+                loadImage(imageUrl: imagesURL, indexPath: indexPath)
+            }
+        }
         cell.layer.masksToBounds = true
         cell.layer.cornerRadius = 12
         return cell
     }
+    
+    private func loadImage(imageUrl: URL, indexPath: IndexPath) {
+        presenter?.loadImage(from: imageUrl) { [weak self] image in
+            DispatchQueue.main.async {
+                guard let self = self, let image = image, let cell = self.selectedCollection.cellForItem(at: indexPath) as? CryptoWalletCell
+                else {
+                    return
+                }
+                cell.cryptoImage.image = image
+                self.presenter?.imageCache.setObject(image, forKey: imageUrl.absoluteString as NSString)
+            }
+        }
+    }
 }
 
+//MARK: - UICollectionViewDelegate
 extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
@@ -198,20 +287,21 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        //отступы от краев секции
         return UIEdgeInsets(top: 20, left: 0, bottom: 7, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) as? CryptoWalletCell {
-            cell.layer.borderWidth = 1 // Устанавливаем толщину рамки
-            cell.layer.borderColor = UIColor.black.cgColor // Устанавливаем цвет рамки
-        }
+        let cell = collectionView.cellForItem(at: indexPath) as? CryptoWalletCell
+        paymentID = currencies[indexPath.item].id
+        selecterCrypto = currencies[indexPath.item].name
+        cell?.layer.borderWidth = 1
+        cell?.layer.cornerRadius = 12
+        cell?.layer.borderColor = UIColor.black.cgColor
     }
 
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if let cell = collectionView.cellForItem(at: indexPath) as? CryptoWalletCell {
-            cell.layer.borderWidth = 0 // Сбрасываем толщину рамки
+            cell.layer.borderWidth = 0
         }
     }
 }

@@ -1,9 +1,16 @@
-import Foundation
+//
+//  NftLoaded.swift
+//  FakeNFT
+//
+//  Created by Марат Хасанов on 09.04.2024.
+//
 
-struct Nft: Decodable {
+import UIKit
+
+struct NftLoaded {
     let createdAt: String
     let name: String
-    let images: [URL]
+    let image: UIImage
     let rating: Int
     let description: String
     let price: Double

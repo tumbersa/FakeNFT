@@ -4,6 +4,12 @@ final class TabBarController: UITabBarController {
 
     var servicesAssembly: ServicesAssembly!
 
+    private let profileTabBarItem = UITabBarItem(
+        title: L10n.TabBar.profileTabBarTitle,
+        image: UIImage(named: "profile_tab_inactive"),
+        tag: 0
+    )
+
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
         super.init(nibName: nil, bundle: nil)
@@ -15,17 +21,20 @@ final class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureTabBars()
+    }
+
+    private func configureTabBars() {
         let profileViewController = ProfileViewController(
             servicesAssembly: servicesAssembly
         )
 
-        let profileNavigationController = UINavigationController(rootViewController: profileViewController)
-
-        profileNavigationController.tabBarItem = UITabBarItem(
-            title: L10n.TabBar.profileTabBarTitle,
-            image: UIImage(named: "profile_tab_inactive"),
-            selectedImage: UIImage(named: "profile_tab_active")
+        let profileNavigationController = UINavigationController(
+            rootViewController: profileViewController
         )
+
+        profileViewController.tabBarItem = profileTabBarItem
+        tabBar.unselectedItemTintColor = UIColor.black
 
         let profilePresenter = ProfilePresenter()
         profileViewController.presenter = profilePresenter
@@ -34,16 +43,5 @@ final class TabBarController: UITabBarController {
         self.setViewControllers([profileNavigationController], animated: true)
 
         view.backgroundColor = .systemBackground
-
-    }
-
-    private func createNavigation(with title: String,
-                                  and image: UIImage?,
-                                  viewController: UIViewController) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: viewController)
-        nav.tabBarItem.title = title
-        nav.tabBarItem.image = image
-
-        return nav
     }
 }

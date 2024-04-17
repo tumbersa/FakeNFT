@@ -46,8 +46,6 @@ final class CatalogPresenter: CatalogPresenterProtocol {
     }
     
     private func makeErrorModel(_ error: Error) -> ErrorModel {
-
-        let actionText = L10n.Error.repeat
         return ErrorModel { [weak self] in
             self?.fetchCollections()
         }

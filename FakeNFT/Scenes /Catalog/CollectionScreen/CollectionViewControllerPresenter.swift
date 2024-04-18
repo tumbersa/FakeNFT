@@ -266,7 +266,6 @@ extension CollectionViewControllerPresenter: NFTCollectionViewCellThreePerRowDel
             idAddedToCartForRequests.insert(id)
         }
         
-        
         utilityQueue.async {[weak self] in
             self?.loadCart(httpMethod: .put, id: id){ [weak self] _ in
                 guard let self else { return }

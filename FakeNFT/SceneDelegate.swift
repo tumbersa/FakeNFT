@@ -11,11 +11,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowsScene)
         
-        let servicesAssembly = ServicesAssembly(networkClient: DefaultNetworkClient(), nftStorage: NftStorageImpl())
+     //   let servicesAssembly = ServicesAssembly(networkClient: DefaultNetworkClient(), nftStorage: NftStorageImpl())
         
-        let tabBarController = TabBarController(controllersFactory: controllersFactory, servicesAssembly: servicesAssembly)
+        let tabBarController = controllersFactory.setupTabBarController()
+        //TabBarController(controllersFactory: controllersFactory, servicesAssembly: servicesAssembly)
 
-        window.rootViewController = tabBarController
+        window.rootViewController = UserDefaults.standard.isOnBoarded ? tabBarController : OnBoardingController()
 
         self.window = window
 

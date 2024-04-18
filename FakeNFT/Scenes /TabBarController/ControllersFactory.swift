@@ -12,6 +12,7 @@ enum ControllersType {
 }
 
 final class ControllersFactory {
+    
     func setupController(of type: ControllersType) -> UINavigationController {
         switch type {
         case .catalogViewController:
@@ -24,6 +25,13 @@ final class ControllersFactory {
                                                      vc: catalogController)
             return catalogNavigationItem
         }
+    }
+    
+    func setupTabBarController() -> UIViewController {
+        let servicesAssembly = ServicesAssembly(networkClient: DefaultNetworkClient(), nftStorage: NftStorageImpl())
+        let tabBarController = TabBarController(controllersFactory: self, servicesAssembly: servicesAssembly)
+        
+        return tabBarController
     }
     
     private func createNavigation(with title: String,

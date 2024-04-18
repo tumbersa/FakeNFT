@@ -19,7 +19,7 @@ final class NFTCollectionViewCellThreePerRow: UICollectionViewCell, ReuseIdentif
         let nftImageView = UIImageView()
         nftImageView.layer.cornerRadius = 12
         nftImageView.layer.masksToBounds = true
-        nftImageView.image = Asset.MockImages.Beige.April._1.image
+     //   nftImageView.image = Asset.MockImages.Beige.April._1.image
         return nftImageView
     }()
     

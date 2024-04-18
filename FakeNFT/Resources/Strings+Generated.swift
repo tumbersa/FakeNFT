@@ -11,6 +11,8 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum L10n {
   internal enum Error {
+    /// Отмена
+    internal static let cancel = L10n.tr("Localizable", "Error.cancel", fallback: "Отмена")
     /// Произошла ошибка сети
     internal static let network = L10n.tr("Localizable", "Error.network", fallback: "Произошла ошибка сети")
     /// Повторить
@@ -21,7 +23,10 @@ internal enum L10n {
     internal static let unknown = L10n.tr("Localizable", "Error.unknown", fallback: "Произошла неизвестная ошибка")
   }
   internal enum Tab {
-    /// Каталог
+    /// Localizable.strings
+    ///   FakeNFT
+    /// 
+    ///   Created by admin on 18.04.2024.
     internal static let catalog = L10n.tr("Localizable", "Tab.catalog", fallback: "Каталог")
   }
   internal enum Catalog {
@@ -39,6 +44,25 @@ internal enum L10n {
       /// Автор коллекции:
       internal static let aboutAuthor = L10n.tr("Localizable", "catalog.collection.AboutAuthor", fallback: "Автор коллекции:")
     }
+  }
+  internal enum OnBoarding {
+    /// Присоединяйтесь и откройте новый мир
+    /// уникальных NFT для коллекционеров
+    internal static let firstDescription = L10n.tr("Localizable", "onBoarding.firstDescription", fallback: "Присоединяйтесь и откройте новый мир\nуникальных NFT для коллекционеров")
+    /// Исследуйте
+    internal static let firstHeader = L10n.tr("Localizable", "onBoarding.firstHeader", fallback: "Исследуйте")
+    /// Что внутри?
+    internal static let onboardingButton = L10n.tr("Localizable", "onBoarding.onboardingButton", fallback: "Что внутри?")
+    /// Пополняйте свою коллекцию эксклюзивными
+    /// картинками, созданными нейросетью!
+    internal static let secondDescription = L10n.tr("Localizable", "onBoarding.secondDescription", fallback: "Пополняйте свою коллекцию эксклюзивными\nкартинками, созданными нейросетью!")
+    /// Коллекционируйте
+    internal static let secondHeader = L10n.tr("Localizable", "onBoarding.secondHeader", fallback: "Коллекционируйте")
+    /// Смотрите статистику других и покажите всем,
+    /// что у вас самая ценная коллекция
+    internal static let thirdDescription = L10n.tr("Localizable", "onBoarding.thirdDescription", fallback: "Смотрите статистику других и покажите всем,\nчто у вас самая ценная коллекция")
+    /// Состязайтесь
+    internal static let thirdHeader = L10n.tr("Localizable", "onBoarding.thirdHeader", fallback: "Состязайтесь")
   }
   internal enum TabBar {
     /// Корзина

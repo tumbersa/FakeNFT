@@ -37,6 +37,7 @@ final class CartCustomCell: UITableViewCell {
     
     private lazy var nftView: UIView = {
         let view = UIView()
+        view.backgroundColor = Asset.Colors.ypWhite.color
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -142,6 +143,11 @@ final class CartCustomCell: UITableViewCell {
     private lazy var deleteNftButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "Group 7"), for: .normal)
+        if traitCollection.userInterfaceStyle == .dark {
+                button.tintColor = .white
+            } else {
+                button.tintColor = .black
+            }
         button.addTarget(self, action: #selector(deleteNFT), for: .touchUpInside)
         button.heightAnchor.constraint(equalToConstant: 40).isActive = true
         button.widthAnchor.constraint(equalToConstant: 40).isActive = true

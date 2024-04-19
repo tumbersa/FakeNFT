@@ -55,6 +55,7 @@ final class CartViewController: UIViewController {
         let table = UITableView()
         table.register(CartCustomCell.self, forCellReuseIdentifier: "customCell")
         table.separatorStyle = .none
+        table.backgroundColor = Asset.Colors.ypWhite.color
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
@@ -97,7 +98,8 @@ final class CartViewController: UIViewController {
         button.setTitle("К оплате", for: .normal)
         button.isHidden = true
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
-        button.backgroundColor = .black
+        button.backgroundColor = UIColor(named: "ypBlack")
+        button.setTitleColor(UIColor(named: "ypWhite"), for: .normal)
         button.heightAnchor.constraint(equalToConstant: 44).isActive = true
         button.widthAnchor.constraint(equalToConstant: 240).isActive = true
         button.addTarget(self, action: #selector(payButtonClicked), for: .touchUpInside)
@@ -118,7 +120,7 @@ final class CartViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = Asset.Colors.ypWhite.color
         updatesAllSetups()
     }
     
@@ -247,8 +249,9 @@ final class CartViewController: UIViewController {
     }
     
     private func setupAllViews() {
-        let addButton = UIBarButtonItem(image: UIImage(named: "filterIcon")!, 
-                                        style: .plain, target: self,
+        let addButton = UIBarButtonItem(image: Asset.CatalogImages.filterIcon.image,
+                                     style: .plain,
+                                     target: self,
                                         action: #selector(addButtonTapped))
         addButton.tintColor = .black
         navigationItem.rightBarButtonItem = addButton

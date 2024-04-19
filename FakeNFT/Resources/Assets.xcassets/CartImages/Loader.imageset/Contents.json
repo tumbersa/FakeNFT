@@ -3,6 +3,10 @@
     {
       "filename" : "Loader.pdf",
       "idiom" : "universal"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
     }
   ],
   "info" : {

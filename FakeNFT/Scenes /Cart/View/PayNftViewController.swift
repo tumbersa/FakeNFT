@@ -50,11 +50,11 @@ final class PayNftViewController: UIViewController {
     private lazy var selectedCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.delegate = self
         collection.dataSource = self
         collection.register(CryptoWalletCell.self, forCellWithReuseIdentifier: "CryptoCell")
+        collection.backgroundColor = Asset.Colors.ypWhite.color
         collection.translatesAutoresizingMaskIntoConstraints = false
         return collection
     }()
@@ -95,7 +95,8 @@ final class PayNftViewController: UIViewController {
         let button = UIButton()
         button.setTitle("Оплатить", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .black
+        button.backgroundColor = UIColor(named: "ypBlack")
+        button.setTitleColor(UIColor(named: "ypWhite"), for: .normal)
         button.heightAnchor.constraint(equalToConstant: 60).isActive = true
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
@@ -131,14 +132,14 @@ final class PayNftViewController: UIViewController {
     
     // MARK: - Private Methods
     private func configureVC() {
-        view.backgroundColor = .white
+        view.backgroundColor = Asset.Colors.ypWhite.color
         title = "Выберите способ оплаты"
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", 
                                                                 style: .plain,
                                                                 target: nil,
                                                                 action: nil)
-        let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(.black, renderingMode: .alwaysOriginal)
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage, 
+        var backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(UIColor(named: "ypBlack") ?? .black, renderingMode: .alwaysOriginal)
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage,
                                                                 style: .plain,
                                                                 target: self,
                                                                 action: #selector(dismissModal))
@@ -296,7 +297,7 @@ extension PayNftViewController: UICollectionViewDelegateFlowLayout {
         selecterCrypto = currencies[indexPath.item].name
         cell?.layer.borderWidth = 1
         cell?.layer.cornerRadius = 12
-        cell?.layer.borderColor = UIColor.black.cgColor
+        cell?.layer.borderColor = UIColor(named: "ypBlack")?.cgColor
     }
 
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {

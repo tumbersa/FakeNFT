@@ -46,10 +46,10 @@ final class DeleteViewController: UIViewController {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
+        button.backgroundColor = UIColor(named: "ypBlack")
         button.setTitleColor(UIColor(named: "ypUniRed"), for: .normal)
         button.setTitle("Удалить", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-        button.backgroundColor = .black
         button.heightAnchor.constraint(equalToConstant: 44).isActive = true
         button.widthAnchor.constraint(equalToConstant: 127).isActive = true
         button.addTarget(self, action: #selector(removeNftButtonClicked), for: .touchUpInside)
@@ -61,10 +61,10 @@ final class DeleteViewController: UIViewController {
         let button = UIButton()
         button.layer.masksToBounds = true
         button.layer.cornerRadius = 16
-        button.titleLabel?.textColor = .red
         button.setTitle("Вернуться", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
-        button.backgroundColor = .black
+        button.backgroundColor = UIColor(named: "ypBlack")
+        button.setTitleColor(UIColor(named: "ypWhite"), for: .normal)
         button.heightAnchor.constraint(equalToConstant: 44).isActive = true
         button.widthAnchor.constraint(equalToConstant: 127).isActive = true
         button.addTarget(self, action: #selector(backNftButtonClicked), for: .touchUpInside)

@@ -272,9 +272,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             updateAvatar(url: avatarURL)
 
             myNFTsCount = profile.nfts.count
-            print("myNFTsCount:\(myNFTsCount)")
             myFavoritesCount = profile.likes.count
-            print("myNFTsCount:\(myFavoritesCount)")
             tableView.reloadData()
 
         } else {

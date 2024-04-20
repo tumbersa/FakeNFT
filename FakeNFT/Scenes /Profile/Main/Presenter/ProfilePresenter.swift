@@ -29,42 +29,40 @@ final class ProfilePresenter {
     private let profileService = ProfileService.shared
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
     weak var delegate: ProfilePresenterDelegate?
-    private(set) var userProfile: Profile?
+    private var profile: Profile?
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
     func updateUserProfile(with profile: Profile) {
         DispatchQueue.main.async { [weak self] in
-            self?.userProfile = profile
+            self?.profile = profile
             self?.view?.updateProfileDetails(profile)
         }
     }
 
     func didTapEditProfile() {
-        if let profile = userProfile {
+        if let profile = profile {
             delegate?.navigateToEditProfileScreen(profile: profile)
         }
     }
 
     func didTapFavoriteNFT() {
-        let nftID = userProfile?.nfts ?? []
-        let likedNFT = userProfile?.likes ?? []
+        let nftID = profile?.nfts ?? []
+        let likedNFT = profile?.likes ?? []
         delegate?.navigateToFavoriteNFTScreen(with: nftID, and: likedNFT)
     }
 
     func didTapMyNFT() {
-        let nftID = userProfile?.nfts ?? []
-        let likedNFT = userProfile?.likes ?? []
+        let nftID = profile?.nfts ?? []
+        let likedNFT = profile?.likes ?? []
         delegate?.navigateToMyNFTScreen(with: nftID, and: likedNFT)
     }
 
     func viewWillAppear() {
-        guard let profile = userProfile else {
             profileService.fetchProfile { [weak self] result in
                 switch result {
                 case .success(let profile):
-                    print("Профиль: \(profile)")
-                    self?.userProfile = profile
+                    self?.profile = profile
                     self?.view?.updateProfileDetails(profile)
                 case .failure(let error):
                     print("Failed to fetch profile: \(error)")
@@ -72,14 +70,12 @@ extension ProfilePresenter: ProfilePresenterProtocol {
             }
 
             return
-        }
-        view?.updateProfileDetails(profile)
     }
 }
 
 extension ProfilePresenter: EditProfilePresenterDelegate {
     func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
-        self.userProfile = profile
+        self.profile = profile
         view?.updateProfileDetails(profile)
     }
 }

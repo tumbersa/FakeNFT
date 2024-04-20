@@ -187,8 +187,6 @@ extension FavoriteNFTViewController: UICollectionViewDataSource,
 
 extension FavoriteNFTViewController: FavoriteNFTCellDelegate {
     func didTapLikeButton(in cell: FavoriteNFTCell) {
-        print("didTapLikeButton вызван")
-
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
 
         guard let like = presenter?.likes[indexPath.row] else { return }

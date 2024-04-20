@@ -13,11 +13,14 @@ final class ProfileService {
     private var token: String?
     private var urlSessionTask: URLSessionTask?
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
+    private (set) var profile: Profile?
 
     private init(
+        profile: Profile? = nil,
         token: String? = nil,
         urlSessionTask: URLSessionTask? = nil
     ) {
+        self.profile = profile
         self.token = token
         self.urlSessionTask = urlSessionTask
     }
@@ -26,15 +29,7 @@ final class ProfileService {
         self.fetchProfile { result in
             switch result {
             case .success(let profile):
-                let response = Profile(
-                    name: profile.name,
-                    avatar: profile.avatar,
-                    description: profile.description,
-                    website: profile.website,
-                    nfts: profile.nfts,
-                    likes: profile.likes,
-                    id: profile.id
-                )
+                self.profile = profile
             case .failure(let error):
                 fatalError("Error: \(error)")
             }
@@ -51,6 +46,16 @@ final class ProfileService {
         urlSessionTask = urlSession.objectTask(for: request) { (response: Result<Profile, Error>) in
             switch response {
             case .success(let profileResult):
+//                let profile = Profile(
+//                    name: profileResult.name,
+//                    avatar: profileResult.avatar,
+//                    description: profileResult.description,
+//                    website: profileResult.website,
+//                    nfts: profileResult.nfts,
+//                    likes: profileResult.likes,
+//                    id: profileResult.id
+//                )
+//                self?.profile = profile
                 completion(.success(profileResult))
             case .failure(let error):
                 completion(.failure(error))
@@ -73,7 +78,6 @@ private extension ProfileService {
         var request = URLRequest(url: url)
 
         request.httpMethod = "GET"
-        print(request)
 
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(tokenKey, forHTTPHeaderField: "X-Practicum-Mobile-Token")

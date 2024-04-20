@@ -259,7 +259,6 @@ extension MyNFTViewController: UITableViewDataSource {
 // MARK: - MyNFTCellDelegate
 extension MyNFTViewController: MyNFTCellDelegate {
     func didTapLikeButton(with nftID: String) {
-        print("Tapped like for NFT with id: \(nftID)")
         presenter?.tapLike(id: nftID)
 
         if let index = self.presenter?.nfts.firstIndex(where: { $0.id == nftID }) {

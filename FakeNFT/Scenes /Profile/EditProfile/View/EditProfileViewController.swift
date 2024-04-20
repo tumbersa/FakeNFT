@@ -22,26 +22,14 @@ protocol EditProfileViewControllerProtocol: AnyObject {
 
 // MARK: - EditProfileViewController Class
 final class EditProfileViewController: UIViewController {
-
-    var editProfile: Profile?
     var presenter: EditProfilePresenter?
-    private var updatedImage: String?
-//    weak var delegate: EditProfileViewControllerDelegate?
     weak var editProfilePresenterDelegate: EditProfilePresenterDelegate?
     private var newAvatarURL: String?
 
-    private var name: String
-    private var avatar: String?
-    private var descriptionText: String
-    private var website: String
-
-    init(editProfile: Profile?, presenter: EditProfilePresenter?) {
+    init(
+        presenter: EditProfilePresenter?
+    ) {
         self.presenter = presenter
-        self.editProfile = editProfile
-        self.name = editProfile?.name ?? ""
-        self.avatar = editProfile?.avatar ?? ""
-        self.descriptionText = editProfile?.description ?? ""
-        self.website = editProfile?.website ?? ""
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -265,8 +253,6 @@ private extension EditProfileViewController {
             action: #selector(handleTapGesture)
         )
         view.addGestureRecognizer(tapGesture)
-
-        updateUI()
     }
 
     func setupConstraints() {
@@ -322,9 +308,7 @@ private extension EditProfileViewController {
             website: website,
             newAvatarURL: newAvatarURL
         )
-//        if let avatarURL = newAvatarURL {
-//            delegate?.didUpdateAvatar(url: avatarURL)
-//        }
+
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -386,18 +370,6 @@ private extension EditProfileViewController {
         nameTextField.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
         siteTextField.resignFirstResponder()
-    }
-
-    func updateUI() {
-        nameTextField.text = name
-        descriptionTextView.text = descriptionText
-        siteTextField.text = website
-
-        guard let avatarURLString = avatar,
-              let avatarURL = URL(string: avatarURLString) else {
-            return
-        }
-        avatarImageView.kf.setImage(with: avatarURL)
     }
 }
 

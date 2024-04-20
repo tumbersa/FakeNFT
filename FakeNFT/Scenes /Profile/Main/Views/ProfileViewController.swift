@@ -273,7 +273,9 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             updateAvatar(url: avatarURL)
 
             myNFTsCount = profile.nfts.count
+            print("myNFTsCount:\(myNFTsCount)")
             myFavoritesCount = profile.likes.count
+            print("myNFTsCount:\(myFavoritesCount)")
             tableView.reloadData()
 
         } else {
@@ -293,7 +295,6 @@ extension ProfileViewController: ProfilePresenterDelegate {
     func navigateToEditProfileScreen() {
         let editProfileService = EditProfileService.shared
         let editProfileViewController = EditProfileViewController(
-            editProfile: profile,
             presenter: nil
         )
         editProfileViewController.editProfilePresenterDelegate = self

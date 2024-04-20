@@ -129,11 +129,6 @@ final class ProfileViewController: UIViewController {
         super.viewWillAppear(animated)
         presenter?.viewWillAppear()
     }
-
-//    func updateAvatarImage(_ url: String) {
-//        let urlString = URL(string: url)
-//        avatarImageView.kf.setImage(with: urlString)
-//    }
 }
 
 // MARK: - ProfileViewController Class

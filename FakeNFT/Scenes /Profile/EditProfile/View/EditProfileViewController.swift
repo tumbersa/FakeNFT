@@ -15,10 +15,9 @@ protocol EditProfileViewControllerProtocol: AnyObject {
     func hideLoading()
     func displayError(_ error: Error)
     func profileUpdateSuccessful()
-}
-
-protocol EditProfileViewControllerDelegate: AnyObject {
-    func didUpdateAvatar(url: String)
+    func convert(to profile: Profile)
+    func updateAvatar(url: URL,
+                      options: KingfisherOptionsInfo?)
 }
 
 // MARK: - EditProfileViewController Class
@@ -27,7 +26,7 @@ final class EditProfileViewController: UIViewController {
     var editProfile: Profile?
     var presenter: EditProfilePresenter?
     private var updatedImage: String?
-    weak var delegate: EditProfileViewControllerDelegate?
+//    weak var delegate: EditProfileViewControllerDelegate?
     weak var editProfilePresenterDelegate: EditProfilePresenterDelegate?
     private var newAvatarURL: String?
 
@@ -219,6 +218,7 @@ final class EditProfileViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
+        presenter?.viewDidLoad()
     }
 }
 
@@ -317,13 +317,14 @@ private extension EditProfileViewController {
         let description = descriptionTextView.text
         let website = siteTextField.text
         presenter?.updateProfile(
-            name: name, description: description,
+            name: name,
+            description: description,
             website: website,
             newAvatarURL: newAvatarURL
         )
-        if let avatarURL = newAvatarURL {
-            delegate?.didUpdateAvatar(url: avatarURL)
-        }
+//        if let avatarURL = newAvatarURL {
+//            delegate?.didUpdateAvatar(url: avatarURL)
+//        }
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -408,6 +409,27 @@ extension EditProfileViewController: UITextFieldDelegate, UITextViewDelegate {
 }
 
 extension EditProfileViewController: EditProfileViewControllerProtocol {
+    func convert(to profile: Profile) {
+        nameTextField.text = profile.name
+        descriptionTextView.text = profile.description
+        siteTextField.text = profile.website
+        if let avatarURLString = profile.avatar {
+            let avatarURL = URL(string: avatarURLString)
+            if let url = avatarURL {
+                updateAvatar(url: url, options: nil)
+            } else {
+                print("Avatar is nil")
+            }
+        }
+    }
+
+    func updateAvatar(url: URL, options: Kingfisher.KingfisherOptionsInfo?) {
+        avatarImageView.kf.indicatorType = .activity
+         avatarImageView.kf.setImage(
+             with: url,
+             options: options)
+    }
+
     func showLoading() {
         ProgressHUD.show()
     }

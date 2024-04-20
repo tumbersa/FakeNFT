@@ -20,7 +20,7 @@ protocol ProfilePresenterProtocol: AnyObject {
     func didTapMyNFT()
     func didTapFavoriteNFT()
     func didTapEditProfile()
-    func updateUserProfile(with profile: Profile, newAvatarURL: String?)
+    func updateUserProfile(with profile: Profile)
 }
 
 // MARK: - ProfilePresenter Class
@@ -33,13 +33,10 @@ final class ProfilePresenter {
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
-    func updateUserProfile(with profile: Profile, newAvatarURL: String?) {
+    func updateUserProfile(with profile: Profile) {
         DispatchQueue.main.async { [weak self] in
             self?.userProfile = profile
             self?.view?.updateProfileDetails(profile)
-            if let urlString = URL(string: newAvatarURL ?? "") {
-                self?.view?.updateAvatar(url: urlString)
-            }
         }
     }
 
@@ -60,8 +57,8 @@ extension ProfilePresenter: ProfilePresenterProtocol {
     }
 
     func viewWillAppear() {
-        guard let profile = profileService.profile else {
-            profileService.fetchProfile(tokenKey) { [weak self] result in
+        guard let profile = userProfile else {
+            profileService.fetchProfile { [weak self] result in
                 switch result {
                 case .success(let profile):
                     print("Профиль: \(profile)")
@@ -73,7 +70,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
 
             return
         }
-//        view?.updateProfileDetails(profile)
+        view?.updateProfileDetails(profile)
     }
 }
 
@@ -81,15 +78,5 @@ extension ProfilePresenter: EditProfilePresenterDelegate {
     func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
         self.userProfile = profile
         view?.updateProfileDetails(profile)
-    }
-}
-
-extension ProfilePresenter: EditProfileViewControllerDelegate {
-    func didUpdateAvatar(url: String) {
-        if let imageURL = URL(string: url) {
-            view?.updateAvatar(url: imageURL)
-        } else {
-            print("Invalid imageURL format")
-        }
     }
 }

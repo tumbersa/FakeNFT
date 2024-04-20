@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import ProgressHUD
 
 protocol EditProfilePresenterProtocol {
+    func viewDidLoad()
     func updateProfile(name: String?, description: String?, website: String?, newAvatarURL: String?)
 }
 
@@ -28,12 +30,19 @@ final class EditProfilePresenter {
 }
 
 extension EditProfilePresenter: EditProfilePresenterProtocol {
+    func viewDidLoad() {
+        ProgressHUD.show()
+        editProfileService.getProfile()
+        ProgressHUD.dismiss()
+    }
+
     func updateProfile(name: String?, description: String?, website: String?, newAvatarURL: String?) {
         view?.showLoading()
 
         let updatedProfile = EditProfileModel(
             name: name ?? "",
             description: description ?? "",
+            avatar: newAvatarURL ?? "",
             website: website ?? "",
             likes: nil
         )

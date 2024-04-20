@@ -9,12 +9,30 @@ import Foundation
 
 // MARK: - EditProfileService
 final class EditProfileService {
+    private weak var view: EditProfileViewControllerProtocol?
     static let shared = EditProfileService()
     private var urlSession = URLSession.shared
     private var urlSessionTask: URLSessionTask?
+    private let profileService = ProfileService.shared
 
-    private init(urlSessionTask: URLSessionTask? = nil) {
-        self.urlSessionTask = urlSessionTask
+    private init() {}
+
+    func setView(_ view: EditProfileViewControllerProtocol) {
+        self.view = view
+    }
+
+    func getProfile() {
+        profileService.fetchProfile { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let profile):
+                    print("Профиль на экране редактирования: \(profile)")
+                    self?.view?.convert(to: profile)
+                case .failure(let error):
+                    print("Failed to fetch profile: \(error)")
+                }
+            }
+        }
     }
 
     func updateProfile(with model: EditProfileModel, completion: @escaping (Result<Profile, Error>) -> Void) {
@@ -41,7 +59,6 @@ private extension EditProfileService {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
-//        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
         urlComponents.path = "/api/v1/profile/1"
 
         guard let url = urlComponents.url else {
@@ -53,8 +70,6 @@ private extension EditProfileService {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
-//        let profileData = "name=\(profile.name ?? "")&description=\(profile.description ?? "")&website=\(profile.website ?? "")&likes=\(profile.likes ?? [])"
-
         var profileData: String = ""
         for like in profile.likes ?? [] {
             profileData += "&likes=\(like)"
@@ -64,9 +79,9 @@ private extension EditProfileService {
             profileData += "&name=\(name)"
         }
 
-//        if let avatar = profile.avatar {
-//            profileData += "&avatar=\(avatar)"
-//        }
+        if let avatar = profile.avatar {
+            profileData += "&avatar=\(avatar)"
+        }
 
         if let description = profile.description {
             profileData += "&description=\(description)"

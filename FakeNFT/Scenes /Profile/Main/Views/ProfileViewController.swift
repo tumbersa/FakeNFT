@@ -130,18 +130,10 @@ final class ProfileViewController: UIViewController {
         presenter?.viewWillAppear()
     }
 
-    func updateAvatarImage(_ url: String) {
-        let urlString = URL(string: url)
-        avatarImageView.kf.setImage(with: urlString) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.presenter?.viewWillAppear()
-            case .failure(let error):
-                print("Error loading avatar: \(error)")
-            }
-        }
-    }
+//    func updateAvatarImage(_ url: String) {
+//        let urlString = URL(string: url)
+//        avatarImageView.kf.setImage(with: urlString)
+//    }
 }
 
 // MARK: - ProfileViewController Class
@@ -278,7 +270,8 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             nameLabel.text = profile.name
             descriptionLabel.text = profile.description
             siteLabel.text = profile.website
-            guard let avatarURLString = ProfileService.shared.profile?.avatar,
+
+            guard let avatarURLString = profile.avatar,
                   let avatarURL = URL(string: avatarURLString) else {
                 return
             }
@@ -305,11 +298,11 @@ extension ProfileViewController: ProfilePresenterDelegate {
     func navigateToEditProfileScreen() {
         let editProfileService = EditProfileService.shared
         let editProfileViewController = EditProfileViewController(
-            editProfile: profileService.profile,
+            editProfile: profile,
             presenter: nil
         )
-        editProfileViewController.delegate = self
         editProfileViewController.editProfilePresenterDelegate = self
+        editProfileService.setView(editProfileViewController)
         let editProfilePresenter = EditProfilePresenter(
             view: editProfileViewController,
             editProfileService: editProfileService
@@ -343,19 +336,8 @@ extension ProfileViewController: ProfilePresenterDelegate {
 extension ProfileViewController: EditProfilePresenterDelegate {
     func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
         DispatchQueue.main.async { [weak self] in
-            if let newAvatarURL = newAvatarURL {
-                self?.updateAvatarImage(newAvatarURL)
-
-            }
             self?.updateProfileDetails(profile)
-            self?.presenter?.updateUserProfile(with: profile, newAvatarURL: newAvatarURL)
+            self?.presenter?.updateUserProfile(with: profile)
         }
-    }
-}
-
-// MARK: - EditProfileViewControllerDelegate
-extension ProfileViewController: EditProfileViewControllerDelegate {
-    func didUpdateAvatar(url: String) {
-        self.updateAvatarImage(url)
     }
 }

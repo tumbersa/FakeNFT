@@ -79,6 +79,7 @@ private extension MyNFTPresenter {
         let model = EditProfileModel(
             name: nil,
             description: nil,
+            avatar: nil,
             website: nil,
             likes: likedNFT
         )

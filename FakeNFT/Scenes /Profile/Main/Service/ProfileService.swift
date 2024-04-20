@@ -25,8 +25,8 @@ final class ProfileService {
         self.urlSessionTask = urlSessionTask
     }
 
-    func fetchProfile(_ token: String) {
-        self.fetchProfile(token) { result in
+    func fetchProfile() {
+        self.fetchProfile { result in
             switch result {
             case .success(let profile):
                 self.profile = profile
@@ -36,8 +36,8 @@ final class ProfileService {
         }
     }
 
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        guard let request = makeFetchProfileRequest(token: token) else {
+    func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
+        guard let request = makeFetchProfileRequest() else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
             return
@@ -65,11 +65,10 @@ final class ProfileService {
 }
 
 private extension ProfileService {
-    func makeFetchProfileRequest(token: String) -> URLRequest? {
+    func makeFetchProfileRequest() -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
-//        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
         urlComponents.path = "/api/v1/profile/1"
 
         guard let url = urlComponents.url else {

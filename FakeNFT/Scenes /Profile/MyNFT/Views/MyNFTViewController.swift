@@ -25,6 +25,7 @@ final class MyNFTViewController: UIViewController {
     private var myNFTs: [NFT] = []
     private var nftID: [String]
     private var likedNFT: [String]
+    private let profileService = ProfileService.shared
     private let editProfileService = EditProfileService.shared
 
     init(nftID: [String], likedID: [String]) {

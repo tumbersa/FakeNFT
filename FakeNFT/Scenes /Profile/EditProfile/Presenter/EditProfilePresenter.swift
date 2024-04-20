@@ -20,20 +20,21 @@ protocol EditProfilePresenterDelegate: AnyObject {
 final class EditProfilePresenter {
     private weak var view: EditProfileViewControllerProtocol?
     private let editProfileService: EditProfileService
+    private var profile: Profile
     weak var delegate: EditProfilePresenterDelegate?
 
     init(view: EditProfileViewControllerProtocol,
-         editProfileService: EditProfileService) {
+         editProfileService: EditProfileService,
+         profile: Profile) {
         self.view = view
         self.editProfileService = editProfileService
+        self.profile = profile
     }
 }
 
 extension EditProfilePresenter: EditProfilePresenterProtocol {
     func viewDidLoad() {
-        ProgressHUD.show()
-        editProfileService.getProfile()
-        ProgressHUD.dismiss()
+        view?.setProfile(profile: profile)
     }
 
     func updateProfile(name: String?, description: String?, website: String?, newAvatarURL: String?) {

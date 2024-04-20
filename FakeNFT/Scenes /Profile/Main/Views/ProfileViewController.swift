@@ -27,7 +27,6 @@ final class ProfileViewController: UIViewController {
     private var avatarImage: UIImage?
 
     // MARK: - Private Properties
-    private var profile: Profile?
     private var myNFTsCount = 0
     private var myFavoritesCount = 0
 
@@ -292,7 +291,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 }
 
 extension ProfileViewController: ProfilePresenterDelegate {
-    func navigateToEditProfileScreen() {
+    func navigateToEditProfileScreen(profile: Profile) {
         let editProfileService = EditProfileService.shared
         let editProfileViewController = EditProfileViewController(
             presenter: nil
@@ -301,7 +300,7 @@ extension ProfileViewController: ProfilePresenterDelegate {
         editProfileService.setView(editProfileViewController)
         let editProfilePresenter = EditProfilePresenter(
             view: editProfileViewController,
-            editProfileService: editProfileService
+            editProfileService: editProfileService, profile: profile
         )
         editProfilePresenter.delegate = self
         editProfileViewController.presenter = editProfilePresenter

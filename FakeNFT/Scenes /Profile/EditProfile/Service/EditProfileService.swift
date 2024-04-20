@@ -21,20 +21,6 @@ final class EditProfileService {
         self.view = view
     }
 
-    func getProfile() {
-        profileService.fetchProfile { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let profile):
-                    print("Профиль на экране редактирования: \(profile)")
-                    self?.view?.convert(to: profile)
-                case .failure(let error):
-                    print("Failed to fetch profile: \(error)")
-                }
-            }
-        }
-    }
-
     func updateProfile(with model: EditProfileModel, completion: @escaping (Result<Profile, Error>) -> Void) {
 
         guard let request = makePutRequest(with: model) else {

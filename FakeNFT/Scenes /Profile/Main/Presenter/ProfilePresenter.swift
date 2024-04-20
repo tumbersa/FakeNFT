@@ -11,7 +11,7 @@ import UIKit
 protocol ProfilePresenterDelegate: AnyObject {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String])
     func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String])
-    func navigateToEditProfileScreen()
+    func navigateToEditProfileScreen(profile: Profile)
 }
 
 protocol ProfilePresenterProtocol: AnyObject {
@@ -41,18 +41,20 @@ extension ProfilePresenter: ProfilePresenterProtocol {
     }
 
     func didTapEditProfile() {
-        delegate?.navigateToEditProfileScreen()
+        if let profile = userProfile {
+            delegate?.navigateToEditProfileScreen(profile: profile)
+        }
     }
 
     func didTapFavoriteNFT() {
-        let nftID = profileService.profile?.nfts ?? []
-        let likedNFT = profileService.profile?.likes ?? []
+        let nftID = userProfile?.nfts ?? []
+        let likedNFT = userProfile?.likes ?? []
         delegate?.navigateToFavoriteNFTScreen(with: nftID, and: likedNFT)
     }
 
     func didTapMyNFT() {
-        let nftID = profileService.profile?.nfts ?? []
-        let likedNFT = profileService.profile?.likes ?? []
+        let nftID = userProfile?.nfts ?? []
+        let likedNFT = userProfile?.likes ?? []
         delegate?.navigateToMyNFTScreen(with: nftID, and: likedNFT)
     }
 
@@ -62,6 +64,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
                 switch result {
                 case .success(let profile):
                     print("Профиль: \(profile)")
+                    self?.userProfile = profile
                     self?.view?.updateProfileDetails(profile)
                 case .failure(let error):
                     print("Failed to fetch profile: \(error)")

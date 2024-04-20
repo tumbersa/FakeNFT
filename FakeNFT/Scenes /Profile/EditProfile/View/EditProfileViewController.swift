@@ -15,9 +15,8 @@ protocol EditProfileViewControllerProtocol: AnyObject {
     func hideLoading()
     func displayError(_ error: Error)
     func profileUpdateSuccessful()
-    func convert(to profile: Profile)
-    func updateAvatar(url: URL,
-                      options: KingfisherOptionsInfo?)
+    func setProfile(profile: Profile)
+    func updateAvatar(url: URL, options: Kingfisher.KingfisherOptionsInfo?)
 }
 
 // MARK: - EditProfileViewController Class
@@ -381,7 +380,7 @@ extension EditProfileViewController: UITextFieldDelegate, UITextViewDelegate {
 }
 
 extension EditProfileViewController: EditProfileViewControllerProtocol {
-    func convert(to profile: Profile) {
+    func setProfile(profile: Profile) {
         nameTextField.text = profile.name
         descriptionTextView.text = profile.description
         siteTextField.text = profile.website
@@ -397,9 +396,9 @@ extension EditProfileViewController: EditProfileViewControllerProtocol {
 
     func updateAvatar(url: URL, options: Kingfisher.KingfisherOptionsInfo?) {
         avatarImageView.kf.indicatorType = .activity
-         avatarImageView.kf.setImage(
-             with: url,
-             options: options)
+        avatarImageView.kf.setImage(
+            with: url,
+            options: options)
     }
 
     func showLoading() {

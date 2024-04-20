@@ -28,16 +28,8 @@ final class ProfileViewController: UIViewController {
 
     // MARK: - Private Properties
     private var profile: Profile?
-    private let tableViewLabels: [String] = [
-        L10n.Profile.myNFT,
-        L10n.Profile.favoritesNFT,
-        L10n.Profile.aboutDeveloper
-    ]
-    private lazy var value: [String?] = [
-        "\(profile?.nfts.count ?? 0)",
-        "\(profile?.likes.count ?? 0)",
-        nil
-    ]
+    private var myNFTsCount = 0
+    private var myFavoritesCount = 0
 
     // MARK: - UI
     private lazy var editButton: UIBarButtonItem = {
@@ -219,8 +211,13 @@ private extension ProfileViewController {
 
 // MARK: - UITableViewDataSource
 extension ProfileViewController: UITableViewDataSource {
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tableViewLabels.count
+        return 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -231,12 +228,21 @@ extension ProfileViewController: UITableViewDataSource {
             fatalError("Could not cast to ProfileCell")
         }
 
-        let label = tableViewLabels[indexPath.row]
+        let myNFTLabel = L10n.Profile.myNFT
+        let favoriteNFTlabel = L10n.Profile.favoritesNFT
+        let aboutDeveloperLabel = L10n.Profile.aboutDeveloper
 
-        cell.configureCell(
-            label: label,
-            value: value[indexPath.row]
-        )
+        switch indexPath.section {
+        case 0:
+            cell.configureText(label: "\(myNFTLabel) (\(myNFTsCount))")
+        case 1:
+            cell.configureText(label: "\(favoriteNFTlabel) (\(myFavoritesCount))")
+        case 2:
+            cell.configureText(label: "\(aboutDeveloperLabel)")
+        default:
+            break
+        }
+
         cell.selectionStyle = .none
 
         return cell
@@ -250,7 +256,7 @@ extension ProfileViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ProfileViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.row {
+        switch indexPath.section {
         case 0:
             presenter?.didTapMyNFT()
         case 1:
@@ -278,21 +284,16 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             }
             updateAvatar(url: avatarURL)
 
-            let myNFTsCount = profile.nfts.count
-            let likesCount = profile.likes.count
+            myNFTsCount = profile.nfts.count
+            myFavoritesCount = profile.likes.count
+            tableView.reloadData()
 
-            let myNFTs = tableView.cellForRow(at: [0, 0]) as? ProfileCell
-            myNFTs?.configureCell(label: nil, value: "(\(String(myNFTsCount)))")
-
-            let myFavorites = tableView.cellForRow(at: [0, 1]) as? ProfileCell
-            myFavorites?.configureCell(label: nil, value: "(\(String(likesCount)))")
         } else {
             nameLabel.text = ""
             descriptionLabel.text = ""
             siteLabel.text = ""
             avatarImageView.image = UIImage()
         }
-
     }
 
     func updateAvatar(url: URL) {
@@ -356,12 +357,5 @@ extension ProfileViewController: EditProfilePresenterDelegate {
 extension ProfileViewController: EditProfileViewControllerDelegate {
     func didUpdateAvatar(url: String) {
         self.updateAvatarImage(url)
-    }
-}
-
-extension ProfileViewController: MyNFTLikesDelegate {
-    func didUpdateLikedNFTCount(_ count: Int) {
-        let myFavorites = tableView.cellForRow(at: [0, 1]) as? ProfileCell
-        myFavorites?.configureCell(label: nil, value: "\(count)")
     }
 }

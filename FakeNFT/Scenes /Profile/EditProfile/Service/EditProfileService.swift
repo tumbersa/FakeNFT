@@ -53,7 +53,29 @@ private extension EditProfileService {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("6209b976-c7aa-4061-8574-573765a55e71", forHTTPHeaderField: "X-Practicum-Mobile-Token")
 
-        let profileData = "name=\(profile.name ?? "")&description=\(profile.description ?? "")&website=\(profile.website ?? "")"
+//        let profileData = "name=\(profile.name ?? "")&description=\(profile.description ?? "")&website=\(profile.website ?? "")&likes=\(profile.likes ?? [])"
+
+        var profileData: String = ""
+        for like in profile.likes ?? [] {
+            profileData += "&likes=\(like)"
+        }
+
+        if let name = profile.name {
+            profileData += "&name=\(name)"
+        }
+
+//        if let avatar = profile.avatar {
+//            profileData += "&avatar=\(avatar)"
+//        }
+
+        if let description = profile.description {
+            profileData += "&description=\(description)"
+        }
+
+        if let website = profile.website {
+            profileData += "&website=\(website)"
+        }
+
         request.httpBody = profileData.data(using: .utf8)
 
         return request

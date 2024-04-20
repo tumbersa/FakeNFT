@@ -209,10 +209,6 @@ extension FavoriteNFTViewController: FavoriteNFTViewControllerProtocol {
             return
         }
 
-        //        for like in likes {
-        //            presenter.likes.append(like)
-        //        }
-
         presenter.likes = likes
 
         DispatchQueue.main.async {

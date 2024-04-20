@@ -43,6 +43,7 @@ extension EditProfilePresenter: EditProfilePresenterProtocol {
                 case .success(let profile):
                     self?.delegate?.profileDidUpdate(profile, newAvatarURL: newAvatarURL)
                     self?.view?.profileUpdateSuccessful()
+                    self?.view?.hideLoading()
                 case .failure(let error):
                     self?.view?.displayError(error)
                     self?.view?.hideLoading()

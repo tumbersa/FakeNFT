@@ -73,7 +73,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
 
             return
         }
-        view?.updateProfileDetails(profile)
+//        view?.updateProfileDetails(profile)
     }
 }
 

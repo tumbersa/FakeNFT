@@ -157,9 +157,6 @@ private extension FavoriteNFTCell {
     // MARK: - Actions
     @objc func likeButtonDidTap() {
         print("Like button on Favorite NFT Sceen tapped")
-        if let id = id {
             delegate?.didTapLikeButton(in: self)
-
-        }
     }
 }

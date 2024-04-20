@@ -87,7 +87,6 @@ private extension MyNFTPresenter {
             switch result {
             case .success:
                 print("Успешно")
-                self.likesDelegate?.didUpdateLikedNFTCount(self.likedNFT.count)
             case .failure(let error):
                 print("\(error.localizedDescription)")
             }

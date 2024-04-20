@@ -79,6 +79,7 @@ private extension ProfileService {
         var request = URLRequest(url: url)
 
         request.httpMethod = "GET"
+        print(request)
 
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(tokenKey, forHTTPHeaderField: "X-Practicum-Mobile-Token")

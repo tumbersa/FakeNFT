@@ -1,18 +1,40 @@
 //
-//  EditProfileView.swift
+//  EditProfileViewController.swift
 //  FakeNFT
 //
 //  Created by Dinara on 24.03.2024.
 //
 
+import Kingfisher
 import SnapKit
+import ProgressHUD
 import UIKit
 
-// MARK: - EditProfileView UIView
-final class EditProfileView: UIView {
-    // MARK: - Properties
-    private var viewController: EditProfileViewController
-    private let presenter: ProfilePresenterProtocol
+protocol EditProfileViewControllerProtocol: AnyObject {
+    func showLoading()
+    func hideLoading()
+    func displayError(_ error: Error)
+    func profileUpdateSuccessful()
+    func setProfile(profile: Profile)
+    func updateAvatar(url: URL, options: Kingfisher.KingfisherOptionsInfo?)
+}
+
+// MARK: - EditProfileViewController Class
+final class EditProfileViewController: UIViewController {
+    var presenter: EditProfilePresenter?
+    weak var editProfilePresenterDelegate: EditProfilePresenterDelegate?
+    private var newAvatarURL: String?
+
+    init(
+        presenter: EditProfilePresenter?
+    ) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - UI
     private lazy var closeButton: UIButton = {
@@ -31,9 +53,9 @@ final class EditProfileView: UIView {
         label.textAlignment = .center
         label.numberOfLines = 2
         label.lineBreakMode = .byWordWrapping
-        let action = UIGestureRecognizer(
+        let action = UITapGestureRecognizer(
             target: self,
-            action: #selector(changeImageDidTap)
+            action: #selector(changeImageDidTap(_:))
         )
         label.addGestureRecognizer(action)
         label.isUserInteractionEnabled = true
@@ -42,8 +64,6 @@ final class EditProfileView: UIView {
 
     private lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "avatar_icon")
-        // заменить моковые данные
         imageView.layer.cornerRadius = 35
         imageView.contentMode = .scaleAspectFill
         imageView.layer.masksToBounds = true
@@ -56,6 +76,7 @@ final class EditProfileView: UIView {
         label.textColor = UIColor(named: "ypUniBlack")
         label.text = L10n.Profile.loadAvatar
         label.textAlignment = .center
+        label.isHidden = true
         return label
     }()
 
@@ -79,8 +100,6 @@ final class EditProfileView: UIView {
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor(named: "ypUniBlack")
         textField.backgroundColor = UIColor(named: "ypLightGray")
-        textField.text = "Joaquin Phoenix"
-        // заменить моковые данные
         textField.layer.cornerRadius = 12
         textField.layer.masksToBounds = true
         textField.clearButtonMode = .whileEditing
@@ -118,8 +137,6 @@ final class EditProfileView: UIView {
         textView.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textView.textColor = UIColor(named: "ypUniBlack")
         textView.backgroundColor = UIColor(named: "ypLightGray")
-        textView.text = "Дизайнер из Казани, люблю цифровое искусство и бейглы. В моей коллекции уже 100+ NFT, и еще больше — на моём сайте. Открыт к коллаборациям."
-        // заменить моковые данные
         textView.layer.cornerRadius = 12
         textView.layer.masksToBounds = true
         textView.textContainerInset = UIEdgeInsets(
@@ -152,8 +169,6 @@ final class EditProfileView: UIView {
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.textColor = UIColor(named: "ypUniBlack")
         textField.backgroundColor = UIColor(named: "ypLightGray")
-        textField.text = "Joaquin Phoenix.com"
-        // заменить моковые данные
         textField.layer.cornerRadius = 12
         textField.layer.masksToBounds = true
         textField.clearButtonMode = .whileEditing
@@ -185,29 +200,18 @@ final class EditProfileView: UIView {
         return stackView
     }()
 
-    // MARK: - Init
-    init(
-        frame: CGRect,
-        viewController: EditProfileViewController,
-        presenter: ProfilePresenterProtocol
-    ) {
-        self.viewController = viewController
-        self.presenter = presenter
-        super.init(frame: frame)
-
+    // MARK: - LifeCycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
         setupViews()
         setupConstraints()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        presenter?.viewDidLoad()
     }
 }
 
-private extension EditProfileView {
-    // MARK: - Setup Views
+private extension EditProfileViewController {
     func setupViews() {
-        self.backgroundColor = .systemBackground
+        view.backgroundColor = .systemBackground
 
         [nameLabel,
          nameTextField
@@ -240,17 +244,16 @@ private extension EditProfileView {
          loadAvatarLabel,
          generalStackView
         ].forEach {
-            self.addSubview($0)
+            view.addSubview($0)
         }
 
         let tapGesture = UITapGestureRecognizer(
             target: self,
             action: #selector(handleTapGesture)
         )
-        self.addGestureRecognizer(tapGesture)
+        view.addGestureRecognizer(tapGesture)
     }
 
-    // MARK: - Setup Constraints
     func setupConstraints() {
         closeButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(23)
@@ -295,24 +298,122 @@ private extension EditProfileView {
 
     // MARK: - Actions
     @objc func closeButtonDidTap() {
-        print("Close button did tap")
+        let name = nameTextField.text
+        let description = descriptionTextView.text
+        let website = siteTextField.text
+        presenter?.updateProfile(
+            name: name,
+            description: description,
+            website: website,
+            newAvatarURL: newAvatarURL
+        )
+
+        self.dismiss(animated: true, completion: nil)
     }
 
-    @objc func changeImageDidTap() {
-        print("Change image did tap")
+    @objc func changeImageDidTap(_ sender: UITapGestureRecognizer) {
+        loadAvatarLabel.isHidden = false
+
+        let alert = UIAlertController(
+            title: L10n.Profile.loadImage,
+            message: L10n.Profile.linkToImage,
+            preferredStyle: .alert
+        )
+
+        alert.addTextField { textField in
+            textField.placeholder = L10n.Profile.placeLink
+        }
+
+        alert.addAction(
+            UIAlertAction(
+                title: "ОK",
+                style: .default) { [weak self] _ in
+                    guard
+                    let self = self,
+                    let textField = alert.textFields?[0],
+                    let URL = textField.text
+                else { return }
+
+                if validateURLFormat(urlString: URL) {
+                    self.loadAvatarLabel.text = URL
+                    self.newAvatarURL = URL
+                } else {
+                    let wrongURL = UIAlertController(
+                        title: L10n.Profile.invalidLink,
+                        message: L10n.Profile.checkLink,
+                        preferredStyle: .alert)
+                    wrongURL.addAction(
+                        UIAlertAction(
+                            title: "ОK",
+                            style: .cancel
+                        ) { _ in
+                            wrongURL.dismiss(animated: true)
+                        }
+                    )
+                    self.present(wrongURL, animated: true)
+                }
+                alert.dismiss(animated: true)
+            }
+        )
+        self.present(alert, animated: true)
+    }
+
+    private func validateURLFormat(urlString: String?) -> Bool {
+        guard
+            let urlString = urlString,
+            let url = NSURL(string: urlString) else { return false }
+        return UIApplication.shared.canOpenURL(url as URL)
     }
 
     @objc func handleTapGesture() {
-        print("Tap Gesture did tap")
         nameTextField.resignFirstResponder()
         descriptionTextView.resignFirstResponder()
         siteTextField.resignFirstResponder()
     }
 }
 
-extension EditProfileView: UITextFieldDelegate, UITextViewDelegate {
+extension EditProfileViewController: UITextFieldDelegate, UITextViewDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension EditProfileViewController: EditProfileViewControllerProtocol {
+    func setProfile(profile: Profile) {
+        nameTextField.text = profile.name
+        descriptionTextView.text = profile.description
+        siteTextField.text = profile.website
+        if let avatarURLString = profile.avatar {
+            let avatarURL = URL(string: avatarURLString)
+            if let url = avatarURL {
+                updateAvatar(url: url, options: nil)
+            } else {
+                print("Avatar is nil")
+            }
+        }
+    }
+
+    func updateAvatar(url: URL, options: Kingfisher.KingfisherOptionsInfo?) {
+        avatarImageView.kf.indicatorType = .activity
+        avatarImageView.kf.setImage(
+            with: url,
+            options: options)
+    }
+
+    func showLoading() {
+        ProgressHUD.show()
+    }
+
+    func hideLoading() {
+        ProgressHUD.dismiss()
+    }
+
+    func displayError(_ error: Error) {
+        ProgressHUD.showError("\(error.localizedDescription)")
+    }
+
+    func profileUpdateSuccessful() {
+        ProgressHUD.showSucceed("Профиль успешно обновлен", delay: 2.0)
     }
 }

@@ -9,11 +9,11 @@ import Foundation
 
 final class ProfileService {
     static let shared = ProfileService()
-    private(set) var profile: Profile?
     private var urlSession = URLSession.shared
     private var token: String?
     private var urlSessionTask: URLSessionTask?
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
+    private (set) var profile: Profile?
 
     private init(
         profile: Profile? = nil,
@@ -25,8 +25,8 @@ final class ProfileService {
         self.urlSessionTask = urlSessionTask
     }
 
-    func fetchProfile(_ token: String) {
-        self.fetchProfile(token) { result in
+    func fetchProfile() {
+        self.fetchProfile { result in
             switch result {
             case .success(let profile):
                 self.profile = profile
@@ -36,27 +36,17 @@ final class ProfileService {
         }
     }
 
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        guard let request = makeFetchProfileRequest(token: token) else {
+    func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
+        guard let request = makeFetchProfileRequest() else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
 
-        urlSessionTask = urlSession.objectTask(for: request) { [weak self] (response: Result<Profile, Error>) in
+        urlSessionTask = urlSession.objectTask(for: request) { (response: Result<Profile, Error>) in
             switch response {
             case .success(let profileResult):
-                let profile = Profile(
-                    name: profileResult.name,
-                    avatar: profileResult.avatar,
-                    description: profileResult.description,
-                    website: profileResult.website,
-                    nfts: profileResult.nfts,
-                    likes: profileResult.likes,
-                    id: profileResult.id
-                )
-                self?.profile = profile
-                completion(.success(profile))
+                completion(.success(profileResult))
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -65,10 +55,10 @@ final class ProfileService {
 }
 
 private extension ProfileService {
-    func makeFetchProfileRequest(token: String) -> URLRequest? {
+    func makeFetchProfileRequest() -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host  = "64858e8ba795d24810b71189.mockapi.io"
+        urlComponents.host  = "d5dn3j2ouj72b0ejucbl.apigw.yandexcloud.net"
         urlComponents.path = "/api/v1/profile/1"
 
         guard let url = urlComponents.url else {
@@ -79,8 +69,8 @@ private extension ProfileService {
 
         request.httpMethod = "GET"
 
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(tokenKey, forHTTPHeaderField: "X-Practicum-Mobile-Token")
         return request
     }
 }

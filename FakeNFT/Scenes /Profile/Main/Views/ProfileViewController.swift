@@ -10,8 +10,8 @@ import SnapKit
 import UIKit
 
 // MARK: - ProfileViewControllerProtocol
-public protocol ProfileViewControllerProtocol: AnyObject {
-    var presenter: ProfilePresenterProtocol? { get set }
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenter? { get set }
     func updateProfileDetails(_ profile: Profile?)
     func updateAvatar(url: URL)
 }
@@ -21,20 +21,14 @@ final class ProfileViewController: UIViewController {
 
     // MARK: - Public Properties
     let servicesAssembly: ServicesAssembly
-    var presenter: ProfilePresenterProtocol?
+    var presenter: ProfilePresenter?
+    weak var delegate: ProfilePresenterDelegate?
+    private let profileService = ProfileService.shared
+    private var avatarImage: UIImage?
 
     // MARK: - Private Properties
-    private var profile: Profile?
-    private let tableViewLabels: [String] = [
-        L10n.Profile.myNFT,
-        L10n.Profile.favoritesNFT,
-        L10n.Profile.aboutDeveloper
-    ]
-    private lazy var value: [String?] = [
-        "\(profile?.nfts.count ?? 0)",
-        "\(profile?.likes.count ?? 0)",
-        nil
-    ]
+    private var myNFTsCount = 0
+    private var myFavoritesCount = 0
 
     // MARK: - UI
     private lazy var editButton: UIBarButtonItem = {
@@ -126,6 +120,8 @@ final class ProfileViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
+        delegate = self
+        presenter?.delegate = self
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -195,23 +191,19 @@ private extension ProfileViewController {
 
     // MARK: - Actions
     @objc func editBarButtonTapped() {
-        print("editBarButton Did Tap")
-        if let presenter = presenter {
-            let editProfileViewController = EditProfileViewController(
-                presenter: presenter
-            )
-            editProfileViewController.modalPresentationStyle = .popover
-            self.present(editProfileViewController, animated: true)
-        } else {
-            print("Presenter is nil")
-        }
+        presenter?.didTapEditProfile()
     }
 }
 
 // MARK: - UITableViewDataSource
 extension ProfileViewController: UITableViewDataSource {
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tableViewLabels.count
+        return 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -222,12 +214,21 @@ extension ProfileViewController: UITableViewDataSource {
             fatalError("Could not cast to ProfileCell")
         }
 
-        let label = tableViewLabels[indexPath.row]
+        let myNFTLabel = L10n.Profile.myNFT
+        let favoriteNFTlabel = L10n.Profile.favoritesNFT
+        let aboutDeveloperLabel = L10n.Profile.aboutDeveloper
 
-        cell.configureCell(
-            label: label,
-            value: value[indexPath.row]
-        )
+        switch indexPath.section {
+        case 0:
+            cell.configureText(label: "\(myNFTLabel) (\(myNFTsCount))")
+        case 1:
+            cell.configureText(label: "\(favoriteNFTlabel) (\(myFavoritesCount))")
+        case 2:
+            cell.configureText(label: "\(aboutDeveloperLabel)")
+        default:
+            break
+        }
+
         cell.selectionStyle = .none
 
         return cell
@@ -241,20 +242,14 @@ extension ProfileViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ProfileViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.row {
+        switch indexPath.section {
         case 0:
-            print("My NFTs cell did tap")
-            let viewController = MyNFTViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(viewController, animated: true)
+            presenter?.didTapMyNFT()
         case 1:
-            print("My Favourite NFTs cell did tap")
-            let viewController = FavoriteNFTViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(viewController, animated: true)
+            presenter?.didTapFavoriteNFT()
         case 2:
-            print("About Developer cell did tap")
             let viewController = AboutDeveloperViewController()
+            viewController.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController, animated: true)
         default:
             break
@@ -269,16 +264,17 @@ extension ProfileViewController: ProfileViewControllerProtocol {
             nameLabel.text = profile.name
             descriptionLabel.text = profile.description
             siteLabel.text = profile.website
-            guard let avatarURLString = ProfileService.shared.profile?.avatar,
+
+            guard let avatarURLString = profile.avatar,
                   let avatarURL = URL(string: avatarURLString) else {
                 return
             }
             updateAvatar(url: avatarURL)
-            let myNFTs = tableView.cellForRow(at: [0, 0]) as? ProfileCell
-            myNFTs?.configureCell(label: nil, value: "(\(String(profile.nfts.count)))")
 
-            let myFavorites = tableView.cellForRow(at: [0, 1]) as? ProfileCell
-            myFavorites?.configureCell(label: nil, value: "(\(String(profile.likes.count)))")
+            myNFTsCount = profile.nfts.count
+            myFavoritesCount = profile.likes.count
+            tableView.reloadData()
+
         } else {
             nameLabel.text = ""
             descriptionLabel.text = ""
@@ -288,6 +284,53 @@ extension ProfileViewController: ProfileViewControllerProtocol {
     }
 
     func updateAvatar(url: URL) {
-        avatarImageView.kf.setImage(with: url)
+        avatarImageView.kf.setImage(with: url, options: [.forceRefresh])
+    }
+}
+
+extension ProfileViewController: ProfilePresenterDelegate {
+    func navigateToEditProfileScreen(profile: Profile) {
+        let editProfileService = EditProfileService.shared
+        let editProfileViewController = EditProfileViewController(
+            presenter: nil
+        )
+        editProfileViewController.editProfilePresenterDelegate = self
+        editProfileService.setView(editProfileViewController)
+        let editProfilePresenter = EditProfilePresenter(
+            view: editProfileViewController,
+            editProfileService: editProfileService, profile: profile
+        )
+        editProfilePresenter.delegate = self
+        editProfileViewController.presenter = editProfilePresenter
+        editProfileViewController.modalPresentationStyle = .popover
+        self.present(editProfileViewController, animated: true)
+    }
+
+    func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String]) {
+        let favoriteNFTViewController = FavoriteNFTViewController(nftID: nftID, likedID: likedNFT)
+        favoriteNFTViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(
+            favoriteNFTViewController,
+            animated: true
+        )
+    }
+
+    func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String]) {
+        let myNFTViewController = MyNFTViewController(nftID: nftID, likedID: likedNFT)
+        myNFTViewController.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(
+            myNFTViewController,
+            animated: true
+        )
+    }
+}
+
+// MARK: - EditProfilePresenterDelegate
+extension ProfileViewController: EditProfilePresenterDelegate {
+    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.updateProfileDetails(profile)
+            self?.presenter?.updateUserProfile(with: profile)
+        }
     }
 }

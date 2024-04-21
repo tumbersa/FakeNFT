@@ -5,8 +5,13 @@
 //  Created by Dinara on 30.03.2024.
 //
 
+import Kingfisher
 import SnapKit
 import UIKit
+
+protocol FavoriteNFTCellDelegate: AnyObject {
+    func didTapLikeButton(in cell: FavoriteNFTCell)
+}
 
 final class FavoriteNFTCell: UICollectionViewCell {
     // MARK: - Public properties
@@ -15,8 +20,8 @@ final class FavoriteNFTCell: UICollectionViewCell {
     // MARK: - Private Properties
     private var id: String?
 
-    // моковое значение лайка
-    private var isLiked: Bool = false
+    // MARK: - Delegate
+    weak var delegate: FavoriteNFTCellDelegate?
 
     // MARK: - UI
     private lazy var image: UIImageView = {
@@ -28,10 +33,6 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var favoriteButton: UIButton = {
         let button = UIButton()
-        button.setImage(
-            UIImage(named: "favorite_button_inactive"),
-            for: .normal
-        )
         button.addTarget(
             self,
             action: #selector(likeButtonDidTap),
@@ -41,8 +42,9 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var name: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.boldSystemFont(ofSize: 15)
         label.textColor = UIColor(named: "ypBlack")
+        label.numberOfLines = 0
         return label
     }()
 
@@ -53,7 +55,7 @@ final class FavoriteNFTCell: UICollectionViewCell {
 
     private lazy var priceValue: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = UIColor(named: "ypBlack")
         return label
     }()
@@ -79,8 +81,14 @@ final class FavoriteNFTCell: UICollectionViewCell {
     }
 
     // MARK: - Public Method
-    func configureCell(with model: NFTCellModel) {
-        image.image = model.images
+    func configureCell(with model: NFT) {
+        if let imageURLString = model.images.first,
+           let imageURL = URL(string: imageURLString) {
+            image.kf.setImage(with: imageURL)
+        } else {
+            image.image = UIImage(named: "avatar_icon")
+        }
+
         name.text = model.name
         ratingView.setRating(model.rating)
         let stringFromNumber = String(format: "%.2f", model.price)
@@ -113,7 +121,7 @@ private extension FavoriteNFTCell {
          favoriteButton,
          stackView
         ].forEach {
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
     }
 
@@ -136,7 +144,8 @@ private extension FavoriteNFTCell {
         stackView.snp.makeConstraints { make in
             make.centerY.equalTo(image.snp.centerY)
             make.leading.equalTo(image.snp.trailing).offset(12)
-            // make.bottom.equalTo(image.snp.bottom).offset(-7)
+            make.width.equalTo(76)
+            make.height.equalTo(66)
         }
 
         ratingView.snp.makeConstraints { make in
@@ -147,7 +156,6 @@ private extension FavoriteNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-        print("Favorite button did tap")
-        setIsLikedNFT(isLiked)
+            delegate?.didTapLikeButton(in: self)
     }
 }

@@ -8,32 +8,35 @@
 import SnapKit
 import UIKit
 
+protocol MyNFTLikesDelegate: AnyObject {
+    func didUpdateLikedNFTCount(_ count: Int)
+}
+
+protocol MyNFTViewControllerProtocol: AnyObject {
+    var presenter: MyNFTPresenter? { get set }
+    func updateMyNFTs(_ nfts: [NFT]?)
+}
+
 // MARK: - MyNFT ViewController
 final class MyNFTViewController: UIViewController {
 
     // MARK: - Private Properties
-    private var myNFTs = [
-        NFTCellModel(
-            name: "Lilo",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 3,
-            price: 1.78,
-            author: "John Doe",
-            id: "1"
-        ),
-        NFTCellModel(
-            name: "Stich",
-            images: UIImage(named: "nft_icon") ?? UIImage(),
-            rating: 5,
-            price: 2.55,
-            author: "John Doe",
-            id: "1"
-        )
-    ]
+    var presenter: MyNFTPresenter?
+    private var myNFTs: [NFT] = []
+    private var nftID: [String]
+    private var likedNFT: [String]
+    private let profileService = ProfileService.shared
+    private let editProfileService = EditProfileService.shared
 
-    // private var myNFTs = [NFTCellModel]()
-    // закомментируйте favoriteNFTS с моковыми данными
-    // и раскомментируйте строку выше для проверки верстки экрана отсутствия Моих NFT
+    init(nftID: [String], likedID: [String]) {
+        self.nftID = nftID
+        self.likedNFT = likedID
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - UI
     private lazy var navBackButton: UIBarButtonItem = {
@@ -86,15 +89,17 @@ final class MyNFTViewController: UIViewController {
         setupNavigation()
         setupViews()
         setupConstraints()
-        updateEmptyView()
+
+        presenter = MyNFTPresenter(nftID: self.nftID, likedNFT: self.likedNFT, editProfileService: editProfileService)
+        presenter?.view = self
+        presenter?.viewDidLoad()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         if let sortType = UserDefaults.standard.data(forKey: "sortType") {
             let type = try? PropertyListDecoder().decode(Filter.self, from: sortType)
-            self.myNFTs = applySortType(by: type ?? .rating)
+            presenter?.nfts = applySortType(by: type ?? .rating)
             tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
     }
@@ -141,8 +146,10 @@ private extension MyNFTViewController {
         UserDefaults.standard.set(type, forKey: "sortType")
     }
 
-    func applySortType(by type: Filter) -> [NFTCellModel] {
-        let nfts = myNFTs
+    func applySortType(by type: Filter) -> [NFT] {
+        guard let nfts = presenter?.nfts else {
+            return []
+        }
 
         switch type {
         case .name:
@@ -155,8 +162,6 @@ private extension MyNFTViewController {
     }
 
     @objc func filterButtonDidTap() {
-        print("Filter button did tap")
-
         let alert = UIAlertController(
             title: nil,
             message: L10n.Profile.filter,
@@ -167,7 +172,7 @@ private extension MyNFTViewController {
             title: L10n.Profile.byPrice,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .price) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .price) ?? []
             self?.saveSortType(type: .price)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
@@ -176,7 +181,7 @@ private extension MyNFTViewController {
             title: L10n.Profile.byRaiting,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .rating) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .rating) ?? []
             self?.saveSortType(type: .rating)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
@@ -185,7 +190,7 @@ private extension MyNFTViewController {
             title: L10n.Profile.byName,
             style: .default
         ) { [weak self] _ in
-            self?.myNFTs = self?.applySortType(by: .name) ?? []
+            self?.presenter?.nfts = self?.applySortType(by: .name) ?? []
             self?.saveSortType(type: .name)
             self?.tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
         }
@@ -202,23 +207,29 @@ private extension MyNFTViewController {
 
         present(alert, animated: true)
     }
-
-    func updateEmptyView() {
-        if myNFTs.isEmpty {
-            self.emptyLabel.isHidden = false
-            tableView.isHidden = true
-            navigationItem.title = ""
-            filterButton.image = nil
-        } else {
-            emptyLabel.isHidden = true
-        }
-    }
 }
 
 // MARK: - UITableViewDataSource
 extension MyNFTViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return myNFTs.count
+
+        if let presenter = presenter {
+            if presenter.nfts.isEmpty {
+                emptyLabel.isHidden = false
+                tableView.isHidden = true
+                navigationItem.title = ""
+                filterButton.image = nil
+            } else {
+                emptyLabel.isHidden = true
+                tableView.isHidden = false
+                navigationItem.title = L10n.Profile.myNFT
+                filterButton.image = UIImage(named: "filter_button_icon")
+            }
+        } else {
+            print("presenter is nil")
+        }
+
+        return presenter?.nfts.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -228,14 +239,59 @@ extension MyNFTViewController: UITableViewDataSource {
         ) as? MyNFTCell else {
             fatalError("Could not cast to MyNFTCell")
         }
-        let nft = myNFTs[indexPath.row]
+
+        guard let nft = presenter?.nfts[indexPath.row] else {
+            return UITableViewCell()
+        }
+
+        cell.delegate = self
         cell.configureCell(with: nft)
+
+        let isLiked = presenter?.isLiked(id: nft.id) ?? true
+        cell.setIsLiked(isLiked: isLiked)
+
         cell.selectionStyle = .none
 
         return cell
     }
 }
 
+// MARK: - MyNFTCellDelegate
+extension MyNFTViewController: MyNFTCellDelegate {
+    func didTapLikeButton(with nftID: String) {
+        presenter?.tapLike(id: nftID)
+
+        if let index = self.presenter?.nfts.firstIndex(where: { $0.id == nftID }) {
+            let indexPath = IndexPath(row: index, section: 0)
+
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+    }
+}
+
 // MARK: - UITableViewDelegate
 extension MyNFTViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 140
+    }
+}
+
+extension MyNFTViewController: MyNFTViewControllerProtocol {
+    func updateMyNFTs(_ nfts: [NFT]?) {
+        guard let presenter = presenter else {
+            print("Presenter is nil")
+            return
+        }
+
+        guard let nfts = nfts else {
+            print("Received nil NFTs")
+            return
+        }
+
+        presenter.nfts = nfts
+
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
 }

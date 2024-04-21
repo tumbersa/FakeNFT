@@ -62,6 +62,16 @@ internal enum L10n {
         internal static let byRaiting = L10n.tr("Localizable", "Profile.byRaiting", fallback: "По рейтингу")
         /// Закрыть
         internal static let close = L10n.tr("Localizable", "Profile.close", fallback: "Закрыть")
+        /// Загрузить изображение
+        internal static let loadImage = L10n.tr("Localizable", "Profile.loadImage", fallback: "Загрузить изображение")
+        /// Вставьте ссылку на изображение
+        internal static let linkToImage = L10n.tr("Localizable", "Profile.linkToImage", fallback: "Вставьте ссылку на изображение")
+        /// Вставьте ссылку:
+        internal static let placeLink = L10n.tr("Localizable", "Profile.placeLink", fallback: "Вставьте ссылку: ")
+        /// Cсылка недействительна
+        internal static let invalidLink = L10n.tr("Localizable", "Profile.invalidLink", fallback: "Cсылка недействительна")
+        /// Проверьте верность ссылки
+        internal static let checkLink = L10n.tr("Localizable", "Profile.checkLink", fallback: "Проверьте верность ссылки")
     }
 
     internal enum Error {

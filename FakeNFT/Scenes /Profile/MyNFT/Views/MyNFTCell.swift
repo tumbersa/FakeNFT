@@ -5,6 +5,7 @@
 //  Created by Dinara on 28.03.2024.
 //
 
+import Kingfisher
 import SnapKit
 import UIKit
 
@@ -21,8 +22,6 @@ final class MyNFTCell: UITableViewCell {
 
     // MARK: - Private Properties
     private var id: String?
-    // моковое значение лайка
-    private var isLiked: Bool = false
 
     // MARK: - Delegate
     weak var delegate: MyNFTCellDelegate?
@@ -37,10 +36,6 @@ final class MyNFTCell: UITableViewCell {
 
     private lazy var favoriteButton: UIButton = {
         let button = UIButton()
-        button.setImage(
-            UIImage(named: "favorite_button_inactive"),
-            for: .normal
-        )
         button.addTarget(
             self,
             action: #selector(likeButtonDidTap),
@@ -50,7 +45,7 @@ final class MyNFTCell: UITableViewCell {
 
     private lazy var name: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.boldSystemFont(ofSize: 15)
         label.textColor = UIColor(named: "ypBlack")
         return label
     }()
@@ -62,8 +57,10 @@ final class MyNFTCell: UITableViewCell {
 
     private lazy var author: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = UIColor(named: "ypBlack")
+        label.lineBreakMode = .byWordWrapping
+        label.numberOfLines = 2
         return label
     }()
 
@@ -86,7 +83,7 @@ final class MyNFTCell: UITableViewCell {
 
     private lazy var priceValue: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
         label.textColor = UIColor(named: "ypBlack")
         return label
     }()
@@ -118,8 +115,15 @@ final class MyNFTCell: UITableViewCell {
     }
 
     // MARK: - Public Method
-    func configureCell(with model: NFTCellModel) {
-        image.image = model.images
+    func configureCell(with model: NFT) {
+
+        if let imageURLString = model.images.first,
+           let imageURL = URL(string: imageURLString) {
+            image.kf.setImage(with: imageURL)
+        } else {
+            image.image = UIImage(named: "avatar_icon")
+        }
+
         name.text = model.name
         ratingView.setRating(model.rating)
         author.text = "от \(model.author)"
@@ -128,7 +132,7 @@ final class MyNFTCell: UITableViewCell {
         id = model.id
     }
 
-    func setIsLiked(_ isLiked: Bool) {
+    func setIsLiked(isLiked: Bool) {
         if isLiked {
             favoriteButton.setImage(UIImage(named: "favorite_button_active"), for: .normal)
         } else {
@@ -161,7 +165,7 @@ private extension MyNFTCell {
          stackView,
          priceStackView
         ].forEach {
-            self.addSubview($0)
+            contentView.addSubview($0)
         }
     }
 
@@ -201,7 +205,8 @@ private extension MyNFTCell {
 
     // MARK: - Actions
     @objc func likeButtonDidTap() {
-        print("Favorite button did tap")
-         setIsLiked(isLiked)
+        if let id = id {
+            delegate?.didTapLikeButton(with: id)
+        }
     }
 }

@@ -7,7 +7,8 @@ final class TabBarController: UITabBarController {
         tag: 0
     )
     var controllersFactory: ControllersFactory
-    
+    var servicesAssembly: ServicesAssembly!
+
     init(controllersFactory: ControllersFactory, servicesAssembly: ServicesAssembly) {
         self.controllersFactory = controllersFactory
         self.servicesAssembly = servicesAssembly
@@ -18,8 +19,7 @@ final class TabBarController: UITabBarController {
         fatalError("init(coder:) has not been implemented")
     }
         
-    var servicesAssembly: ServicesAssembly!
-    
+
     private let cartTabBarItem = UITabBarItem(
         title: L10n.TabBar.cartTabBarTitle,
         image: UIImage(named: "Cart"),
@@ -29,17 +29,7 @@ final class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTabBars()
-    }
 
-        let catalogNavigationItem = controllersFactory.setupController(of: ControllersType.catalogViewController)
-    
-        let statisticsController = createStatisticsVC()
-        
-        let cartViewController = UINavigationController(rootViewController: CartViewController(servicesAssembly: servicesAssembly))
-        cartViewController.tabBarItem = cartTabBarItem
-        
-        self.setViewControllers([catalogNavigationItem, cartViewController, statisticsController], animated: true)
-        view.backgroundColor = .systemBackground
     }
 
     private func createNavigation(with title: String,
@@ -81,8 +71,15 @@ final class TabBarController: UITabBarController {
         profileViewController.presenter = profilePresenter
         profilePresenter.view = profileViewController
 
-        self.setViewControllers([profileNavigationController], animated: true)
+        let catalogNavigationItem = controllersFactory.setupController(of: ControllersType.catalogViewController)
 
-        view.backgroundColor = .systemBackground
+        let statisticsController = createStatisticsVC()
+
+        let cartViewController = UINavigationController(rootViewController: CartViewController(servicesAssembly: servicesAssembly))
+        cartViewController.tabBarItem = cartTabBarItem
+
+        self.setViewControllers([profileNavigationController, catalogNavigationItem, cartViewController, statisticsController], animated: true)
+
+        view.backgroundColor = Asset.Colors.ypWhite.color
     }
 }

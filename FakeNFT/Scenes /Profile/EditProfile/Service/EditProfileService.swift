@@ -13,7 +13,7 @@ final class EditProfileService {
     static let shared = EditProfileService()
     private var urlSession = URLSession.shared
     private var urlSessionTask: URLSessionTask?
-    private let profileService = ProfileService.shared
+    private let profileService = UserProfileService.shared
 
     private init() {}
 
@@ -21,7 +21,7 @@ final class EditProfileService {
         self.view = view
     }
 
-    func updateProfile(with model: EditProfileModel, completion: @escaping (Result<Profile, Error>) -> Void) {
+    func updateProfile(with model: EditProfileModel, completion: @escaping (Result<UserProfile, Error>) -> Void) {
 
         guard let request = makePutRequest(with: model) else {
             assertionFailure("Invalid request")
@@ -29,7 +29,7 @@ final class EditProfileService {
             return
         }
 
-        urlSessionTask = urlSession.objectTask(for: request) { (response: Result<Profile, Error>) in
+        urlSessionTask = urlSession.objectTask(for: request) { (response: Result<UserProfile, Error>) in
             switch response {
             case .success(let profile):
                 completion(.success(profile))

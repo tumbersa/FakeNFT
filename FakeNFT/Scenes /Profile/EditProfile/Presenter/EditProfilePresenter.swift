@@ -13,18 +13,18 @@ protocol EditProfilePresenterProtocol {
 }
 
 protocol EditProfilePresenterDelegate: AnyObject {
-    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?)
+    func profileDidUpdate(_ profile: UserProfile, newAvatarURL: String?)
 }
 
 final class EditProfilePresenter {
     private weak var view: EditProfileViewControllerProtocol?
     private let editProfileService: EditProfileService
-    private var profile: Profile
+    private var profile: UserProfile
     weak var delegate: EditProfilePresenterDelegate?
 
     init(view: EditProfileViewControllerProtocol,
          editProfileService: EditProfileService,
-         profile: Profile) {
+         profile: UserProfile) {
         self.view = view
         self.editProfileService = editProfileService
         self.profile = profile

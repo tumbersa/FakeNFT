@@ -10,7 +10,7 @@ import Foundation
 protocol ProfilePresenterDelegate: AnyObject {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String])
     func navigateToFavoriteNFTScreen(with nftID: [String], and likedNFT: [String])
-    func navigateToEditProfileScreen(profile: Profile)
+    func navigateToEditProfileScreen(profile: UserProfile)
 }
 
 protocol ProfilePresenterProtocol: AnyObject {
@@ -19,20 +19,20 @@ protocol ProfilePresenterProtocol: AnyObject {
     func didTapMyNFT()
     func didTapFavoriteNFT()
     func didTapEditProfile()
-    func updateUserProfile(with profile: Profile)
+    func updateUserProfile(with profile: UserProfile)
 }
 
 // MARK: - ProfilePresenter Class
 final class ProfilePresenter {
     weak var view: ProfileViewControllerProtocol?
-    private let profileService = ProfileService.shared
+    private let profileService = UserProfileService.shared
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
     weak var delegate: ProfilePresenterDelegate?
-    private var profile: Profile?
+    private var profile: UserProfile?
 }
 
 extension ProfilePresenter: ProfilePresenterProtocol {
-    func updateUserProfile(with profile: Profile) {
+    func updateUserProfile(with profile: UserProfile) {
         DispatchQueue.main.async { [weak self] in
             self?.profile = profile
             self?.view?.updateProfileDetails(profile)
@@ -73,7 +73,7 @@ extension ProfilePresenter: ProfilePresenterProtocol {
 }
 
 extension ProfilePresenter: EditProfilePresenterDelegate {
-    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
+    func profileDidUpdate(_ profile: UserProfile, newAvatarURL: String?) {
         self.profile = profile
         view?.updateProfileDetails(profile)
     }

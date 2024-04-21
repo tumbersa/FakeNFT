@@ -12,7 +12,7 @@ import UIKit
 // MARK: - ProfileViewControllerProtocol
 protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenter? { get set }
-    func updateProfileDetails(_ profile: Profile?)
+    func updateProfileDetails(_ profile: UserProfile?)
     func updateAvatar(url: URL)
 }
 
@@ -23,7 +23,7 @@ final class ProfileViewController: UIViewController {
     let servicesAssembly: ServicesAssembly
     var presenter: ProfilePresenter?
     weak var delegate: ProfilePresenterDelegate?
-    private let profileService = ProfileService.shared
+    private let profileService = UserProfileService.shared
     private var avatarImage: UIImage?
 
     // MARK: - Private Properties
@@ -259,7 +259,7 @@ extension ProfileViewController: UITableViewDelegate {
 
 // MARK: - ProfileViewControllerProtocol
 extension ProfileViewController: ProfileViewControllerProtocol {
-    func updateProfileDetails(_ profile: Profile?) {
+    func updateProfileDetails(_ profile: UserProfile?) {
         if let profile {
             nameLabel.text = profile.name
             descriptionLabel.text = profile.description
@@ -289,7 +289,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
 }
 
 extension ProfileViewController: ProfilePresenterDelegate {
-    func navigateToEditProfileScreen(profile: Profile) {
+    func navigateToEditProfileScreen(profile: UserProfile) {
         let editProfileService = EditProfileService.shared
         let editProfileViewController = EditProfileViewController(
             presenter: nil
@@ -327,7 +327,7 @@ extension ProfileViewController: ProfilePresenterDelegate {
 
 // MARK: - EditProfilePresenterDelegate
 extension ProfileViewController: EditProfilePresenterDelegate {
-    func profileDidUpdate(_ profile: Profile, newAvatarURL: String?) {
+    func profileDidUpdate(_ profile: UserProfile, newAvatarURL: String?) {
         DispatchQueue.main.async { [weak self] in
             self?.updateProfileDetails(profile)
             self?.presenter?.updateUserProfile(with: profile)

@@ -7,16 +7,16 @@
 
 import Foundation
 
-final class ProfileService {
-    static let shared = ProfileService()
+final class UserProfileService {
+    static let shared = UserProfileService()
     private var urlSession = URLSession.shared
     private var token: String?
     private var urlSessionTask: URLSessionTask?
     private let tokenKey = "6209b976-c7aa-4061-8574-573765a55e71"
-    private (set) var profile: Profile?
+    private (set) var profile: UserProfile?
 
     private init(
-        profile: Profile? = nil,
+        profile: UserProfile? = nil,
         token: String? = nil,
         urlSessionTask: URLSessionTask? = nil
     ) {
@@ -36,14 +36,14 @@ final class ProfileService {
         }
     }
 
-    func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
+    func fetchProfile(completion: @escaping (Result<UserProfile, Error>) -> Void) {
         guard let request = makeFetchProfileRequest() else {
             assertionFailure("Invalid request")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
 
-        urlSessionTask = urlSession.objectTask(for: request) { (response: Result<Profile, Error>) in
+        urlSessionTask = urlSession.objectTask(for: request) { (response: Result<UserProfile, Error>) in
             switch response {
             case .success(let profileResult):
                 completion(.success(profileResult))
@@ -54,7 +54,7 @@ final class ProfileService {
     }
 }
 
-private extension ProfileService {
+private extension UserProfileService {
     func makeFetchProfileRequest() -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"

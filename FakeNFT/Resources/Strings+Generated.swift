@@ -10,6 +10,52 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 internal enum L10n {
+    internal enum Profile {
+        /// Мои NFT
+        internal static let myNFT = L10n.tr("Localizable", "Profile.myNFT", fallback: "Мои NFT")
+        /// Избранные NFT
+        internal static let favoritesNFT = L10n.tr("Localizable", "Profile.favoritesNFT", fallback: "Избранные NFT")
+        /// О разработчике
+        internal static let aboutDeveloper = L10n.tr("Localizable", "Profile.aboutDeveloper", fallback: "О разработчике")
+        /// Имя
+        internal static let name = L10n.tr("Localizable", "Profile.name", fallback: "Имя")
+        /// Описание
+        internal static let description = L10n.tr("Localizable", "Profile.description", fallback: "Описание")
+        /// Сайт
+        internal static let site = L10n.tr("Localizable", "Profile.site", fallback: "Сайт")
+        /// Загрузить изображение
+        internal static let loadAvatar = L10n.tr("Localizable", "Profile.loadAvatar", fallback: "Загрузить изображение")
+        /// Сменить фото
+        internal static let changeImage = L10n.tr("Localizable", "Profile.changeImage", fallback: "Сменить фото")
+        /// Цена
+        internal static let priceText = L10n.tr("Localizable", "Profile.priceText", fallback: "Цена")
+        /// У вас ещё нет NFT
+        internal static let emptyNFTLabel = L10n.tr("Localizable", "Profile.emptyNFTLabel", fallback: "У вас ещё нет NFT")
+        /// Избранные NFT
+        internal static let NFTFavorites = L10n.tr("Localizable", "Profile.NFTFavorites", fallback: "Избранные NFT")
+        /// У Вас ещё нет избранных NFT
+        internal static let emptyFavouriteNFT = L10n.tr("Localizable", "Profile.emptyFavouriteNFT", fallback: "У Вас ещё нет избранных NFT")
+        /// Сортировка
+        internal static let filter = L10n.tr("Localizable", "Profile.filter", fallback: "Сортировка")
+        /// По цене
+        internal static let byPrice = L10n.tr("Localizable", "Profile.byPrice", fallback: "По цене")
+        /// По названию
+        internal static let byName = L10n.tr("Localizable", "Profile.byName", fallback: "По названию")
+        /// По рейтингу
+        internal static let byRaiting = L10n.tr("Localizable", "Profile.byRaiting", fallback: "По рейтингу")
+        /// Закрыть
+        internal static let close = L10n.tr("Localizable", "Profile.close", fallback: "Закрыть")
+        /// Загрузить изображение
+        internal static let loadImage = L10n.tr("Localizable", "Profile.loadImage", fallback: "Загрузить изображение")
+        /// Вставьте ссылку на изображение
+        internal static let linkToImage = L10n.tr("Localizable", "Profile.linkToImage", fallback: "Вставьте ссылку на изображение")
+        /// Вставьте ссылку:
+        internal static let placeLink = L10n.tr("Localizable", "Profile.placeLink", fallback: "Вставьте ссылку: ")
+        /// Cсылка недействительна
+        internal static let invalidLink = L10n.tr("Localizable", "Profile.invalidLink", fallback: "Cсылка недействительна")
+        /// Проверьте верность ссылки
+        internal static let checkLink = L10n.tr("Localizable", "Profile.checkLink", fallback: "Проверьте верность ссылки")
+    }
   internal enum Error {
     /// Отмена
     internal static let cancel = L10n.tr("Localizable", "Error.cancel", fallback: "Отмена")

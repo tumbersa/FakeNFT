@@ -46,16 +46,6 @@ final class ProfileService {
         urlSessionTask = urlSession.objectTask(for: request) { (response: Result<Profile, Error>) in
             switch response {
             case .success(let profileResult):
-//                let profile = Profile(
-//                    name: profileResult.name,
-//                    avatar: profileResult.avatar,
-//                    description: profileResult.description,
-//                    website: profileResult.website,
-//                    nfts: profileResult.nfts,
-//                    likes: profileResult.likes,
-//                    id: profileResult.id
-//                )
-//                self?.profile = profile
                 completion(.success(profileResult))
             case .failure(let error):
                 completion(.failure(error))

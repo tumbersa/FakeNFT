@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit
 
 protocol ProfilePresenterDelegate: AnyObject {
     func navigateToMyNFTScreen(with nftID: [String], and likedNFT: [String])

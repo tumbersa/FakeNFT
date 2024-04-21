@@ -214,3 +214,6 @@
 
 ![Simulator Screen Recording - iPhone 15 - 2024-04-21 at 23 39 54](https://github.com/4eKeP/iOS-FakeNFT-cohort-11_team-6/assets/136311088/0919383b-e2cf-4828-80ed-53a050d94a56)
 
+**Демонстрация экрана Статистика:**
+
+![Simulator Screen Recording - iPhone 15 - 2024-04-21 at 22 45 43](https://github.com/4eKeP/iOS-FakeNFT-cohort-11_team-6/assets/76837873/7883c67c-fe57-4b19-ad76-c51b73b58e68)

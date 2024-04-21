@@ -80,6 +80,9 @@ final class TabBarController: UITabBarController {
 
         self.setViewControllers([profileNavigationController, catalogNavigationItem, cartViewController, statisticsController], animated: true)
 
-        view.backgroundColor = Asset.Colors.ypWhite.color
+        tabBar.isTranslucent = false
+        tabBar.backgroundColor = Asset.Colors.ypWhite.color
+        tabBar.unselectedItemTintColor = Asset.Colors.ypBlack.color
+        tabBar.tintColor = Asset.Colors.Universal.ypUniBlue.color
     }
 }

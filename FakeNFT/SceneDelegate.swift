@@ -21,6 +21,5 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
 
         window.makeKeyAndVisible()
-
     }
 }

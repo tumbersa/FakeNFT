@@ -1,7 +1,11 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
-    
+    private let profileTabBarItem = UITabBarItem(
+        title: L10n.TabBar.profileTabBarTitle,
+        image: UIImage(named: "profile_tab_inactive"),
+        tag: 0
+    )
     var controllersFactory: ControllersFactory
     
     init(controllersFactory: ControllersFactory, servicesAssembly: ServicesAssembly) {
@@ -9,6 +13,7 @@ final class TabBarController: UITabBarController {
         self.servicesAssembly = servicesAssembly
         super.init(nibName: nil, bundle: nil)
     }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -23,6 +28,8 @@ final class TabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureTabBars()
+    }
 
         let catalogNavigationItem = controllersFactory.setupController(of: ControllersType.catalogViewController)
     
@@ -58,4 +65,24 @@ final class TabBarController: UITabBarController {
         return navController
     }
 
+    private func configureTabBars() {
+        let profileViewController = ProfileViewController(
+            servicesAssembly: servicesAssembly
+        )
+
+        let profileNavigationController = UINavigationController(
+            rootViewController: profileViewController
+        )
+
+        profileViewController.tabBarItem = profileTabBarItem
+        tabBar.unselectedItemTintColor = UIColor.black
+
+        let profilePresenter = ProfilePresenter()
+        profileViewController.presenter = profilePresenter
+        profilePresenter.view = profileViewController
+
+        self.setViewControllers([profileNavigationController], animated: true)
+
+        view.backgroundColor = .systemBackground
+    }
 }

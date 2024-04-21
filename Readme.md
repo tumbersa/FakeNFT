@@ -206,6 +206,7 @@
   
 ![Simulator Screen Recording - iPhone 15 - 2024-04-21 at 22 24 37](https://github.com/4eKeP/iOS-FakeNFT-cohort-11_team-6/assets/76837873/526a38ef-3f93-4795-9b4c-e0fc82c55266)
 
+**Демонстрация экрана Корзина:**
 
 ![Simulator Screen Recording - iPhone 15 - 2024-04-21 at 21 39 14](https://github.com/4eKeP/iOS-FakeNFT-cohort-11_team-6/assets/136503343/4165f8ce-0eb9-4a1d-9698-55d053d62d95)
 

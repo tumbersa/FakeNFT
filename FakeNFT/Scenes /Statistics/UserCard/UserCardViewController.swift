@@ -94,12 +94,7 @@ final class UserCardViewController: UIViewController {
                                          action: #selector(backButtonPressed))
         backButton.image = UIImage(systemName: "chevron.left")
         navigationItem.leftBarButtonItem = backButton
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         
-        tabBarController?.tabBar.isHidden = true
     }
     
     @objc private func backButtonPressed() {

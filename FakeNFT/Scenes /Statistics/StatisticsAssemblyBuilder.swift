@@ -39,6 +39,7 @@ final class StatisticsAssemblyBuilderImpl: StatisticsAssemblyBuilder {
             userDetailed: input,
             router: router)
         let viewController = UserCardViewController(presenter: presenter)
+        viewController.hidesBottomBarWhenPushed = true
         presenter.view = viewController
         return viewController
     }

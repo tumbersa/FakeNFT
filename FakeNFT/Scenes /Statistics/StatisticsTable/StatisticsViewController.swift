@@ -69,11 +69,6 @@ final class StatisticsViewController: UIViewController, ErrorView {
         presenter.viewDidLoad()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        tabBarController?.tabBar.isHidden = false
-    }
     
     private func configureNavBar() {
         navigationController?.navigationBar.tintColor = .label
@@ -81,6 +76,7 @@ final class StatisticsViewController: UIViewController, ErrorView {
     }
     
     private func layoutUI() {
+        view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         tableView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)

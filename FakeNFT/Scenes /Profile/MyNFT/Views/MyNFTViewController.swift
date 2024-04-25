@@ -86,6 +86,7 @@ final class MyNFTViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         setupNavigation()
         setupViews()
         setupConstraints()

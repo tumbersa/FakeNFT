@@ -138,7 +138,7 @@ final class PayNftViewController: UIViewController {
                                                                 style: .plain,
                                                                 target: nil,
                                                                 action: nil)
-        var backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(UIColor(named: "ypBlack") ?? .black, renderingMode: .alwaysOriginal)
+        let backButtonImage = UIImage(systemName: "chevron.left")?.withTintColor(UIColor(named: "ypBlack") ?? .black, renderingMode: .alwaysOriginal)
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: backButtonImage,
                                                                 style: .plain,
                                                                 target: self,

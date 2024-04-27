@@ -151,7 +151,7 @@ final class CartPresenter {
             case .success(let nft):
                 self.arrOfNFT.append(nft)
                 self.view?.reloadTableView(nft: arrOfNFT)
-            case .failure(let error):
+            case .failure(_):
                 break
             }
         }

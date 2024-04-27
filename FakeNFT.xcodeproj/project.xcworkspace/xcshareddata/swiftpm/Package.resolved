@@ -1,4 +1,5 @@
 {
+  "originHash" : "2f266d24b857dc46bbe1afd0205fab2b02a86638bc8f3f508301e0da71803529",
   "pins" : [
     {
       "identity" : "collectionconcurrencykit",
@@ -109,5 +110,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
